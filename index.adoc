@@ -1,0 +1,37 @@
+= P2Poolv2 Documentation
+:page-nav_order: 1
+:page-permalink: /
+:page-description: Documentation for P2Poolv2, a permissionless, auditable, self-custodial Bitcoin mining pool.
+
+[.fs-6.fw-300]
+Run a node, point your miners at it, and follow every share from the
+stratum server to the payout.
+
+xref:getting-started/index.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
+https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
+
+NOTE: This site is being set up. The pages here are samples that exercise
+the toolchain (AsciiDoc, PlantUML, search, navigation) and will be
+replaced as the content structure is decided.
+
+== What is here
+
+Getting started::
+  Build a node from source and connect a miner. See
+  xref:getting-started/index.adoc[Getting started].
+
+Architecture::
+  How the stratum server and the controller node fit together, with
+  diagrams. See xref:architecture/index.adoc[Architecture].
+
+Writing documentation::
+  How these pages are written: AsciiDoc conventions, navigation
+  attributes and PlantUML diagrams. See
+  xref:writing-docs.adoc[Writing documentation].
+
+== Elsewhere
+
+* The project site: https://p2poolv2.org[p2poolv2.org]
+* Source code: https://github.com/p2poolv2/p2poolv2[github.com/p2poolv2/p2poolv2]
+* Testnet4 pool and chain explorer: https://testnet4.p2poolv2.org[testnet4.p2poolv2.org]
+* Chat: https://matrix.to/#/#p2poolv2:matrix.org[#p2poolv2:matrix.org]

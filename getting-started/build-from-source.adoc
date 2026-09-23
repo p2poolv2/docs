@@ -1,0 +1,63 @@
+= Build from source
+:page-parent: Getting started
+:page-nav_order: 1
+
+The node is a Rust workspace. You need a stable Rust toolchain and a
+C compiler for the RocksDB bindings.
+
+== Prerequisites
+
+[cols="1,1,2",options="header"]
+|===
+| Tool | Version | Why
+
+| Rust
+| stable
+| Builds the node
+
+| clang / gcc
+| any recent
+| Compiles the RocksDB bindings
+
+| bitcoind
+| 28 or later
+| Supplies block templates over RPC
+|===
+
+== Build
+
+[source,shell]
+----
+git clone https://github.com/p2poolv2/p2poolv2.git
+cd p2poolv2
+cargo build --release # <1>
+----
+<1> The binary lands in `target/release/`.
+
+TIP: The first build takes several minutes while RocksDB compiles.
+Later builds are incremental.
+
+== Configure
+
+Start from one of the sample configurations in the repository. The
+stratum section sets where miners connect:
+
+.config.toml (excerpt)
+[source,toml]
+----
+include::_snippets/stratum-config.toml[]
+----
+<1> Miners connect to this port.
+<2> Your bech32m P2Poolv2 address, which owns the share coinbase.
+
+WARNING: `miner_address` and the bitcoin payout address are two separate
+things. Do not derive one from the other.
+
+== Run
+
+[source,shell]
+----
+./target/release/p2poolv2 --config config.toml
+----
+
+Press kbd:[Ctrl+C] to stop the node.

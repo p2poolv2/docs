@@ -1,0 +1,64 @@
+# P2Poolv2 documentation
+
+The source for https://docs.p2poolv2.org. Jekyll with the
+[Just the Docs](https://just-the-docs.com) theme, pages in AsciiDoc via
+jekyll-asciidoc, diagrams in PlantUML via asciidoctor-diagram.
+
+```
+_config.yml                    site, theme and Asciidoctor settings
+index.adoc                     home page
+getting-started/, architecture/  sections (sample content for now)
+writing-docs.adoc              how to write pages; also the feature test page
+_snippets/                     files pulled into pages with include::
+_plantuml/p2poolv2.config      brand skin applied to every PlantUML diagram
+_sass/custom/setup.scss        the brand palette and fonts
+_sass/color_schemes/p2poolv2.scss  Just the Docs colour scheme and code colours
+_sass/custom/custom.scss       brand overrides and styles for AsciiDoc blocks
+_includes/head_custom.html     favicon and self-hosted fonts
+assets/images/                 logo and favicon, from ../website/assets
+assets/fonts/, assets/css/fonts.css  Inter and JetBrains Mono, from ../website
+.github/workflows/pages.yml    build and deploy to GitHub Pages
+CNAME                          docs.p2poolv2.org
+```
+
+## Working on it
+
+Needs Ruby (see `.ruby-version`), Bundler, and a Java runtime for
+PlantUML. Graphviz (`dot`) is needed for class, component and activity
+diagrams. The PlantUML jar itself comes from the
+`asciidoctor-diagram-plantuml` gem.
+
+```
+bundle install
+bundle exec jekyll serve --livereloadshare
+```
+
+Then open http://localhost:4000. If a diagram does not update, run
+`bundle exec jekyll clean` and remove `.asciidoctor/`.
+
+## Writing pages
+
+See `writing-docs.adoc`, rendered at `/writing-docs.html`. In short: a
+`.adoc` file with `= Title` and `:page-nav_order:`, `:page-parent:` and
+`:page-has_children:` attributes for the sidebar, and `[plantuml, name, svg]`
+blocks for diagrams.
+
+## Brand
+
+Colours, logo, favicon and fonts match the landing page in `../website`,
+which takes them from `../logos/p2poolv2-brand-pack`. The four brand
+colours (Bitcoin Orange `#F7931A`, Black `#0B0B0C`, Near Black `#121212`,
+White) are the only colours on the site, including in code highlighting
+and diagrams. They are defined once in `_sass/custom/setup.scss` (and,
+for diagrams, in `_plantuml/p2poolv2.config`); any shade is one of them
+at reduced opacity. White on orange fails contrast, so anything on a
+filled orange surface is black. The site loads nothing from a third
+party: fonts are self-hosted.
+
+## Publishing
+
+Pushing to `main` runs `.github/workflows/pages.yml`, which builds the
+site and deploys it to GitHub Pages. In the repository settings set
+Pages > Source to "GitHub Actions" and the custom domain to
+`docs.p2poolv2.org`, and point a `CNAME` DNS record for `docs` at
+`p2poolv2.github.io`.

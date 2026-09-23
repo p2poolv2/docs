@@ -1,0 +1,56 @@
+// SPDX-FileCopyrightText: 2024-2026 P2Poolv2 Developers
+// SPDX-License-Identifier: MIT OR Apache-2.0
+//
+// The P2Poolv2 colour scheme for Just the Docs, matching ../website.
+//
+// The brand pack specifies four colours and they are the only colours on
+// this site. Every shade below is one of the four at reduced opacity.
+// Do not introduce a fifth colour.
+
+$color-scheme: dark;
+
+// The palette ($p2-*) and fonts are defined in _sass/custom/setup.scss.
+
+// Just the Docs variables.
+$body-background-color: $p2-black;
+$body-heading-color: $p2-white;
+$body-text-color: $p2-white-78;
+$link-color: $p2-orange;
+$nav-child-link-color: $p2-white-56;
+$sidebar-color: $p2-near-black;
+$base-button-color: $p2-near-black;
+$btn-primary-color: $p2-orange;
+$code-background-color: $p2-near-black;
+$code-linenumber-color: $p2-white-56;
+$feedback-color: $p2-near-black;
+$table-background-color: $p2-near-black;
+$search-background-color: $p2-near-black;
+$search-result-preview-color: $p2-white-56;
+$border-color: $p2-white-11;
+
+// Syntax highlighting (Rouge). Four colours only: orange marks keywords
+// and structure, white carries names and literals, and comments recede.
+.highlight,
+pre.highlight {
+  background: $code-background-color;
+  color: $p2-white-78;
+}
+
+.highlight {
+  // Reset whatever the base light scheme's Pygments theme set, so no
+  // colour outside the four leaks through for tokens not listed here.
+  [class] { color: inherit; background: none; font-style: normal; font-weight: inherit; }
+
+  .c, .ch, .cm, .c1, .cs, .cp, .cpf { color: $p2-white-40; font-style: italic; }
+  .k, .kc, .kd, .kn, .kp, .kr, .kt, .kv { color: $p2-orange; }
+  .o, .ow, .p { color: $p2-white-56; }
+  .s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss { color: $p2-white; }
+  .m, .mb, .mf, .mh, .mi, .il, .mo, .mx { color: $p2-orange; }
+  .nf, .fm, .nc, .nn, .ne { color: $p2-white; font-weight: 600; }
+  .nb, .bp, .nt, .na, .nd, .nl { color: $p2-orange-82; }
+  .n, .nx, .nv, .vc, .vg, .vi, .vm, .no { color: $p2-white-78; }
+  .gd { color: $p2-white-56; text-decoration: line-through; }
+  .gi { color: $p2-orange; }
+  .gh, .gu { color: $p2-white; font-weight: 700; }
+  .err { color: $p2-white; text-decoration: underline wavy $p2-orange; }
+}

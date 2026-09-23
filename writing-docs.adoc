@@ -1,0 +1,180 @@
+= Writing documentation
+:page-nav_order: 4
+
+Pages are written in AsciiDoc and built with Jekyll and the Just the Docs
+theme. This page is both the guide and the test page: every feature below
+is rendered live, so if something looks wrong here it is wrong
+everywhere.
+
+== Adding a page
+
+Create a `.adoc` file anywhere in the repository. The document title
+becomes the page title, and attributes that start with `page-` become
+Jekyll page variables, which is how the sidebar is driven.
+
+[source,asciidoc]
+----
+= Build from source           <1>
+:page-parent: Getting started <2>
+:page-nav_order: 1            <3>
+----
+<1> The page title, shown in the sidebar and the browser tab.
+<2> The `title` of the parent page, for pages in a section.
+<3> Position among siblings. Lower comes first.
+
+A section landing page sets `:page-has_children: true`. Just the Docs
+then lists its children at the foot of the page.
+
+[cols="1,3",options="header"]
+|===
+| Attribute | Effect
+
+| `:page-nav_order:`
+| Sort order in the sidebar
+
+| `:page-parent:`
+| Title of the parent page
+
+| `:page-grand_parent:`
+| Title of the grandparent, for a third level
+
+| `:page-has_children:`
+| Marks a section page
+
+| `:page-nav_exclude:`
+| Hide the page from the sidebar
+
+| `:page-permalink:`
+| Override the output URL
+|===
+
+== Diagrams
+
+Diagrams are PlantUML, written inline and rendered to SVG at build time.
+The brand skin in `_plantuml/p2poolv2.config` is applied to every
+diagram, so there is no need to set colours.
+
+[source,asciidoc]
+------
+[plantuml, handshake, svg] <1>
+....
+@startuml
+Alice -> Bob : hello
+Bob --> Alice : hi
+@enduml
+....
+------
+<1> Block type, output file name (unique per page), format.
+
+Which renders as:
+
+[plantuml, handshake, svg]
+....
+@startuml
+Alice -> Bob : hello
+Bob --> Alice : hi
+@enduml
+....
+
+Generated images are written to `/diagrams/` in the built site and
+cached in `.asciidoctor/diagram` between builds.
+
+== Links
+
+* To another page, use `xref:`, with the path to the `.adoc` file:
+  xref:getting-started/build-from-source.adoc[Build from source].
+* To a section on another page:
+  xref:getting-started/build-from-source.adoc#configure[Configure].
+* To a section on this page: <<diagrams>>.
+* External: https://asciidoctor.org/docs/[Asciidoctor documentation].
+
+== Admonitions
+
+NOTE: A note, for information alongside the main text.
+
+TIP: A tip, for a shortcut or a better way.
+
+IMPORTANT: Important, for something the reader must not skip.
+
+CAUTION: Caution, for something that could cost time or money.
+
+WARNING: A warning, for something that could lose funds or data.
+
+[NOTE]
+.With a title
+====
+Admonitions can hold several paragraphs, lists and code.
+
+[source,shell]
+----
+cargo test
+----
+====
+
+== Code
+
+Inline code looks like `cargo build --release`. Listings take a language
+for highlighting:
+
+[source,rust]
+----
+/// Returns true when the share meets the pool target.
+pub fn meets_target(hash: &BlockHash, target: &Target) -> bool {
+    let value = hash.to_byte_array(); // little endian
+    Target::from_le_bytes(value) <= *target
+}
+----
+
+.With a title
+[source,json]
+----
+{
+  "id": 1,
+  "method": "mining.subscribe",
+  "params": ["cgminer/4.10.0"]
+}
+----
+
+Shared snippets live under `_snippets/` and are pulled in with
+`+include::_snippets/<file>[]+`, so a config excerpt is written once.
+
+== Text
+
+*Bold*, _italic_, `monospace`, #highlighted#, H~2~O, E=mc^2^, and
+keyboard keys kbd:[Ctrl+C].
+
+.An unordered list
+* Permissionless
+** It checks your work, not your identity
+* Auditable
+* Self-custodial
+
+.An ordered list
+. Build the node
+. Configure it
+. Connect a miner
+
+.A definition list
+Share::
+  Proof of work below the pool target and above the bitcoin target.
+Share chain::
+  The chain of shares that every node replays.
+
+== Blocks
+
+[quote,Satoshi Nakamoto,Bitcoin whitepaper]
+____
+A purely peer-to-peer version of electronic cash would allow online
+payments to be sent directly from one party to another without going
+through a financial institution.
+____
+
+.Example block
+====
+An example block frames something worked through.
+====
+
+.Sidebar
+****
+A sidebar holds an aside that the main text does not depend on.
+****

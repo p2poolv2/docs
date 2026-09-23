@@ -1,0 +1,97 @@
+# P2Poolv2 documentation, served at https://docs.p2poolv2.org
+title: P2Poolv2 Docs
+description: Documentation for P2Poolv2, a permissionless, auditable, self-custodial Bitcoin mining pool.
+url: "https://docs.p2poolv2.org"
+baseurl: ""
+
+theme: just-the-docs
+color_scheme: p2poolv2
+
+logo: "/assets/images/logo.png"
+# Favicon is linked from _includes/head_custom.html (it is an SVG, which the
+# theme's favicon_ico setting would mislabel as image/x-icon).
+
+search_enabled: true
+search:
+  heading_level: 3
+  previews: 3
+  button: false
+
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
+
+aux_links:
+  "p2poolv2.org":
+    - "https://p2poolv2.org"
+  "GitHub":
+    - "https://github.com/p2poolv2/p2poolv2"
+aux_links_new_tab: false
+
+footer_content: "Copyright &copy; 2024-2026 P2Poolv2 Developers. Distributed under the MIT or Apache-2.0 licence."
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/p2poolv2/docs"
+gh_edit_branch: "main"
+gh_edit_view_mode: "edit"
+
+plugins:
+  - jekyll-asciidoc
+  - jekyll-seo-tag
+
+# AsciiDoc. Pages carry AsciiDoc headers rather than YAML front matter:
+# `= Title` becomes page.title and `:page-<name>: value` sets page.<name>,
+# so `:page-nav_order: 2` and `:page-parent: Guides` drive the sidebar.
+asciidoc:
+  processor: asciidoctor
+asciidoctor:
+  # Resolve includes against the site root, so pages can pull shared
+  # snippets from _snippets/ (ignored by Jekyll as it starts with _).
+  base_dir: :source
+  safe: safe
+  attributes:
+    # Generated diagrams are written to /diagrams in the built site.
+    imagesdir: /diagrams
+    # Render the `= Title` line as the page's h1.
+    showtitle: ""
+    source-highlighter: rouge
+    rouge-css: class
+    sectanchors: ""
+    idprefix: ""
+    idseparator: "-"
+    experimental: ""
+    # PlantUML: render to SVG so diagrams stay sharp and inherit no raster
+    # background.
+    plantuml-format: svg
+    diagram-cachedir: "{site-source}/.asciidoctor/diagram"
+    # Brand skin applied to every PlantUML diagram.
+    plantumlconfig: "{site-source}/_plantuml/p2poolv2.config"
+
+# Diagrams are written into _site/diagrams while pages render, after
+# Jekyll has decided which files belong in the site; without this its
+# cleanup pass deletes them.
+keep_files:
+  - diagrams
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .asciidoctor
+  - README.md
+  - AGENTS.md
+  - LICENSE
+  - .jekyll-cache
+
+# The theme's Sass still uses @import and global colour functions; keep
+# the build log readable until it migrates.
+sass:
+  quiet_deps: true
+  silence_deprecations: [import, global-builtin, color-functions, slash-div]

@@ -1,0 +1,11 @@
+= Getting started
+:page-nav_order: 2
+:page-has_children: true
+
+A P2Poolv2 node runs a Stratum v1 server for your miners and a controller
+node that takes part in the share chain.
+
+NOTE: Sample page. The steps below show the page layout and will be
+checked against the node source before they are relied on.
+
+The pages in this section:

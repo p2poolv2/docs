@@ -1,0 +1,66 @@
+= Share flow
+:page-parent: Architecture
+:page-nav_order: 1
+
+NOTE: Sample page, demonstrating PlantUML sequence, state and activity
+diagrams. The flow is illustrative and will be checked against
+`docs/architecture/share-processing-pipeline.md` in the node source.
+
+== From miner to peers
+
+[plantuml, share-sequence, svg]
+....
+@startuml
+participant Miner
+participant "Stratum server" as S
+participant "Controller node" as C
+participant Peers
+
+Miner -> S : mining.submit
+S -> S : check share difficulty
+alt meets pool difficulty
+  S -> C : share
+  C -> C : validate and store
+  C -> Peers : broadcast share
+  S --> Miner : accepted
+else below difficulty
+  S --> Miner : rejected
+end
+@enduml
+....
+
+== Share lifecycle
+
+[plantuml, share-states, svg]
+....
+@startuml
+[*] --> Received
+Received --> Validated : checks pass
+Received --> Rejected : checks fail
+Validated --> Confirmed : built upon
+Confirmed --> Paid : block found
+Rejected --> [*]
+Paid --> [*]
+@enduml
+....
+
+== Validating a share from a peer
+
+[plantuml, validate-activity, svg]
+....
+@startuml
+start
+:Receive share from peer;
+if (Parent known?) then (yes)
+  :Check proof of work;
+  if (Valid?) then (yes)
+    :Store and relay;
+  else (no)
+    :Drop and penalise peer;
+  endif
+else (no)
+  :Request parent;
+endif
+stop
+@enduml
+....

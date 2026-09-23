@@ -1,0 +1,476 @@
+// SPDX-FileCopyrightText: 2024-2026 P2Poolv2 Developers
+// SPDX-License-Identifier: MIT OR Apache-2.0
+//
+// Site-wide overrides on top of Just the Docs, in three parts:
+//
+//   1. brand: square corners, type, links and buttons, as on p2poolv2.org;
+//   2. AsciiDoc: Just the Docs styles kramdown's HTML, so the blocks
+//      Asciidoctor emits (admonitions, listings, tables, images, callouts)
+//      are styled here;
+//   3. diagrams: a frame for PlantUML output.
+//
+// Colours come from the scheme in _sass/color_schemes/p2poolv2.scss and
+// nowhere else. No colour literals in this file.
+
+// ---------------------------------------------------------------
+// 1. brand
+// ---------------------------------------------------------------
+
+// The design has no rounded corners anywhere.
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+// JetBrains Mono's ligatures turn -> and <= into single glyphs; in
+// documentation code must read as the characters to type.
+code,
+pre,
+kbd {
+  font-variant-ligatures: none;
+}
+
+h1, h2, h3, h4, h5, h6,
+.site-title,
+.nav-list .nav-list-item .nav-list-link,
+.btn {
+  font-family: $mono-font-family;
+}
+
+.main-content {
+  h1, h2, h3 {
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  // Just the Docs uppercases h4; the site does not shout.
+  h4 {
+    text-transform: none;
+    letter-spacing: -0.02em;
+    font-size: 1rem !important;
+  }
+
+  // Links in prose: white text on an orange rule, orange on hover.
+  a:not([class]) {
+    color: $p2-white;
+    text-decoration: underline;
+    text-decoration-color: $p2-orange;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    background-image: none;
+
+    &:hover {
+      color: $p2-orange;
+    }
+  }
+
+  // Inline code sits on a faint orange wash, as on the landing page.
+  :not(pre) > code {
+    background: $p2-orange-12;
+    border: 0;
+    padding: 1px 5px;
+    color: $p2-white;
+  }
+
+  hr {
+    background-color: $border-color;
+  }
+
+  // Keep prose to a readable measure.
+  .paragraph,
+  .ulist,
+  .olist,
+  .dlist,
+  > p {
+    max-width: 72ch;
+  }
+}
+
+.site-header {
+  border-bottom: 1px solid $border-color;
+}
+
+.side-bar {
+  border-right: 1px solid $border-color;
+}
+
+// The lockup is 2:1 and height-inefficient; give it the height it needs.
+.site-logo {
+  min-height: 3rem;
+}
+
+.nav-list .nav-list-item {
+  .nav-list-link {
+    color: $p2-white-78;
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+
+    &:hover {
+      color: $p2-orange;
+      background-image: none;
+      background-color: $p2-white-06;
+    }
+
+    &.active {
+      color: $p2-orange;
+      background-image: none;
+      box-shadow: inset 2px 0 0 $p2-orange;
+    }
+  }
+
+  .nav-list-expander {
+    color: $p2-white-56;
+
+    &:hover {
+      background-image: none;
+      background-color: $p2-white-06;
+    }
+  }
+}
+
+.aux-nav .aux-nav-list-link {
+  color: $p2-white-78;
+  font-family: $mono-font-family;
+
+  &:hover {
+    color: $p2-orange;
+  }
+}
+
+.search-input {
+  color: $p2-white;
+}
+
+.search-result.active,
+.search-result:hover {
+  background-color: $p2-white-06;
+}
+
+.search-result-highlight {
+  color: $p2-orange;
+  font-weight: 600;
+}
+
+// Buttons: flat, with black text on filled orange (white on orange fails AA).
+.btn {
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 1px solid $border-color;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $p2-white;
+
+  &:hover {
+    border-color: $p2-white;
+  }
+}
+
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  color: $p2-black !important;
+  background-color: $p2-orange !important;
+  border-color: $p2-orange;
+}
+
+.btn-primary:hover {
+  background-color: $p2-orange-82 !important;
+}
+
+.btn-outline {
+  color: $p2-white;
+  border-color: $p2-orange;
+  box-shadow: none;
+
+  &:hover {
+    color: $p2-black;
+    background-color: $p2-orange;
+  }
+}
+
+.label {
+  font-family: $mono-font-family;
+}
+
+// ---------------------------------------------------------------
+// 2. AsciiDoc
+// ---------------------------------------------------------------
+
+.main-content {
+  // Block titles (.Title above a block).
+  .title {
+    font-family: $mono-font-family;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: $p2-white-56;
+    margin-bottom: 0.375rem;
+  }
+
+  .paragraph,
+  .listingblock,
+  .literalblock,
+  .imageblock,
+  .admonitionblock,
+  .exampleblock,
+  .sidebarblock,
+  .quoteblock,
+  .verseblock,
+  .ulist,
+  .olist,
+  .dlist,
+  .colist,
+  table.tableblock {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .paragraph p,
+  .ulist p,
+  .olist p {
+    margin: 0;
+  }
+
+  // Listings and literals. Just the Docs already frames an AsciiDoc
+  // listing's div.content (and adds a copy button); give that frame a
+  // hairline instead of its body-text-coloured border.
+  .listingblock > .content,
+  .literalblock > .content {
+    border: 1px solid $border-color;
+    background: $code-background-color;
+    padding: 0.875rem 1rem;
+    overflow-x: auto;
+  }
+
+  .listingblock pre,
+  .literalblock pre {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: $p2-white-78;
+  }
+
+  .listingblock code,
+  .literalblock code {
+    font-size: inherit;
+    background: none;
+    padding: 0;
+    border: 0;
+  }
+
+  // Callout markers inside listings, and the numbered list beneath.
+  .conum {
+    font-family: $mono-font-family;
+    font-weight: 700;
+    color: $p2-orange;
+  }
+
+  .colist ol {
+    margin-top: 0.5rem;
+
+    > li::before {
+      font-family: $mono-font-family;
+      font-weight: 700;
+      color: $p2-orange;
+    }
+
+    > li p {
+      margin: 0;
+    }
+  }
+
+  // Admonitions. Asciidoctor emits a two-cell table (which Just the Docs
+  // wraps in a .table-wrapper); render it as a bordered panel with an
+  // orange rule and a mono label.
+  .admonitionblock {
+    .table-wrapper {
+      margin: 0;
+      box-shadow: none;
+      border: 0;
+      overflow: visible;
+    }
+
+    table {
+      display: block;
+      width: 100%;
+      border: 1px solid $border-color;
+      border-left: 3px solid $p2-orange;
+      background: $p2-near-black;
+      box-shadow: none;
+      margin: 0;
+
+      tbody,
+      tr {
+        display: block;
+      }
+
+      td {
+        display: block;
+        border: 0;
+        background: none;
+        padding: 0;
+      }
+
+      td.icon {
+        padding: 0.75rem 1rem 0;
+
+        .title {
+          margin: 0;
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: $p2-orange;
+        }
+      }
+
+      td.content {
+        padding: 0.25rem 1rem 0.75rem;
+        color: $p2-white-78;
+
+        > :first-child { margin-top: 0; }
+        > :last-child { margin-bottom: 0; }
+      }
+    }
+
+    // Tips and notes are quieter than warnings: white rule, white label.
+    &.note table,
+    &.tip table {
+      border-left-color: $p2-white-56;
+
+      td.icon .title { color: $p2-white; }
+    }
+  }
+
+  // Example and sidebar blocks.
+  .exampleblock > .content,
+  .sidebarblock > .content {
+    border: 1px solid $border-color;
+    padding: 1rem;
+
+    > :first-child { margin-top: 0; }
+    > :last-child { margin-bottom: 0; }
+  }
+
+  .sidebarblock > .content {
+    background: $p2-near-black;
+  }
+
+  .quoteblock {
+    border-left: 2px solid $p2-orange;
+    padding-left: 1rem;
+    margin-left: 0;
+
+    blockquote {
+      margin: 0;
+      color: $p2-white;
+    }
+
+    .attribution {
+      font-size: 0.875rem;
+      color: $p2-white-56;
+      margin-top: 0.5rem;
+    }
+  }
+
+  // Tables.
+  table.tableblock {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: none;
+    border: 1px solid $border-color;
+
+    th, td {
+      border: 0;
+      border-bottom: 1px solid $border-color;
+      padding: 0.5rem 0.75rem;
+      background: none;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      font-family: $mono-font-family;
+      font-size: 0.8125rem;
+      color: $p2-white;
+      background: $p2-near-black;
+      border-bottom-color: $p2-orange-26;
+    }
+
+    p.tableblock { margin: 0; }
+  }
+
+  .dlist dt {
+    font-family: $mono-font-family;
+    font-weight: 700;
+    color: $p2-white;
+  }
+
+  kbd {
+    font-family: $mono-font-family;
+    font-size: 0.8125rem;
+    border: 1px solid $border-color;
+    padding: 0 0.3rem;
+  }
+
+  mark {
+    background: $p2-orange-26;
+    color: $p2-white;
+  }
+
+  // Asciidoctor's inline table of contents, when a page asks for one.
+  #toc {
+    border: 1px solid $border-color;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+
+    #toctitle {
+      font-family: $mono-font-family;
+      font-weight: 700;
+      color: $p2-white;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 1rem;
+    }
+  }
+
+  // Section anchors from Asciidoctor's `sectanchors`; Just the Docs adds
+  // its own, so hide these to avoid a double marker.
+  a.anchor {
+    display: none;
+  }
+}
+
+// ---------------------------------------------------------------
+// 3. diagrams
+// ---------------------------------------------------------------
+
+// PlantUML diagrams carry the brand skin from _plantuml/p2poolv2.config,
+// so they are drawn on the page black and need no frame.
+.main-content .imageblock {
+  .content {
+    overflow-x: auto;
+  }
+
+  img,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .title {
+    margin-top: 0.5rem;
+  }
+}
