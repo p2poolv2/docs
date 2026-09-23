@@ -1,6 +1,6 @@
 = Share flow
 :page-parent: Architecture
-:page-nav_order: 1
+:page-nav_order: 100
 
 NOTE: Sample page, demonstrating PlantUML sequence, state and activity
 diagrams. The flow is illustrative and will be checked against

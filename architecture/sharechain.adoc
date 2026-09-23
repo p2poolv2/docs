@@ -1,0 +1,4 @@
+= Sharechain
+:page-parent: Architecture
+:page-nav_order: 20
+

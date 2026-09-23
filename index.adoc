@@ -33,5 +33,6 @@ sharechain view.
 
 * The project site: https://p2poolv2.org[p2poolv2.org]
 * Source code: https://github.com/p2poolv2/p2poolv2[github.com/p2poolv2/p2poolv2]
+* Wiki: https://github.com/p2poolv2/p2poolv2/wiki[github.com/p2poolv2/p2poolv2/wiki]
 * Testnet4 pool and chain explorer: https://testnet4.p2poolv2.org[testnet4.p2poolv2.org]
 * Chat: https://matrix.to/#/#p2poolv2:matrix.org[#p2poolv2:matrix.org]

@@ -1,0 +1,4 @@
+= Stratum Server & Vardiff
+:page-parent: Architecture
+:page-nav_order: 10
+
