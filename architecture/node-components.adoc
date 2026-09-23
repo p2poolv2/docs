@@ -1,4 +1,4 @@
-= Nodes Components
+= Node Components
 :page-parent: Architecture
 :page-nav_order: 5
 
@@ -13,7 +13,7 @@ and talks to the other nodes in the pool.
 @startuml
 skinparam componentStyle rectangle
 
-actor "Minerxx" as miner
+actor "Miner Rigs" as miner
 
 node "P2Poolv2 node" {
   component "Stratum server" as stratum
@@ -28,7 +28,7 @@ miner --> stratum : shares
 stratum --> controller : shares
 controller --> stratum : coinbase,\ndifficulty
 controller --> store
-controller <--> peers : share chain
+controller <--> peers : pool shares
 bitcoind --> controller : block templates
 @enduml
 ....
@@ -46,6 +46,11 @@ bitcoind --> controller : block templates
 . Builds a coinbase based on the accounting above.
 . Tell the stratum server the current pool difficulty and coinbase.
 . Validate shares received from peers to match the pool difficulty and expected payouts derived from the sharechain accounting.
+
+In the figure `shares` means the shares found by the mining rig that
+meet the local vardiff. In contrast, `pool shares` are the shares that
+also meet the current pool difficulty. Only the pool shares are
+transmitted to the other p2poolv2 nodes.
 
 In the source code you will see the stratum source and the controller
 node source is rolled into the single crate called `p2poolv2_lib`.
