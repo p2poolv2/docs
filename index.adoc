@@ -10,24 +10,23 @@ stratum server to the payout.
 xref:getting-started/index.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
 https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
 
-NOTE: This site is being set up. The pages here are samples that exercise
-the toolchain (AsciiDoc, PlantUML, search, navigation) and will be
-replaced as the content structure is decided.
-
 == What is here
 
-Getting started::
-  Build a node from source and connect a miner. See
-  xref:getting-started/index.adoc[Getting started].
+xref:getting-started/index.adoc[Getting started]:: Build a node from source and connect a miner.
 
-Architecture::
-  How the stratum server and the controller node fit together, with
-  diagrams. See xref:architecture/index.adoc[Architecture].
+xref:architecture/index.adoc[Architecture]:: How the stratum server and the share chain fit
+together.
 
-Writing documentation::
-  How these pages are written: AsciiDoc conventions, navigation
-  attributes and PlantUML diagrams. See
-  xref:writing-docs.adoc[Writing documentation].
+xref:sharechain-design.adoc[Sharechain Design]:: The design of the sharechain, including all the details
+on how shares are validated and accounted for using PPLNS
+accounting.
+
+xref:payout-mechanism[Payout Mechanism]:: The payout mechanism used so that limitations in
+coinbase size do not impact the scalability of the pool.
+
+xref:dashboards[Dashboards]:: The various dashboards available for tracking the local
+hashrate of the miners attached to a node and for tracking the global
+sharechain view.
 
 == Elsewhere
 
