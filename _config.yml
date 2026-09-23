@@ -30,7 +30,7 @@ aux_links_new_tab: false
 
 footer_content: "Copyright &copy; 2024-2026 P2Poolv2 Developers. Distributed under the MIT or Apache-2.0 licence."
 
-gh_edit_link: true
+gh_edit_link: false
 gh_edit_link_text: "Edit this page on GitHub"
 gh_edit_repository: "https://github.com/p2poolv2/docs"
 gh_edit_branch: "main"
