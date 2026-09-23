@@ -47,6 +47,7 @@ jobs --> miners: notify
 validator --> chain : pool shares
 validator -up-> bitcoind : submitblock
 jobs -- vardiff: update/get difficulty
+miners --> validator: new share
 @enduml
 ....
 
