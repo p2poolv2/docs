@@ -2,42 +2,64 @@
 :page-nav_order: 3
 :page-has_children: true
 
-P2Poolv2 is composed of two components: a Stratum server that miners
-connect to, and a controller node that runs share accounting and talks
-to the other nodes in the pool.
+P2Poolv2 is a peer to peer network where all peers in the network are
+p2poolv2 mining nodes. Each node serves locally connected mining rigs,
+so all nodes are responsible for one or more mining machines. The
+nodes act as a gateway for the mining rigs to the peer to peer
+network.
 
-NOTE: Sample page, demonstrating a PlantUML component diagram.
+Each node runs the stratum protocol to distribute work to miner rigs
+to collect work at 3 seconds interval from each node. This rapid
+frequency allows us to estimate hashrate for each miner connected to a
+node. However, not all these shares meet the difficulty of the
+p2poolv2, which maintains a 10 second frequence for shares. We run
+ASERT as the difficulty adjustment algorithm to aim for a 10s share
+interval. See xref:stratum.adoc[Stratum Server & Vardiff] for details
+on the difficulty adjustment algorithm used.
 
-[plantuml, components, svg]
-.The two components of a node
+Shares that do meet the pool difficulty as determined by ASERT are
+then gossipped over the peer to peer network. All receiving shares
+validate the share. See xref:validation.adoc[Share Validation] for details.
+
+The diagram below shows a peer to peer network with seven nodes, Node
+A to Node G. Some of the connections are carrying shares as multiple
+nodes can emit shares at the same time too.
+
+[graphviz, p2p-mesh, svg]
 ....
-@startuml
-skinparam componentStyle rectangle
+graph p2p {
+  layout=neato
+  overlap=false
+  splines=true
+  sep="-10"
+  bgcolor="#0B0B0C"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontcolor="#FFFFFF", fontname="DejaVu Sans", fontsize=12]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
 
-actor "Miner" as miner
+  A [label="Node A"]; B [label="Node B"]; C [label="Node C"]; D [label="Node D"]
+  E [label="Node E"]; F [label="Node F"]; G [label="Node G"]
 
-node "P2Poolv2 node" {
-  component "Stratum server" as stratum
-  component "Controller node" as controller
-  database "Share store" as store
+  A -- B [label="share a1"]
+  A -- D [label="share a1"]
+  B -- C [label="share b1"]
+  B -- E [label="share b1"]
+  C -- F
+  D -- E
+  D -- G [label="share g1"]
+  E -- F 
+  E -- G [label="share g1"]
+  F -- G [label="share g1"]
+  C -- E
 }
-
-cloud "Other P2Poolv2 nodes" as peers
-component "bitcoind" as bitcoind
-
-miner --> stratum : shares
-stratum --> controller : shares
-controller --> stratum : coinbase,\ndifficulty
-controller --> store
-controller <--> peers : share chain
-bitcoind --> controller : block templates
-@enduml
 ....
 
-== Controller node responsibilities
-
-. Accept shares from the stratum server.
-. Tell the stratum server the current pool difficulty and coinbase.
-. Run share accounting to decide which miners are paid how much.
-. Validate shares received from peers.
-. Talk to other nodes in the pool to coordinate payouts.
+The shares are thus replicated at all nodes and a Nakamoto consensus
+is reached on the state of the sharechain. With this consensus all
+nodes will agree on the state of the sharechain and how many shares
+were mined by each miner at which difficulty. Using this, each node
+can evaluate the rewards due to all miners when a share is
+received. The share's bitcoin coinbase is thus verified that it meets
+the expected reward distribution. See xref:pplns-accounting.adoc[PPLNS
+Share Accounting] on how the accounting is always audited.

@@ -1,0 +1,53 @@
+= Nodes Components
+:page-parent: Architecture
+:page-nav_order: 5
+
+
+P2Poolv2 node is composed of two components: a Stratum server that
+miners connect to, and a controller node that runs share accounting
+and talks to the other nodes in the pool.
+
+[plantuml, components, svg]
+.The two components of a node
+....
+@startuml
+skinparam componentStyle rectangle
+
+actor "Minerxx" as miner
+
+node "P2Poolv2 node" {
+  component "Stratum server" as stratum
+  component "Controller node" as controller
+  database "Share store" as store
+}
+
+cloud "Other P2Poolv2 nodes" as peers
+component "bitcoind" as bitcoind
+
+miner --> stratum : shares
+stratum --> controller : shares
+controller --> stratum : coinbase,\ndifficulty
+controller --> store
+controller <--> peers : share chain
+bitcoind --> controller : block templates
+@enduml
+....
+
+== Stratum server responsibilities
+
+. Listens to blockchain events from bitcoind.
+. Builds work for mining devices using the stratum protocol and the details received from the p2poolv2 controller node.
+. Listens to shares found by mining devices and sends them to the controller node.
+
+== Controller node responsibilities
+
+. Accept shares from the stratum server.
+. Run share accounting on the last N shares on the sharechain to decide which miners are paid how much.
+. Builds a coinbase based on the accounting above.
+. Tell the stratum server the current pool difficulty and coinbase.
+. Validate shares received from peers to match the pool difficulty and expected payouts derived from the sharechain accounting.
+
+In the source code you will see the stratum source and the controller
+node source is rolled into the single crate called `p2poolv2_lib`.
+
+

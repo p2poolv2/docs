@@ -1,0 +1,4 @@
+= PPLNS Share Accounting
+:page-parent: Architecture
+:page-nav_order: 45
+
