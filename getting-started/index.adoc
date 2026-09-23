@@ -12,3 +12,13 @@ share chain works.
 The best place to see how to run a node is the
 https://github.com/p2poolv2/p2poolv2/blob/main/README.adoc[README on
 our repository].
+
+== Testnet4 is Live
+
+You can see what the p2poolv2's testnet4 pool is doing by look at our
+https://grafana.p2poolv2.org[Grafana dashboard] and our node's
+https://testnet4.p2poolv2.org[view of the share chain].
+
+If you want to mine to our public node, you can connect to
+`stratum://testnet4.p2poolv2.org:3333`. Even though we recommend running
+a node. P2Poolv2 is only as strong as there are nodes mining on it.
