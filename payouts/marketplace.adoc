@@ -1,4 +1,4 @@
-= Sell Shares For Payouts
+= Sell Shares for Payouts
 :page-nav_order: 50
 
 == Need for marketplace

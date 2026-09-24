@@ -1,4 +1,4 @@
-= Writing documentation
+= Writing Documentation
 :page-nav_order: 100
 
 Pages are written in AsciiDoc and built with Jekyll and the Just the Docs

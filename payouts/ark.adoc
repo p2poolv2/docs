@@ -1,5 +1,5 @@
 = Swaps With Ark
 :page-nav_order: 10
-:page-parent: Sell Shares For Payouts
+:page-parent: Sell Shares for Payouts
 
 == Running swaps with Ark

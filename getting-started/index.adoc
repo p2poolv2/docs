@@ -1,4 +1,4 @@
-= Getting started
+= Getting Started
 :page-nav_order: 20
 :page-has_children: true
 
