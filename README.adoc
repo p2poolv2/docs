@@ -10,6 +10,7 @@ This documentation project is a work-in-progress and the rendered site is not pu
 
 * xref:index.adoc[P2Poolv2 Documentation] (docs home page)
 * xref:getting-started/index.adoc[Getting Started]
+* xref:stories/single-miner.adoc[Single Miner Story]
 * xref:writing-docs.adoc[Writing documentation]
 
 ==== Additional Contents

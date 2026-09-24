@@ -1,0 +1,12 @@
+= Stories
+:page-nav_order: 90
+:page-has_children: true
+
+This section will contain pages similar to "User Stories" or "Use Case Scenarios". We'll simply call them "Stories" for now.
+
+The first story is "Single Miner Story" and will explore the behavior of a P2poolv2 network with a single miner.
+
+* xref:single-miner.adoc[Single Miner]
+
+
+
