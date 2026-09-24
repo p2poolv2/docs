@@ -1,4 +1,4 @@
-= Share flow
+= Share Flow
 :page-parent: Sharechain
 :page-nav_order: 4
 

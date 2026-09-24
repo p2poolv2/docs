@@ -1,0 +1,4 @@
+= Pool Size Constraints
+:page-parent: Sharechain
+:page-nav_order: 5
+
