@@ -1,4 +1,4 @@
 = PPLNS Share Accounting
-:page-parent: Architecture
-:page-nav_order: 45
+:page-parent: Sharechain
+:page-nav_order: 1
 

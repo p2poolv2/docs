@@ -1,6 +1,5 @@
-= Architecture
-:page-nav_order: 3
-:page-has_children: true
+= P2P Network of Miners
+:page-nav_order: 20
 
 P2Poolv2 is a peer to peer network where all peers in the network are
 p2poolv2 mining nodes. Each node serves locally connected mining rigs,

@@ -1,6 +1,6 @@
 = Share Validation
-:page-parent: Architecture
-:page-nav_order: 30
+:page-parent: Sharechain
+:page-nav_order: 2
 
 == Why do we need to validate share
 

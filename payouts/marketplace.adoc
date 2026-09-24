@@ -1,6 +1,5 @@
-= Marketplace
-:page-nav_order: 4
-:page-has_children: true
+= Sell Shares For Payouts
+:page-nav_order: 50
 
 == Need for marketplace
 

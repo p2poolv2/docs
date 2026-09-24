@@ -1,4 +1,0 @@
-= Trading Shares for BTC
-:page-parent: Architecture
-:page-nav_order: 50
-

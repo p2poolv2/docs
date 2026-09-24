@@ -1,5 +1,5 @@
 = On Chain Swaps
 :page-nav_order: 5
-:page-parent: Marketplace
+:page-parent: Sell Shares For Payouts
 
 == Running swaps on chain with bitcoin

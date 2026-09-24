@@ -1,6 +1,6 @@
 = Sharechain
-:page-parent: Architecture
-:page-nav_order: 20
+:page-has_children: true
+:page-nav_order: 24
 
 == What is a sharechain
 

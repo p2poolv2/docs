@@ -1,6 +1,5 @@
 = Stratum Server & Vardiff
-:page-parent: Architecture
-:page-nav_order: 10
+:page-nav_order: 22
 
 Each p2poolv2 node comes with its own Stratum server, whose
 responsibilities are to generate work for the mining rigs and to make

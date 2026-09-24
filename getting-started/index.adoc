@@ -1,5 +1,5 @@
 = Getting started
-:page-nav_order: 2
+:page-nav_order: 20
 :page-has_children: true
 
 A P2Poolv2 node runs a Stratum v1 server for your miners and a p2p

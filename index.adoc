@@ -13,21 +13,16 @@ https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"
 
 == What is here
 
-xref:getting-started/index.adoc[Getting started]:: Build a node from source and connect a miner.
+Run a node:: Run a node from source and connect your miners, see xref:getting-started/index.adoc[Getting started]
 
-xref:architecture/index.adoc[Architecture]:: How the stratum server and the share chain fit
-together.
+P2P Network:: How miners join a p2p network to reduce their variance xref:p2p-network-of-miners.adoc[P2P Network of Miners]
 
-xref:sharechain-design.adoc[Sharechain Design]:: The design of the sharechain, including all the details
-on how shares are validated and accounted for using PPLNS
-accounting.
+Sharechain:: The design of the sharechain, including all the details on how shares are validated and accounted for using PPLNS accounting. See xref:architecture/sharechain.adoc[Sharechain Design]
 
-xref:payout-mechanism[Payout Mechanism]:: The payout mechanism used so that limitations in
-coinbase size do not impact the scalability of the pool.
+Payout Mechanisms:: The payout mechanism used so that limitations in
+coinbase size do not impact the scalability of the pool. See how miners are paid directly xref:payouts/coinbase.adoc[from bitcoin coinbase] and how small miners can  xref:payouts/marketplace.adoc[Sell shares for payouts]
 
-xref:dashboards[Dashboards]:: The various dashboards available for tracking the local
-hashrate of the miners attached to a node and for tracking the global
-sharechain view.
+Dashboards:: The various dashboards available for tracking the local hashrate of the miners attached to a node and for tracking the global sharechain view. See xref:dashboards[Dashboards].
 
 == Elsewhere
 

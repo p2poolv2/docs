@@ -1,4 +1,4 @@
 = Script and UTXO Txs
-:page-parent: Architecture
-:page-nav_order: 40
+:page-parent: Sharechain
+:page-nav_order: 3
 
