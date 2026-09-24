@@ -2,3 +2,14 @@
 :page-parent: Architecture
 :page-nav_order: 20
 
+== What is a sharechain
+
+== Why is it needed
+
+== Where is it available
+
+== How is it built and maintained
+
+== How are shares validated
+
+   Point to share validation page

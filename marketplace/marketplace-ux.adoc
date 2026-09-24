@@ -1,0 +1,8 @@
+= Marketplace Application Mocks
+:page-nav_order: 30
+:page-parent: Marketplace
+
+
+== Miner UX
+
+== Marketplace UX

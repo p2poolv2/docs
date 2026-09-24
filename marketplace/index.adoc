@@ -2,3 +2,10 @@
 :page-nav_order: 4
 :page-has_children: true
 
+== Need for marketplace
+
+== Constraints from sharechain on marketplace
+
+== User story of a miner selling shares
+
+== User story of a marketplace buying shares

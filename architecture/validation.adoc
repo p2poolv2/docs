@@ -2,3 +2,14 @@
 :page-parent: Architecture
 :page-nav_order: 30
 
+== Why do we need to validate share
+
+== What are the requirements of share validation
+
+Make sure to capture the malicious fork argument
+
+Also capture the lack of need for validating bitcoin blocks
+
+== Overview of share validation
+
+== For each requirement, describe how validation works
