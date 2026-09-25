@@ -6,10 +6,10 @@ DATUM both enable pool operators to offload transaction selection to
 miners. This decentralizes block template construction to miners
 participating in the pool.
 
-The following diagram captures the messages exchanged when a pool runs
-a DATUM Gateway or SV2 with Job Decleration. We do not get into the
-exact message types specified by the two protocols, but capture the
-abstract idea of decentralizing template construction.
+The following diagram captures the messages exchanged when a pool
+supports DATUM Gateway or SV2 with Job Declaration. We do not get into
+the exact message types specified by the two protocols, but capture
+the abstract idea of decentralizing template construction.
 
 [plantuml, datum-sv2-jobs, svg]
 .Miners build templates, the pool accepts jobs and credits shares
@@ -19,14 +19,21 @@ participant "Miner A\n(own bitcoind)" as A
 participant "Pool operator\n(DATUM / SV2 JD server)" as P
 participant "Miner B\n(own bitcoind)" as B
 
-P -> A : coinbase payout outputs
-P -> B : coinbase payout outputs
-A -> A : build template\nfrom own mempool
-B -> B : build template\nfrom own mempool
-A -> P : declare job
-P --> A : job accepted
-B -> P : declare job
-P --> B : job accepted
+alt DATUM
+  P -> A : coinbase outputs\n(payout split incl. miners)
+  P -> B : coinbase outputs\n(payout split incl. miners)
+  A -> A : build template\nfrom own mempool
+  B -> B : build template\nfrom own mempool
+else SV2 Job Declaration
+  P -> A : pool's coinbase output\n(reward to pool wallet)
+  P -> B : pool's coinbase output\n(reward to pool wallet)
+  A -> A : build template\nfrom own mempool
+  B -> B : build template\nfrom own mempool
+  A -> P : declare job
+  P --> A : job accepted
+  B -> P : declare job
+  P --> B : job accepted
+end
 loop while hashing
   A -> P : submit share
   P -> P : validate share,\ncredit Miner A
@@ -38,18 +45,18 @@ end
 
 == Centralised Pools Provide Permissioned Mining
 
-Before we get into the details of how P2Poolvs compares to SV2/DATUM
+Before we get into the details of how P2Poolv2 compares to SV2/DATUM
 it is important to note that when miners join a centralised pool, by
 definition they need a permission to join the pool and receive work or
 payouts from them. A lot of pool operators are companies that need to
-follow the regulator environment they operate under. P2Poolv2 strives
-to keep permissionless, where anyone can join the p2p network and
+follow the regulatory environment they operate under. P2Poolv2 strives
+to remain permissionless, where anyone can join the p2p network and
 start mining with fully auditable accounting and payout mechanisms.
 
 == Pools Control Payout Distribution
 
 However, Ocean still manages the payout distribution when the DATUM
-server notifies the DATUM clients to include a provided bitcoin
+server notifies the DATUM gateways to include a provided bitcoin
 coinbase output distribution.
 
 A centralized pool operating with SV2's Job Declaration has the same
@@ -83,15 +90,19 @@ participant "Miner A\n(own bitcoind)" as A
 participant "Miner B\n(own bitcoind)" as B
 
 R -[#E5484D]> P : suppress transactions\ninvolving address X
-A -> P : declare job with\ntransaction paying X
-P --> A : job accepted
-B -> P : declare job without X
-P --> B : job accepted
+A -> A : build template with\ntransaction paying X
+B -> B : build template\nwithout X
 A -> P : submit shares
 B -> P : submit shares
 P -[#E5484D]> P : compute payouts,\nleave out Miner A
-P -[#E5484D]> A : coinbase payout outputs\n(Miner A left out)
-P -> B : coinbase payout outputs\n(Miner B paid)
+alt DATUM
+  P -[#E5484D]> A : next coinbase outputs\n(Miner A left out)
+  P -> B : next coinbase outputs\n(Miner B included)
+else SV2 Job Declaration
+  P -[#E5484D]> P : withhold Miner A's\naccount balance
+  P -> B : pay Miner B\nfrom pool wallet
+  note over P : coinbase-only mode: the pool\nonly sees X once Miner A\nfinds a block
+end
 A -[#E5484D]> A : leave pool
 @enduml
 ....
@@ -101,18 +112,17 @@ A -[#E5484D]> A : leave pool
 DATUM server validates the shares it accepts, so it has a final say in
 what block templates it accepts as valid work.
 
-In SV2's Job Decleration in Full-Template Mode, the pool operator can
+In SV2's Job Declaration in Full-Template Mode, the pool operator can
 outright reject jobs just like Ocean can with the DATUM protocol.
 
 However, SV2's Job Declaration's Coinbase Only Mode allows a miner to
-miner without sending the list of transactions to the pool
-operator. In such setups the SV2 pool can't reject the work
-outright. This is the most censorship resilient mode available to
-pools using SV2 and P2Poolv2 sets this as the base guarantee to
-permissionless mining.
+mine without sending the list of transactions to the pool operator. In
+such setups the SV2 pool can't reject the work outright. This is the
+most censorship resilient mode available to pools using SV2 and
+P2Poolv2 sets this as the base guarantee to permissionless mining.
 
 [plantuml, datum-sv2-work-rejected, svg]
-.The pool rejects a job or share outright
+.Whether the pool can reject work depends on what it can see
 ....
 @startuml
 actor Regulator as R
@@ -121,10 +131,16 @@ participant "Miner A\n(own bitcoind)" as A
 
 R -[#E5484D]> P : suppress transactions\ninvolving address X
 A -> A : build template with\ntransaction paying X
-A -> P : declare job / submit share
-P -[#E5484D]> P : check template\nagainst blocklist
-P -[#E5484D]-> A : rejected: template includes\nsuppressed transaction
-note over A : Miner A's work earns nothing\nunless it drops the transaction
+alt DATUM / SV2 full-template
+  A -> P : declare job / submit share\n(transactions visible)
+  P -[#E5484D]> P : check template\nagainst blocklist
+  P -[#E5484D]-> A : rejected: template includes\nsuppressed transaction
+  note over A : Miner A's work earns nothing\nunless it drops the transaction
+else SV2 coinbase-only
+  A -> P : declare coinbase / submit share\n(no transaction list)
+  P --> A : accepted: pool can't\nsee transaction X
+  note over P : Pool has to respond to the regulator
+end
 @enduml
 ....
 
