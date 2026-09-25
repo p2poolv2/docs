@@ -4,9 +4,10 @@
 :page-description: Documentation for P2Poolv2, a permissionless, auditable, self-custodial Bitcoin mining pool.
 
 [.fs-6.fw-300]
-Permissionless mining pool where miners build block templates,
-continuously audit accounting and are paid directly to their wallets
-from bitcoin coinbase or by selling shares.
+Mission: Replace pool operators with miners
+
+P2Poolv2 is a permissionless mining pool where miners build block templates,
+continuously audit accounting and are paid directly to their wallets.
 
 xref:getting-started/index.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
 https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
@@ -28,6 +29,7 @@ Dashboards:: The various dashboards available for tracking the local hashrate of
 
 * The project site: https://p2poolv2.org[p2poolv2.org]
 * Source code: https://github.com/p2poolv2/p2poolv2[github.com/p2poolv2/p2poolv2]
+* X: https://x.com/p2poolv2[https://x.com/p2poolv2]
 * Wiki: https://github.com/p2poolv2/p2poolv2/wiki[github.com/p2poolv2/p2poolv2/wiki]
 * Testnet4 pool and chain explorer: https://testnet4.p2poolv2.org[testnet4.p2poolv2.org]
-* Chat: https://matrix.to/#/#p2poolv2:matrix.org[#p2poolv2:matrix.org]
+* Matrix chat: https://matrix.to/#/#p2poolv2:matrix.org[#p2poolv2:matrix.org]
