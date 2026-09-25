@@ -2,7 +2,158 @@
 :page-has_children: true
 :page-nav_order: 24
 
-== What Is a Sharechain
+== What Is a Sharechain?
+
+A sharechain is a blockchain of shareblocks where each shareblock is a
+has an embedded bitcoin header. The sharechain difficulty is much
+lower than the bitcoin difficulty, and therefore we find it easier to
+say that the sharechain is a blockchain of "weak" bitcoin blocks.
+
+The bitcoin header includes the bits field for the target bitcoin
+difficulty and the shareblock header includes a bits field capturing
+the target sharechain difficuty. The diagram below shows the
+relationship between a sharechain header and a bitcoin header.
+
+[graphviz, shareblock-headers, svg]
+.A shareblock's proof of work lives in its bitcoin header
+....
+digraph shareblock {
+  compound=true
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.15
+  ranksep=0.15
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFF"
+  node [shape=box, style=filled, fillcolor="#121212", color="#FFFFFF66",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=2.8, fixedsize=true, height=0.35]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_block {
+    label="Shareblock n"
+    fontsize=13
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+
+    subgraph cluster_share_header {
+      label="Share header"
+      fontsize=11
+      fontcolor="#FFFFFFC7"
+      color="#FFFFFF66"
+      fillcolor="#121212"
+
+      prevhash [label="previous shareblock hash"]
+      sharebits [label="bits: sharechain target"]
+      sharetime [label="time"]
+
+      subgraph cluster_bitcoin_header {
+        label="Bitcoin header"
+        fontsize=11
+        fontcolor="#FFFFFFC7"
+        color="#FFFFFF66"
+        fillcolor="#0B0B0C"
+
+        version [label="version"]
+        prevbtc [label="previous bitcoin block hash"]
+        merkle [label="merkle root"]
+        btctime [label="time"]
+        btcbits [label="bits: bitcoin target"]
+        nonce [label="nonce", fillcolor="#F7931A", color="#F7931A",
+               fontcolor="#0B0B0C"]
+      }
+    }
+  }
+
+  prev [label="Shareblock n-1", color="#F7931A", width=1.6]
+  pow [label="Proof of work\nhash of the bitcoin header", color="#F7931A",
+       penwidth=2, width=2.6, height=0.6]
+  powrule [shape=plain, style="", fillcolor="", fixedsize=false,
+           fontcolor="#FFFFFFC7", fontsize=11,
+           label="Meets sharechain target: valid share\lAlso meets bitcoin target: bitcoin block\l"]
+
+  // Stack the fields top to bottom.
+  edge [style=invis]
+  prevhash -> sharebits -> sharetime -> version -> prevbtc -> merkle -> btctime -> btcbits -> nonce
+  pow -> powrule
+  edge [style=solid]
+
+  {rank=same; prevhash; prev}
+  {rank=same; merkle; pow}
+
+  prevhash -> prev [label="points to", constraint=false]
+  merkle -> pow [ltail=cluster_bitcoin_header, constraint=false]
+}
+....
+
+The sharechain is thus a chain of shareblocks, each referring to a
+bitcoin block header that captures the proof of work. A shareblock can
+embed the same bitcoin header as miners produce shares working on the
+same bitcoin header.
+
+[graphviz, sharechain-bitcoin-chain, svg]
+.Shareblocks build on the bitcoin tip, and Shareblock 3 found Block 101
+....
+digraph sharechain {
+  rankdir=LR
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=1.4
+  ranksep=0.45
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.3, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_sharechain {
+    label="Sharechain"
+    fontsize=12
+    color="#FFFFFF66"
+    s1 [label="Shareblock 1"]
+    s2 [label="Shareblock 2"]
+    s3 [label="Shareblock 3", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    s4 [label="Shareblock 4"]
+    s5 [label="Shareblock 5"]
+    s6 [label="Shareblock 6"]
+  }
+
+  subgraph cluster_bitcoin {
+    label="Bitcoin blockchain"
+    labelloc=b
+    fontsize=12
+    color="#FFFFFF66"
+    b100 [label="Block 100"]
+    b101 [label="Block 101", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    b102 [label="Block 102"]
+  }
+
+  // Each block points back to its parent.
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 [dir=back]
+  b100 -> b101 -> b102 [dir=back, minlen=2]
+
+  {rank=same; s1; b100}
+  {rank=same; s3; b101}
+  {rank=same; s6; b102}
+
+  // Previous bitcoin block hash in each shareblock's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7", constraint=false]
+  s1 -> b100 [xlabel="builds on    "]
+  s2 -> b100
+  s4 -> b101
+  s5 -> b101
+  s6 -> b102
+
+  // Shareblock 3's bitcoin header met the bitcoin target and became
+  // Block 101, which already links it to Block 100.
+  s3 -> b101 [style=bold, color="#F7931A", penwidth=2,
+              xlabel="found block:      \lheader met\lbitcoin target\l"]
+}
+....
 
 == Why Is It Needed
 
