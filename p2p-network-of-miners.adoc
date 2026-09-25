@@ -13,12 +13,12 @@ frequency allows us to estimate hashrate for each miner connected to a
 node. However, not all these shares meet the difficulty of the
 p2poolv2, which maintains a 10 second frequence for shares. We run
 ASERT as the difficulty adjustment algorithm to aim for a 10s share
-interval. See xref:stratum.adoc[Stratum Server & Vardiff] for details
+interval. See xref:architecture/stratum.adoc[Stratum Server & Vardiff] for details
 on the difficulty adjustment algorithm used.
 
 Shares that do meet the pool difficulty as determined by ASERT are
 then gossipped over the peer to peer network. All receiving shares
-validate the share. See xref:validation.adoc[Share Validation] for details.
+validate the share. See xref:architecture/validation.adoc[Share Validation] for details.
 
 The diagram below shows a peer to peer network with seven nodes, Node
 A to Node G. Some of the connections are carrying shares as multiple
@@ -60,5 +60,5 @@ nodes will agree on the state of the sharechain and how many shares
 were mined by each miner at which difficulty. Using this, each node
 can evaluate the rewards due to all miners when a share is
 received. The share's bitcoin coinbase is thus verified that it meets
-the expected reward distribution. See xref:pplns-accounting.adoc[PPLNS
+the expected reward distribution. See xref:architecture/pplns-accounting.adoc[PPLNS
 Share Accounting] on how the accounting is always audited.

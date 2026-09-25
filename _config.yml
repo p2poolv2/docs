@@ -83,6 +83,7 @@ defaults:
 exclude:
   - Gemfile
   - Gemfile.lock
+  - Rakefile
   - vendor
   - .asciidoctor
   - README.md

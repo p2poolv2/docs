@@ -13,3 +13,7 @@ group :jekyll_plugins do
 end
 
 gem "webrick", "~> 1.8"
+
+# Link checking, run through the Rakefile.
+gem "rake", "~> 13.0"
+gem "html-proofer", "~> 5.0"

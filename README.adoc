@@ -9,7 +9,7 @@ jekyll-asciidoc, diagrams in PlantUML via asciidoctor-diagram.
 This documentation project is a work-in-progress and the rendered site is not published yet. For convenience, we provide direct Asciidoc links to a few notable, in-progress pages.
 
 * xref:index.adoc[P2Poolv2 Documentation] (docs home page)
-* xref:getting-started/index.adoc[Getting Started]
+* xref:getting_started.adoc[Getting Started]
 * xref:stories/single-miner.adoc[Single Miner Story]
 * xref:writing-docs.adoc[Writing documentation]
 
@@ -44,6 +44,23 @@ bundle exec jekyll serve --livereloadshare
 
 Then open http://localhost:4000. If a diagram does not update, run
 `bundle exec jekyll clean` and remove `.asciidoctor/`.
+
+=== Checking links
+
+The `Rakefile` builds the site and runs
+https://github.com/gjtorikian/html-proofer[html-proofer] over `_site/`,
+checking links between pages, `#anchor` links and image paths.
+
+....
+bundle exec rake                 # build, then check internal links
+bundle exec rake check:external  # also check links to other sites
+bundle exec rake build           # build only
+....
+
+The task fails and lists each broken link with the page and line in
+`_site/` it appears on. Run the internal check before pushing. The
+external check makes a request for every outside URL, so it is slower
+and can fail when a site is down or rate-limits the requests.
 
 === Writing pages
 

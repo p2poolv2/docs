@@ -82,9 +82,9 @@ cached in `.asciidoctor/diagram` between builds.
 == Links
 
 * To another page, use `xref:`, with the path to the `.adoc` file:
-  xref:getting-started/build-from-source.adoc[Build from source].
+  xref:getting_started.adoc[Getting started].
 * To a section on another page:
-  xref:getting-started/build-from-source.adoc#configure[Configure].
+  xref:getting_started.adoc#testnet4-is-live[Configure].
 * To a section on this page: <<diagrams>>.
 * External: https://asciidoctor.org/docs/[Asciidoctor documentation].
 
