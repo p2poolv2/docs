@@ -1,3 +1,127 @@
-= Compared to SV2 & DATUM 
+= Compared to SV2 & DATUM
 :page-nav_order: 4
 
+A centralized pool running SV2 with Job Declaration or Ocean pool's
+DATUM both enable pool operators to offload transaction selection to
+miners. This decentralizes block template construction to miners
+participating in the pool.
+
+The following diagram captures the messages exchanged when a pool runs
+a DATUM or SV2 stratum server. We do not get into the exact message
+types specified by the two protocols, but capture the abstract idea of
+decentralizing template construction.
+
+[plantuml, datum-sv2-jobs, svg]
+.Miners build templates, the pool accepts jobs and credits shares
+....
+@startuml
+participant "Miner A\n(own bitcoind)" as A
+participant "Pool operator\n(DATUM / SV2 JD server)" as P
+participant "Miner B\n(own bitcoind)" as B
+
+P -> A : coinbase payout outputs
+P -> B : coinbase payout outputs
+A -> A : build template\nfrom own mempool
+B -> B : build template\nfrom own mempool
+A -> P : declare job
+P --> A : job accepted
+B -> P : declare job
+P --> B : job accepted
+loop while hashing
+  A -> P : submit share
+  P -> P : validate share,\ncredit Miner A
+  B -> P : submit share
+  P -> P : validate share,\ncredit Miner B
+end
+@enduml
+....
+
+== Pools Control Payout Distribution
+
+However, Ocean still manages the payout distribution when the DATUM
+server notifies the DATUM clients to include a provided bitcoin
+coinbase output distribution.
+
+A centralized pool operating with SV2's Job Declaration has the same
+shortcoming.
+
+In both the cases the accounting and payout distribution end up being
+controlled by a centralized pool operator. SV2 can be used in a more
+decentralized model, but we haven't seen a pool design to support
+that yet.
+
+This is where the rubber meets the road. If a pool still decides on
+block reward distribution, then it has a lever that can guide the
+transaction selection behaviour of miners. When a centralized pool
+operator comes under pressure from a regulator, it will have to comply
+and thus refuse to pay a miner that includes transactions involving
+certain addresses or Script constructions that the regulators want it
+to suppress.
+
+The diagram below shows how under pressure from a regulator the
+centralized pool operator refuses to pay a miner for their work and
+thus forces the miner to leave the now compliant pool.
+
+[plantuml, datum-sv2-payout-refused, svg]
+.The pool leaves a miner out of the payout
+....
+@startuml
+actor Regulator as R
+participant "Pool operator\n(DATUM / SV2 JD server)" as P
+participant "Miner A\n(own bitcoind)" as A
+participant "Miner B\n(own bitcoind)" as B
+
+R -[#E5484D]> P : suppress transactions\ninvolving address X
+A -> P : declare job with\ntransaction paying X
+P --> A : job accepted
+B -> P : declare job without X
+P --> B : job accepted
+A -> P : submit shares
+B -> P : submit shares
+P -[#E5484D]> P : compute payouts,\nleave out Miner A
+P -[#E5484D]> A : coinbase payout outputs\n(Miner A left out)
+P -> B : coinbase payout outputs\n(Miner B paid)
+A -[#E5484D]> A : leave pool
+@enduml
+....
+
+== Pools Can Still Reject Work/Jobs
+
+DATUM server validates the shares it accepts, so it is has a final say
+in what block templates it accepts as valid work. SV2's Job
+Declaration supports the same too, a pool can refuse jobs declared by
+a miner.
+
+[plantuml, datum-sv2-work-rejected, svg]
+.The pool rejects a job or share outright
+....
+@startuml
+actor Regulator as R
+participant "Pool operator\n(DATUM / SV2 JD server)" as P
+participant "Miner A\n(own bitcoind)" as A
+
+R -[#E5484D]> P : suppress transactions\ninvolving address X
+A -> A : build template with\ntransaction paying X
+A -> P : declare job / submit share
+P -[#E5484D]> P : check template\nagainst blocklist
+P -[#E5484D]-> A : rejected: template includes\nsuppressed transaction
+note over A : Miner A's work earns nothing\nunless it drops the transaction
+@enduml
+....
+
+
+== P2Poolv2 Decentralized Accounting
+
+P2Poolv2 instead runs accounting using a decentralized share chain,
+which is a blockchain of weak bitcoin blocks. With Nakamoto consensus
+on the chain, all miners see the same view of the shares and therefore
+can generate payout distributions in coinbases that all other miners
+can continuously and independently validate.
+
+== P2Poolv2 Non-Custodial Payouts
+
+With payouts directly from coinbases and also from atomic swaps
+mechanism miners never hand over custody of their shares or their
+payout rewards to a pool operator, see
+xref:payouts/marketplace.adoc[Marketplace] on how this is enabled in
+P2Poolv2.
