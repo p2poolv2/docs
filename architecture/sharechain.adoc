@@ -2,14 +2,14 @@
 :page-has_children: true
 :page-nav_order: 24
 
-== What is a sharechain
+== What Is a Sharechain
 
-== Why is it needed
+== Why Is It Needed
 
-== Where is it available
+== Where Is It Available
 
-== How is it built and maintained
+== How Is It Built and Maintained
 
-== How are shares validated
+== How Are Shares Validated
 
    Point to share validation page

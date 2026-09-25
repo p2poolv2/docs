@@ -2,11 +2,11 @@
 :page-parent: Sharechain
 :page-nav_order: 4
 
-NOTE: Sample page, demonstrating PlantUML sequence, state and activity
-diagrams. The flow is illustrative and will be checked against
+NOTE: This sample page demonstrates PlantUML sequence, state, and
+activity diagrams. The flow is illustrative and will be checked against
 `docs/architecture/share-processing-pipeline.md` in the node source.
 
-== From miner to peers
+== From Miner to Peers
 
 [plantuml, share-sequence, svg]
 ....
@@ -29,7 +29,7 @@ end
 @enduml
 ....
 
-== Share lifecycle
+== Share Lifecycle
 
 [plantuml, share-states, svg]
 ....
@@ -44,7 +44,7 @@ Paid --> [*]
 @enduml
 ....
 
-== Validating a share from a peer
+== Validating a Share From a Peer
 
 [plantuml, validate-activity, svg]
 ....
@@ -56,7 +56,7 @@ if (Parent known?) then (yes)
   if (Valid?) then (yes)
     :Store and relay;
   else (no)
-    :Drop and penalise peer;
+    :Drop and penalize peer;
   endif
 else (no)
   :Request parent;

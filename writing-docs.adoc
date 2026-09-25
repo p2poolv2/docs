@@ -3,10 +3,10 @@
 
 Pages are written in AsciiDoc and built with Jekyll and the Just the Docs
 theme. This page is both the guide and the test page: every feature below
-is rendered live, so if something looks wrong here it is wrong
+is rendered live, so if something looks wrong here, it is wrong
 everywhere.
 
-== Adding a page
+== Adding a Page
 
 Create a `.adoc` file anywhere in the repository. The document title
 becomes the page title, and attributes that start with `page-` become
@@ -52,7 +52,7 @@ then lists its children at the foot of the page.
 
 Diagrams are PlantUML, written inline and rendered to SVG at build time.
 The brand skin in `_plantuml/p2poolv2.config` is applied to every
-diagram, so there is no need to set colours.
+diagram, so you do not need to set colors.
 
 [source,asciidoc]
 ------
@@ -66,7 +66,7 @@ Bob --> Alice : hi
 ------
 <1> Block type, output file name (unique per page), format.
 
-Which renders as:
+It renders as:
 
 [plantuml, handshake, svg]
 ....
@@ -140,8 +140,8 @@ Shared snippets live under `_snippets/` and are pulled in with
 
 == Text
 
-*Bold*, _italic_, `monospace`, #highlighted#, H~2~O, E=mc^2^, and
-keyboard keys kbd:[Ctrl+C].
+The inline styles are *bold*, _italic_, `monospace`, #highlighted#,
+H~2~O, E=mc^2^, and keyboard keys such as kbd:[Ctrl+C].
 
 .An unordered list
 * Permissionless
@@ -157,7 +157,7 @@ keyboard keys kbd:[Ctrl+C].
 .A definition list
 Share::
   Proof of work below the pool target and above the bitcoin target.
-Share chain::
+Sharechain::
   The chain of shares that every node replays.
 
 == Blocks

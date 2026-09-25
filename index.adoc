@@ -7,23 +7,23 @@
 Mission: Replace pool operators with miners
 
 P2Poolv2 is a permissionless mining pool where miners build block templates,
-continuously audit accounting and are paid directly to their wallets.
+continuously audit accounting, and are paid directly to their wallets.
 
 xref:getting_started.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
 https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
 
-== What is here
+== What Is Here
 
-Run a node:: Run a node from source and connect your miners, see xref:getting_started.adoc[Getting started]
+Run a node:: Run a node from source and connect your miners. See xref:getting_started.adoc[Getting started].
 
-P2P Network:: How miners join a p2p network to reduce their variance xref:p2p-network-of-miners.adoc[P2P Network of Miners]
+P2P Network:: How miners join a peer-to-peer network to reduce their variance. See xref:p2p-network-of-miners.adoc[P2P Network of Miners].
 
-Sharechain:: The design of the sharechain, including all the details on how shares are validated and accounted for using PPLNS accounting. See xref:architecture/sharechain.adoc[Sharechain Design]
+Sharechain:: The design of the sharechain, including how shares are validated and how PPLNS accounts for them. See xref:architecture/sharechain.adoc[Sharechain Design].
 
-Payout Mechanisms:: The payout mechanism used so that limitations in
-coinbase size do not impact the scalability of the pool. See how miners are paid directly xref:payouts/coinbase.adoc[from bitcoin coinbase] and how small miners can  xref:payouts/marketplace.adoc[Sell shares for payouts]
+Payout Mechanisms:: How the pool pays miners without letting the coinbase size
+limit its scalability. See how miners are paid directly xref:payouts/coinbase.adoc[from the bitcoin coinbase] and how small miners can xref:payouts/marketplace.adoc[sell shares for payouts].
 
-Dashboards:: The various dashboards available for tracking the local hashrate of the miners attached to a node and for tracking the global sharechain view. See xref:dashboards.adoc[Dashboards].
+Dashboards:: Dashboards that track the hashrate of the miners attached to a node and the global sharechain view. See xref:dashboards.adoc[Dashboards].
 
 == Elsewhere
 

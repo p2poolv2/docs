@@ -3,22 +3,22 @@
 :page-has_children: true
 
 A P2Poolv2 node runs a Stratum v1 server for your miners and a p2p
-network node that builds a share chain with in collaboration with
-other p2poolv2 nodes. The share chain is a blockchain of weak bitcoin
+network node that builds a sharechain in collaboration with
+other P2Poolv2 nodes. The sharechain is a blockchain of weak bitcoin
 blocks that supports blocks. See
 xref:architecture/sharechain.adoc[Sharechain Design] for details on how the
-share chain works.
+sharechain works.
 
 The best place to see how to run a node is the
 https://github.com/p2poolv2/p2poolv2/blob/main/README.adoc[README on
 our repository].
 
-== Testnet4 is Live
+== Testnet4 Is Live
 
-You can see what the p2poolv2's testnet4 pool is doing by look at our
+You can see what the P2Poolv2 testnet4 pool is doing by looking at our
 https://grafana.p2poolv2.org[Grafana dashboard] and our node's
-https://testnet4.p2poolv2.org[view of the share chain].
+https://testnet4.p2poolv2.org[view of the sharechain].
 
-If you want to mine to our public node, you can connect to
-`stratum://testnet4.p2poolv2.org:3333`. Even though we recommend running
-a node. P2Poolv2 is only as strong as there are nodes mining on it.
+To mine on our public node, connect to
+`stratum://testnet4.p2poolv2.org:3333`. We recommend running your own
+node, however: P2Poolv2 is only as strong as the nodes mining on it.

@@ -2,9 +2,9 @@
 :page-nav_order: 21
 
 
-P2Poolv2 node is composed of two components: a Stratum server that
-miners connect to, and a controller node that runs share accounting
-and talks to the other nodes in the pool.
+A P2Poolv2 node has two components: a Stratum server that miners
+connect to, and a controller node that runs share accounting and talks
+to the other nodes in the pool.
 
 [plantuml, components, svg]
 .The two components of a node
@@ -32,26 +32,26 @@ bitcoind --> controller : block templates
 @enduml
 ....
 
-== Stratum server responsibilities
+== Stratum Server Responsibilities
 
 . Listens to blockchain events from bitcoind.
-. Builds work for mining devices using the stratum protocol and the details received from the p2poolv2 controller node.
-. Listens to shares found by mining devices and sends them to the controller node.
+. Builds work for mining devices using the Stratum protocol and the details received from the P2Poolv2 controller node.
+. Receives shares found by mining devices and sends them to the controller node.
 
-== Controller node responsibilities
+== Controller Node Responsibilities
 
-. Accept shares from the stratum server.
-. Run share accounting on the last N shares on the sharechain to decide which miners are paid how much.
-. Builds a coinbase based on the accounting above.
-. Tell the stratum server the current pool difficulty and coinbase.
-. Validate shares received from peers to match the pool difficulty and expected payouts derived from the sharechain accounting.
+. Accepts shares from the Stratum server.
+. Runs share accounting on the last N shares on the sharechain to decide how much each miner is paid.
+. Builds a coinbase from that accounting.
+. Tells the Stratum server the current pool difficulty and coinbase.
+. Validates that shares received from peers meet the pool difficulty and pay the expected payouts derived from the sharechain accounting.
 
 In the figure `shares` means the shares found by the mining rig that
 meet the local vardiff. In contrast, `pool shares` are the shares that
 also meet the current pool difficulty. Only the pool shares are
-transmitted to the other p2poolv2 nodes.
+transmitted to the other P2Poolv2 nodes.
 
-In the source code you will see the stratum source and the controller
-node source is rolled into the single crate called `p2poolv2_lib`.
+In the source code, the Stratum server and the controller node share a
+single crate, `p2poolv2_lib`.
 
 

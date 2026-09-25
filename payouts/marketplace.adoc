@@ -1,10 +1,10 @@
 = Sell Shares for Payouts
 :page-nav_order: 50
 
-== Need for marketplace
+== Need for Marketplace
 
-== Constraints from sharechain on marketplace
+== Constraints From Sharechain on Marketplace
 
-== User story of a miner selling shares
+== User Story of a Miner Selling Shares
 
-== User story of a marketplace buying shares
+== User Story of a Marketplace Buying Shares

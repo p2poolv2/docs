@@ -1,15 +1,14 @@
 = Compared to SV2 & DATUM
 :page-nav_order: 4
 
-A centralized pool running SV2 with Job Declaration or Ocean pool's
-DATUM both enable pool operators to offload transaction selection to
-miners. This decentralizes block template construction to miners
-participating in the pool.
+SV2 with Job Declaration and OCEAN's DATUM both let a centralized pool
+operator offload transaction selection to miners. Both decentralize
+block template construction to the miners in the pool.
 
-The following diagram captures the messages exchanged when a pool
-supports DATUM Gateway or SV2 with Job Declaration. We do not get into
-the exact message types specified by the two protocols, but capture
-the abstract idea of decentralizing template construction.
+The following diagram shows the messages exchanged when a pool
+supports DATUM Gateway or SV2 with Job Declaration. It leaves out the
+exact message types each protocol specifies and captures only the idea
+of decentralized template construction.
 
 [plantuml, datum-sv2-jobs, svg]
 .Miners build templates, the pool accepts jobs and credits shares
@@ -43,42 +42,37 @@ end
 @enduml
 ....
 
-== Centralised Pools Provide Permissioned Mining
+== Centralized Pools Provide Permissioned Mining
 
-Before we get into the details of how P2Poolv2 compares to SV2/DATUM
-it is important to note that when miners join a centralised pool, by
-definition they need a permission to join the pool and receive work or
-payouts from them. A lot of pool operators are companies that need to
-follow the regulatory environment they operate under. P2Poolv2 strives
-to remain permissionless, where anyone can join the p2p network and
-start mining with fully auditable accounting and payout mechanisms.
+Miners who join a centralized pool need, by definition, the operator's
+permission to join and to receive work or payouts. Many pool operators
+are companies that must follow the regulations where they operate.
+P2Poolv2 strives to remain permissionless: anyone can join the
+peer-to-peer network and start mining, with fully auditable accounting
+and payouts.
 
 == Pools Control Payout Distribution
 
-However, Ocean still manages the payout distribution when the DATUM
-server notifies the DATUM gateways to include a provided bitcoin
-coinbase output distribution.
+OCEAN, however, still manages the payout distribution: the DATUM
+server tells the DATUM Gateways which coinbase outputs to include.
 
 A centralized pool operating with SV2's Job Declaration has the same
 shortcoming.
 
-In both cases the accounting and payout distribution end up being
-controlled by a centralized pool operator. SV2 can be used in a more
-decentralized model, but we haven't seen a pool design to support
-that yet.
+In both cases a centralized pool operator controls the accounting and
+payout distribution. SV2 could support a more decentralized model, but
+we have not yet seen a pool designed for it.
 
-This is where the rubber meets the road. If a pool still decides on
-block reward distribution, then it has a lever that can guide the
-transaction selection behaviour of miners. When a centralized pool
-operator comes under pressure from a regulator, it can be compelled to
-comply and thus refuse to pay a miner that includes transactions
-involving certain addresses or Script constructions that the
-regulators want it to suppress.
+This is where the rubber meets the road. A pool that decides the block
+reward distribution holds a lever over its miners' transaction
+selection. Under pressure from a regulator, a centralized pool
+operator can be compelled to refuse payment to any miner that includes
+transactions involving the addresses or Script constructions the
+regulator wants suppressed.
 
-The diagram below shows how under pressure from a regulator the
-centralized pool operator refuses to pay a miner for their work and
-leaves the miner the choice of dropping the transaction or leaving the
-pool.
+The diagram below shows a centralized pool operator, under pressure
+from a regulator, refusing to pay a miner for its work. The miner must
+then drop the transaction or leave the pool.
 
 [plantuml, datum-sv2-payout-refused, svg]
 .The pool leaves a miner out of the payout
@@ -109,17 +103,17 @@ A -[#E5484D]> A : leave pool
 
 == Pools Can Reject Jobs
 
-DATUM server validates the shares it accepts, so it has a final say in
-what block templates it accepts as valid work.
+The DATUM server validates the shares it accepts, so it has the final
+say over which block templates count as valid work.
 
-In SV2's Job Declaration in Full-Template Mode, the pool operator can
-outright reject jobs just like Ocean can with the DATUM protocol.
+In the full-template mode of SV2 Job Declaration, the pool operator
+can reject jobs outright, as OCEAN can with DATUM.
 
-However, SV2's Job Declaration's Coinbase Only Mode allows a miner to
-mine without sending the list of transactions to the pool operator. In
-such setups the SV2 pool can't reject the work outright. This is the
-most censorship resilient mode available to pools using SV2 and
-P2Poolv2 sets this as the base guarantee to permissionless mining.
+The coinbase-only mode of SV2 Job Declaration, however, lets a miner
+mine without sending its transaction list to the pool operator, so the
+pool cannot reject the work outright. It is the most
+censorship-resilient mode available to SV2 pools, and P2Poolv2 makes
+it the baseline guarantee for permissionless mining.
 
 [plantuml, datum-sv2-work-rejected, svg]
 .Whether the pool can reject work depends on what it can see
@@ -146,21 +140,19 @@ end
 
 == P2Poolv2 Decentralized Accounting
 
-P2Poolv2 instead runs accounting using a decentralized share chain,
-which is a blockchain of weak bitcoin blocks. With Nakamoto consensus
-on the chain, all miners converge on the same view of shares and
-therefore can generate payout distributions in coinbases that all
-other miners can continuously and independently validate.
+P2Poolv2 instead runs accounting on a decentralized sharechain, a
+blockchain of weak bitcoin blocks. Nakamoto consensus brings all miners
+to the same view of the shares, so each miner can generate coinbase
+payout distributions that every other miner can continuously and
+independently validate.
 
 == P2Poolv2 Non-Custodial Payouts
 
-With payouts directly from coinbases and also from an atomic swaps
-mechanism miners never hand over custody of their shares or their
-payout rewards to a pool operator, see
-xref:payouts/marketplace.adoc[Marketplace] on how this is enabled in
-P2Poolv2.
+Miners are paid directly from coinbases or through an atomic swap
+mechanism, so they never hand custody of their shares or rewards to a
+pool operator. See xref:payouts/marketplace.adoc[Marketplace] for how
+P2Poolv2 enables this.
 
-The only way P2Poolv2 can reject transactions is if it is 51% attacked
-by miners who want to reject certain transactions. In that case, the
-censored miners have the recourse to fork the pool and run a different
-p2poolv2 chain.
+P2Poolv2 can reject transactions only if miners who want them rejected
+mount a 51% attack. The censored miners can then fork the pool and run
+a separate P2Poolv2 chain.

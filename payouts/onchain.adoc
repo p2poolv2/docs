@@ -2,4 +2,4 @@
 :page-nav_order: 5
 :page-parent: Sell Shares for Payouts
 
-== Running swaps on chain with bitcoin
+== Running Swaps on Chain With Bitcoin

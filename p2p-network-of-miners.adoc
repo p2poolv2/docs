@@ -1,28 +1,26 @@
 = P2P Network of Miners
 :page-nav_order: 20
 
-P2Poolv2 is a peer to peer network where all peers in the network are
-p2poolv2 mining nodes. Each node serves locally connected mining rigs,
-so all nodes are responsible for one or more mining machines. The
-nodes act as a gateway for the mining rigs to the peer to peer
-network.
+P2Poolv2 is a peer-to-peer network in which every peer is a P2Poolv2
+mining node. Each node serves one or more locally connected mining rigs
+and acts as their gateway to the peer-to-peer network.
 
-Each node runs the stratum protocol to distribute work to miner rigs
-to collect work at 3 seconds interval from each node. This rapid
-frequency allows us to estimate hashrate for each miner connected to a
-node. However, not all these shares meet the difficulty of the
-p2poolv2, which maintains a 10 second frequence for shares. We run
-ASERT as the difficulty adjustment algorithm to aim for a 10s share
-interval. See xref:architecture/stratum.adoc[Stratum Server & Vardiff] for details
-on the difficulty adjustment algorithm used.
+Each node runs the Stratum protocol to send work to its mining rigs
+and to collect shares from each rig every 3 seconds. This rapid
+frequency lets the node estimate the hashrate of each connected miner.
+Not all of these shares, however, meet the P2Poolv2 pool difficulty,
+which targets one share every 10 seconds. P2Poolv2 uses ASERT as the
+difficulty adjustment algorithm to hold that 10s share interval. See
+xref:architecture/stratum.adoc[Stratum Server & Vardiff] for details
+on the difficulty adjustment algorithm.
 
-Shares that do meet the pool difficulty as determined by ASERT are
-then gossipped over the peer to peer network. All receiving shares
-validate the share. See xref:architecture/validation.adoc[Share Validation] for details.
+Nodes gossip the shares that meet the pool difficulty over the
+peer-to-peer network, and every node that receives a share validates
+it. See xref:architecture/validation.adoc[Share Validation] for details.
 
-The diagram below shows a peer to peer network with seven nodes, Node
-A to Node G. Some of the connections are carrying shares as multiple
-nodes can emit shares at the same time too.
+The diagram below shows a peer-to-peer network of seven nodes, Node A
+to Node G. Several connections carry shares at once, because more than
+one node can find a share at the same time.
 
 [graphviz, p2p-mesh, svg]
 ....
@@ -54,11 +52,11 @@ graph p2p {
 }
 ....
 
-The shares are thus replicated at all nodes and a Nakamoto consensus
-is reached on the state of the sharechain. With this consensus all
-nodes will agree on the state of the sharechain and how many shares
-were mined by each miner at which difficulty. Using this, each node
-can evaluate the rewards due to all miners when a share is
-received. The share's bitcoin coinbase is thus verified that it meets
-the expected reward distribution. See xref:architecture/pplns-accounting.adoc[PPLNS
-Share Accounting] on how the accounting is always audited.
+Every node thus holds a replica of the shares, and the nodes reach
+Nakamoto consensus on the state of the sharechain. Through this
+consensus, all nodes agree on the sharechain and on how many shares
+each miner mined at which difficulty. When a share arrives, each node
+uses this agreement to work out the rewards due to every miner, and
+verifies that the share's bitcoin coinbase pays the expected reward
+distribution. See xref:architecture/pplns-accounting.adoc[PPLNS
+Share Accounting] for how the accounting is continuously audited.

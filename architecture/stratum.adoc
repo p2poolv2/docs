@@ -1,23 +1,21 @@
 = Stratum Server & Vardiff
 :page-nav_order: 22
 
-Each p2poolv2 node comes with its own Stratum server, whose
-responsibilities are to generate work for the mining rigs and to make
-sure they work with a target share interval.
+Each P2Poolv2 node comes with its own Stratum server, which generates
+work for the mining rigs and keeps them at a target share interval.
 
-The stratum implementation is highly inspired by the params CKPool
-uses. Specifically, 3s share interval and the vardiff algorithm
-used. CKpool is one of the most robust and battle tested stratum
-server implementation and p2poolv2 leverages the years of learning and
-experience captured in the difficulty adjustment algorithm.
+The Stratum implementation closely follows CKPool's parameters: the
+3s share interval and the vardiff algorithm. CKPool is a robust,
+battle-tested Stratum server, and P2Poolv2 draws on the years of
+experience captured in its difficulty adjustment algorithm.
 
-Our code base implements the stratum server in Rust and provides
-extensive test coverage to ease future changes.
+Our code base implements the Stratum server in Rust, with extensive
+test coverage to ease future changes.
 
 == Components
 
-The diagram shows a simplified view of the various components of the
-Stratum server.
+The diagram shows a simplified view of the Stratum server's
+components.
 
 [plantuml, stratum-components, svg]
 .Stratum server components
@@ -36,7 +34,7 @@ rectangle "Stratum server" {
   component "Vardiff" as vardiff
 }
 
-database "Share chain" as chain
+database "Sharechain" as chain
 actor "Miners" as miners
 
 bitcoind --> gbt : templates
@@ -57,16 +55,16 @@ Template fetcher::
   new transactions make it into the work.
 
 Job builder:: Turns each template into a mining job. The
-  coinbase transaction pays out to miners according to PPLNS
-  accounting over the share chain, and each job commits to the current
-  share chain tip. Every connected miner is sent the new job with
+  coinbase transaction pays miners according to PPLNS
+  accounting over the sharechain, and each job commits to the current
+  sharechain tip. Every connected miner is sent the new job with
   `mining.notify`.
 
 Vardiff::
   Adjusts each miner's difficulty so that it submits roughly one share
   every 3.3 seconds, whatever its hashrate. It follows CKPool's
   algorithm and waits for enough shares, or enough time, before
-  changing difficulty so that it does not overreact to luck.
+  changing difficulty, so that it does not overreact to luck.
 
 Share validator::
 +
@@ -74,20 +72,20 @@ Share validator::
 Checks every submitted share against the miner's current difficulty,
 and rejects duplicates. Then:
 
-* a share that meets the *pool target* is sent to the share chain,
+* a share that meets the *pool target* is sent to the sharechain,
   which stores it and relays it to peers;
 * a share that also meets the *bitcoin target* is a block, and is
   submitted to bitcoind straight away with `submitblock`.
 
 Shares below the pool target still count towards the miner's measured
-hashrate and vardiff, but do not enter the share chain.
+hashrate and vardiff, but they do not enter the sharechain.
 --
 
 [[miner-options]]
-== Miner options
+== Miner Options
 
 Miners pass options in the password field of `mining.authorize`, as
-`key=value` pairs separated by commas, semicolons or spaces, for
+`key=value` pairs separated by commas, semicolons, or spaces, for
 example `d=65536,p2p=tp2pool1p...`.
 
 [cols="1,3",options="header"]
@@ -96,16 +94,17 @@ example `d=65536,p2p=tp2pool1p...`.
 
 | `d=<difficulty>`
 | Asks the stratum server to start at this difficulty instead of the pool default.
-  Some miners know that their hashrate requires a high difficulty to start.
+  Useful for a miner whose hashrate calls for a high starting difficulty.
 
 | `th=<terahashes>`
 | Your miner's hashrate in TH/s, from which a starting difficulty is worked out.
   If both `d=` and `th=` are given, `d=` wins.
 
 | `p2p=<address>`
-| The P2Poolv2 address that owns your share chain outputs. Not needed
+| The P2Poolv2 address that owns your sharechain outputs. Not needed
   if the node operator has set one for the whole pool.
 |===
 
 Suggested difficulties are kept within the pool's configured minimum
-and maximum. See config documentation in p2poolv2 node's config.toml file.
+and maximum. See the configuration documentation in the P2Poolv2
+node's `config.toml` file.

@@ -2,4 +2,4 @@
 :page-nav_order: 20
 :page-parent: Sell Shares for Payouts
 
-== Data available to miners and buyers to buy shares
+== Data Available to Miners and Buyers to Buy Shares

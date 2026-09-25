@@ -2,4 +2,4 @@
 :page-nav_order: 10
 :page-parent: Sell Shares for Payouts
 
-== Running swaps with Ark
+== Running Swaps With Ark

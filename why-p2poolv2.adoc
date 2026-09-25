@@ -1,15 +1,15 @@
-= Why do we need P2Poolv2
+= Why Do We Need P2Poolv2
 :page-nav_order: 3
 
 
 Bitcoin mining pools are a centralization pressure on bitcoin.
 
-We need an open source software stack that can be run by participants
-to help pool hashrate without
+We need an open source software stack that participants can run to
+pool their hashrate without a central operator that
 
-. a central operator that decides on the transactions included on the block or
-. distributes rewards for miners from its custodial wallet.
+. decides which transactions go into a block, or
+. pays miners from its custodial wallet.
 
-P2Poolv2 is rebooting the original P2Pool for bitcoin with latest advances available in bitcoin and uses modern programming languages and libraries like rust-bitcoin.
+P2Poolv2 reboots the original P2Pool for bitcoin. It builds on the latest advances in bitcoin and uses modern programming languages and libraries, such as rust-bitcoin.
 
-Looking at the https://mempool.space/graphs/mining/pools[pool distribution on mempool.space], the **goal of P2Poolv2 is to enable miners to mine block without depending on a centralized server** run by an organization that single handily controls the server.
+Given the https://mempool.space/graphs/mining/pools[pool distribution on mempool.space], the **goal of P2Poolv2 is to let miners mine blocks without depending on a centralized server** that a single organization controls.
