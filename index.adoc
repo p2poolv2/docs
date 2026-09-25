@@ -14,7 +14,7 @@ https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"
 
 == What is here
 
-Run a node:: Run a node from source and connect your miners, see xref:getting-started/index.adoc[Getting started]
+Run a node:: Run a node from source and connect your miners, see xref:getting_started.adoc[Getting started]
 
 P2P Network:: How miners join a p2p network to reduce their variance xref:p2p-network-of-miners.adoc[P2P Network of Miners]
 
