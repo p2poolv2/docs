@@ -4,11 +4,20 @@ The source for https://docs.p2poolv2.org. Jekyll with the
 https://just-the-docs.com[Just the Docs] theme, pages in AsciiDoc via
 jekyll-asciidoc, diagrams in PlantUML via asciidoctor-diagram.
 
+=== Contents
+
+This documentation project is a work-in-progress and the rendered site is not published yet. For convenience, we provide direct Asciidoc links to a few notable, in-progress pages.
+
+* xref:index.adoc[P2Poolv2 Documentation] (docs home page)
+* xref:getting-started/index.adoc[Getting Started]
+* xref:stories/single-miner.adoc[Single Miner Story]
+* xref:writing-docs.adoc[Writing documentation]
+
+==== Additional Contents
+
 ....
 _config.yml                    site, theme and Asciidoctor settings
-index.adoc                     home page
-getting-started/, architecture/  sections (sample content for now)
-writing-docs.adoc              how to write pages; also the feature test page
+architecture/                  sections (sample content for now)
 _snippets/                     files pulled into pages with include::
 _plantuml/p2poolv2.config      brand skin applied to every PlantUML diagram
 _sass/custom/setup.scss        the brand palette and fonts
@@ -38,7 +47,7 @@ Then open http://localhost:4000. If a diagram does not update, run
 
 === Writing pages
 
-See `writing-docs.adoc`, rendered at `/writing-docs.html`. In short: a
+See xref:writing-docs.adoc[Writing documentation]. In short: a
 `.adoc` file with `= Title` and `:page-nav++_++order:`, `:page-parent:`
 and `:page-has++_++children:` attributes for the sidebar, and
 `++[++plantuml, name, svg++]++` blocks for diagrams.

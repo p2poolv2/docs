@@ -1,0 +1,9 @@
+= Single Miner Story
+:page-nav_order: 91
+
+== Introduction
+
+This _Story_ will explain the operation of the simplest possible configuration of a P2poolv2 pool: a pool with a single-miner attached. It will walk through the various events that occur during mining, the blocks and UTXOs issued on the sharechain, and the Bitcoin block and coinbase that is generated when the pool successfully mines a Bitcoin block.
+
+For now this page is a placeholder.
+
