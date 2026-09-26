@@ -2,8 +2,6 @@
 :page-has_children: true
 :page-nav_order: 24
 
-== What Is a Sharechain?
-
 A sharechain is a blockchain of shareblocks where each shareblock is a
 has an embedded bitcoin header. The sharechain difficulty is much
 lower than the bitcoin difficulty, and therefore we find it easier to
@@ -11,10 +9,10 @@ say that the sharechain is a blockchain of "weak" bitcoin blocks.
 
 The bitcoin header includes the bits field for the target bitcoin
 difficulty and the shareblock header includes a bits field capturing
-the target sharechain difficuty. The diagram below shows the
+the target sharechain difficulty. The diagram below shows the
 relationship between a sharechain header and a bitcoin header.
 
-=== ShareBlock Header and Bitcoin Header
+== ShareBlock Header and Bitcoin Header
 
 The relationship between the shareblock header and bitcoin header is
 shown in the diagram below. Note that there are two `bits` fields,
@@ -100,7 +98,7 @@ digraph shareblock {
 }
 ....
 
-=== Sharechain and Bitcoin Blockchain
+== Sharechain and Bitcoin Blockchain
 
 The sharechain is a chain of shareblocks. Each sharechain block refers
 to a bitcoin block header that captures the proof of work. This
@@ -177,12 +175,49 @@ digraph sharechain {
 }
 ....
 
-== Why Is It Needed
+== Sharechain Provides Consensus on Payout Distribution
 
-== Where Is It Available
+A sharechain provides Nakamoto consensus on the weak shares across all
+nodes. With eventual consistency all nodes have the same view of the
+sharechain and all nodes determine the same payout distribution when
+building shares. This enables all nodes to validate all shares on the
+sharechain payout honestly. Any share received from another peer that
+does not distribute payouts as per the receiving node's local view is
+rejected by the local node.
 
-== How Is It Built and Maintained
+Without this consensus provided by the sharechain, nodes can not
+validate the payout distribution conforms to a receiving node's view
+of the payout distribution. See the
+xref:architecture/validation.adoc[Validation] section on how shares
+are validated.
 
-== How Are Shares Validated
+== Shares Have an Intrinsic Value
 
-   Point to share validation page
+The share also has a bits field identifying the pool difficulty the
+share was mined at. The difficulty along with the time when the share
+was mined as well as the bitcoin network difficulty when the share was
+mined all provide an intrinsic value of the sharechain coinbase output
+a miner owns.
+
+Given the above information the value of the sharechain can be derived
+from the probability that the pool will find a bitcoin block that will
+end up in a bitcoin reward for the share.
+
+This value is what miners can sell too others. The miners want an
+immediate payout and the buyers want to earn the bitcoin that this
+share will earn when the pool finds a bitcoin block.
+
+NOTE: TODO: Build a table of share valuation parameters.
+
+== Sharechain Provides UTXO & Script Based Transaction Support
+
+The sharechain supports UTXO and Script based transaction
+support. Each sharechain block has a coinbase paying the miner of the
+share 1 Unit of the sharechain value. This captures the intrinsic
+value of the share, and with the transaction support this share can
+now be traded.
+
+Using UTXO/Script the share can be traded for bitcoin using atomic
+swaps, either on chain or off-chain. See the
+xref:payouts/marketplace.adoc[Marketplace] section on how such swaps
+enable a payout mechanism for miners on P2Poolv2.
