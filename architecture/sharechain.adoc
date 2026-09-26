@@ -14,6 +14,18 @@ difficulty and the shareblock header includes a bits field capturing
 the target sharechain difficuty. The diagram below shows the
 relationship between a sharechain header and a bitcoin header.
 
+=== ShareBlock Header and Bitcoin Header
+
+The relationship between the shareblock header and bitcoin header is
+shown in the diagram below. Note that there are two `bits` fields,
+capturing the two difficulty targets - one for the bitcoin block and
+the other for the sharechain.
+
+There are a number of other book keeping fields in the shareblock
+header that we have not shown here. The important ones to note are the
+previous block hashes, the bits fields and the time fields. The
+bitcoin block header is shown in full.
+
 [graphviz, shareblock-headers, svg]
 .A shareblock's proof of work lives in its bitcoin header
 ....
@@ -88,10 +100,19 @@ digraph shareblock {
 }
 ....
 
-The sharechain is thus a chain of shareblocks, each referring to a
-bitcoin block header that captures the proof of work. A shareblock can
-embed the same bitcoin header as miners produce shares working on the
-same bitcoin header.
+=== Sharechain and Bitcoin Blockchain
+
+The sharechain is a chain of shareblocks. Each sharechain block refers
+to a bitcoin block header that captures the proof of work. This
+resulting PoW is compared to the sharechain and bitcoin bits fields to
+validate the share meets sharechain difficulty and the bitcoin
+difficulty respectively.
+
+A number of shareblocks can be working on the same bitcoin previous
+blockhash, as shown by dashed arrows in the diagram below. The orange
+arrow from ShareBlock 3 to Block 101 shows that ShareBlock 3's PoW
+meets the bitcoin difficulty and therefore Block 101 can be submitted
+to bitcoin blockchain.
 
 [graphviz, sharechain-bitcoin-chain, svg]
 .Shareblocks build on the bitcoin tip, and Shareblock 3 found Block 101
@@ -144,6 +165,7 @@ digraph sharechain {
   edge [style=dashed, color="#FFFFFFC7", constraint=false]
   s1 -> b100 [xlabel="builds on    "]
   s2 -> b100
+  s3 -> b100
   s4 -> b101
   s5 -> b101
   s6 -> b102
