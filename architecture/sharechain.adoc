@@ -100,11 +100,13 @@ digraph shareblock {
 
 == Sharechain and Bitcoin Blockchain
 
-The sharechain is a chain of shareblocks. Each sharechain block refers
-to a bitcoin block header that captures the proof of work. This
-resulting PoW is compared to the sharechain and bitcoin bits fields to
-validate the share meets sharechain difficulty and the bitcoin
-difficulty respectively.
+The sharechain is a chain of shareblocks. Each sharechain block embeds
+a bitcoin block header that captures the proof of work. Th bitcoin
+blockhash computed from the bitcoin header is compared to the
+sharechain bits fields to validate the share meets sharechain
+difficulty. The bitcoin blockhash is also compared to bitcoin header
+bits field to check if this block is also a bitcoin block that can be
+broadcast to the bitcoin network.
 
 A number of shareblocks can be working on the same bitcoin previous
 blockhash, as shown by dashed arrows in the diagram below. The orange
@@ -183,29 +185,37 @@ sharechain and all nodes determine the same payout distribution when
 building shares. This enables all nodes to validate all shares on the
 sharechain payout honestly. Any share received from another peer that
 does not distribute payouts as per the receiving node's local view is
-rejected by the local node.
+rejected by the local node. See xref:pplns-accounting.adoc[PPLNS Share
+Accounting] section to see how share accounting is handled in a
+decentralized network.
 
 Without this consensus provided by the sharechain, nodes can not
 validate the payout distribution conforms to a receiving node's view
 of the payout distribution. See the
-xref:architecture/validation.adoc[Validation] section on how shares
+xref:validation.adoc[Share Validation] section on how shares
 are validated.
 
-== Shares Have an Intrinsic Value
+== Shares Have a Valuation
 
-The share also has a bits field identifying the pool difficulty the
-share was mined at. The difficulty along with the time when the share
-was mined as well as the bitcoin network difficulty when the share was
-mined all provide an intrinsic value of the sharechain coinbase output
-a miner owns.
+When the pool finds a block, all the shares within a certain depth
+from the tip end up earning a payout from the bitcoin coinbase. This
+depth depends on the length of the PPLNS (pay-per-last-n-shares)
+window. Therefore, there is an intrinsic value that these shares
+hold - they earn bitcoin when the pool finds a bitcoin block up to a
+certain expiry time. This makes the shares behave as an Options
+instrument with a known expiry.
 
-Given the above information the value of the sharechain can be derived
-from the probability that the pool will find a bitcoin block that will
-end up in a bitcoin reward for the share.
+Apart from the share's presence in the PPLNS window, there are other
+fields in the shareblock that can be used to assign a value to the
+shares.
 
-This value is what miners can sell too others. The miners want an
-immediate payout and the buyers want to earn the bitcoin that this
-share will earn when the pool finds a bitcoin block.
+. The pool difficulty the share was mined at - shareheader `bits`
+. The bitcoin difficulty when the share was mined - bitcoi header `bits`
+. The height of the share in the share chain
+
+This value associated with a is what miners can sell too others. The
+miners want an immediate payout and the buyers want to earn the
+bitcoin that this share will earn when the pool finds a bitcoin block.
 
 NOTE: TODO: Build a table of share valuation parameters.
 
@@ -213,11 +223,11 @@ NOTE: TODO: Build a table of share valuation parameters.
 
 The sharechain supports UTXO and Script based transaction
 support. Each sharechain block has a coinbase paying the miner of the
-share 1 Unit of the sharechain value. This captures the intrinsic
-value of the share, and with the transaction support this share can
-now be traded.
+share 1 share unit of the sharechain value. This captures the
+intrinsic value of the share, and with the transaction support this
+share can now be traded.
 
 Using UTXO/Script the share can be traded for bitcoin using atomic
 swaps, either on chain or off-chain. See the
-xref:payouts/marketplace.adoc[Marketplace] section on how such swaps
+xref:../payouts/marketplace.adoc[Sell Shares for Payouts] section on how such swaps
 enable a payout mechanism for miners on P2Poolv2.
