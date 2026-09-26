@@ -44,7 +44,7 @@ digraph shareblock {
     fillcolor="#121212"
 
     subgraph cluster_share_header {
-      label="Share header"
+      label="Shareblock header"
       fontsize=11
       fontcolor="#FFFFFFC7"
       color="#FFFFFF66"
