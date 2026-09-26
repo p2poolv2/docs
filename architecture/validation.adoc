@@ -4,12 +4,33 @@
 
 == Why Do We Need to Validate Shares
 
+Shares carry a claimed proof of work and are rewarded for it. The
+sharechain validates all shares that are added to the chain so that
+the share is valid and can not be rewarded twice for the same work. If
+nodes don't validate shares receieved from other nodes, a sending node
+can send the same proof of work for multiple shares and earn multiple
+payouts for the same work done.
+
 == What Are the Requirements of Share Validation
 
-Make sure to capture the malicious fork argument
+Each share is validated in the context of the chain, i.e. it is
+validated knowing the height and previous shareblock hash of the
+share. This context dependent validation is required before confirming
+the share. The ASERT based proof of work and output spend validation
+can only run once the share position in the chain is known.
 
-Also capture the lack of need for validating bitcoin blocks
+A share validation should cover the following:
 
-== Overview of Share Validation
+Proof of Work is Correct:: The proof of work meets the pool difficulty at the share's chain height.
+ShareBlock is Valid:: All shareblock transactions are valid per the entire bitcoin block validation rules.
+Duplicate Work is Disallowed:: The same bitcoin header is not embedded in more than one shareblock header.
+Mine on Current Bitcoin Chain:: The bitcoin header is building on the current bitcoin chain, not an adverserial fork of bitcoin.
+PPLNS Payout is Valid:: The bitcoin coinbase pays all miners according to the chain's PPLNS window at the share height.
+
+// Make sure to capture the malicious fork argument
 
 == For Each Requirement, Describe How Validation Works
+
+== What is Not Validated and Why?
+
+Capture the lack of need for validating bitcoin blocks
