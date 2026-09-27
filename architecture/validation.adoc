@@ -6,30 +6,51 @@
 
 Shares carry a claimed proof of work and are rewarded for it. The
 sharechain validates all shares that are added to the chain so that
-the share is valid and can not be rewarded twice for the same work. If
-nodes don't validate shares receieved from other nodes, a sending node
+the share is valid and cannot be rewarded twice for the same work. If
+nodes don't validate shares received from other nodes, a sending node
 can send the same proof of work for multiple shares and earn multiple
 payouts for the same work done.
 
 == What Are the Requirements of Share Validation
+
+A share validation should cover the following to make sure no miner
+can take more than their work is due:
+
+Proof of Work Meets Pool Difficulty:: Payouts depend on proof of work
+submitted by miners. The pool difficulty comes from the ASERT
+algorithm applied over a share's ancestors and a share's declared
+target should match what the pool expects according to ASERT.
+
+Timestamps Limits:: ASERT sets the difficulty from share times and
+height. Miners should not be able to manipulate share timestamps that
+results in lower difficulty for their shares.
+
+Unique PoW for Each Share:: No two shares should be able to use the
+same PoW from the bitcoin block to earn more than one reward for a
+single PoW.
+
+Uncles Follow the Rules:: Uncle shares earn rewards and uncles have to
+follow all of the validation rules discussed here.
+
+Bitcoin Payouts Follow the PPLNS Window:: All bitcoin coinbases should
+follow the PPLNS window on the sharechain. No share should include a
+bitcoin block header with a coinbase in the bitcoin block that doesn't
+follow the sharechain PPLNS reward distribution.
+
+Share Transactions Are Valid:: All shareblock transactions, including
+the coinbase are valid in terms of value spent, scripts, spent
+outputs.
+
+Mine on Current Bitcoin Chain:: The bitcoin header should build on the
+current bitcoin chain, not an adverserial fork of bitcoin.
+
+== For Each Requirement, Describe How Validation Works
 
 Each share is validated in the context of the chain, i.e. it is
 validated knowing the height and previous shareblock hash of the
 share. This context dependent validation is required before confirming
 the share. The ASERT based proof of work and output spend validation
 can only run once the share position in the chain is known.
-
-A share validation should cover the following:
-
-Proof of Work is Correct:: The proof of work meets the pool difficulty at the share's chain height.
-ShareBlock is Valid:: All shareblock transactions are valid per the entire bitcoin block validation rules.
-Duplicate Work is Disallowed:: The same bitcoin header is not embedded in more than one shareblock header.
-Mine on Current Bitcoin Chain:: The bitcoin header is building on the current bitcoin chain, not an adverserial fork of bitcoin.
-PPLNS Payout is Valid:: The bitcoin coinbase pays all miners according to the chain's PPLNS window at the share height.
-
-// Make sure to capture the malicious fork argument
-
-== For Each Requirement, Describe How Validation Works
 
 == What is Not Validated and Why?
 
