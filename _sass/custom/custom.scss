@@ -410,10 +410,26 @@ h1, h2, h3, h4, h5, h6,
     p.tableblock { margin: 0; }
   }
 
+  // The theme lays every dl out as a two-column grid with a narrow,
+  // right-aligned term column. Long terms wrap badly there, so stack
+  // each term above its description instead.
+  .dlist dl {
+    display: block;
+  }
+
   .dlist dt {
     font-family: $mono-font-family;
     font-weight: 700;
     color: $p2-white;
+    text-align: left;
+
+    &::after {
+      content: none;
+    }
+  }
+
+  .dlist dd {
+    margin: 0.25rem 0 1rem 1.5rem;
   }
 
   kbd {
