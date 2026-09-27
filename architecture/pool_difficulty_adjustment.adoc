@@ -1,3 +1,16 @@
 = Pool Vardiff
 :page-nav_order: 23
 
+We use the ASERT difficulty adjustment for pool's difficulty
+adjustment. We ran simulations (using LLMs) to analyse various
+difficulty adjustment algorithms. The results are in
+https://github.com/p2poolv2/pool_difficulty_adjustment_analysis/blob/6e6ce1a8ac50e0257a9839a9744fc3e52b0f3ecd/daa_simulation_report.md[daa
+simulation report].
+
+Our goals were to select a DAA algorithm that shows resistance to
+various hashrate attacks like oscillating hashrate attack, sudden 90%
+drop and noisy random oscillations. The methodology followed is at https://github.com/p2poolv2/pool_difficulty_adjustment_analysis/blob/6e6ce1a8ac50e0257a9839a9744fc3e52b0f3ecd/daa_evaluation.md[daa evaluation].
+
+The results showed using ASERT would provide the most attack
+resistance. The parameters we provided were a target block rate of 10s
+and maximum uncle depth of 3, with PPLNS accounting.
