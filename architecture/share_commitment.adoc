@@ -1,0 +1,136 @@
+= Share Commitments
+:page-parent: Sharechain
+:page-nav_order: 0
+
+Each share is committed to in the bitcoin coinbase for the header
+embedded in the shareblock header. The goal is twofold:
+
+. Each bitcoin PoW can be used to build a single share.
+. Each shareblock coinbase is unique, even if it generates shares for the same bitcoin block template.
+
+The diagram below shows the fields in share that are committed to in
+the bitcoin coinbase. The commitment is placed in the bitcoin
+coinbase, which is accumulated with the merkle root from bitcoin
+header to get the bitcoin block hash. This results in the shareblock
+header's fields indirectly committing into the bitcoin header and the
+bitcoin blockhash. This guarantees that a bitcoin blockhash' PoW can
+not be represented by more than one shareblock, guaranteeing the first
+requirement - that each PoW can be used to build only a single share.
+
+By committing to the the bitcoin blockhash in shareblock coinbase, we
+are then guaranteed that each shareblock coinbase is unique. Even if
+the shareblock is generated for the same bitcoin block template, each
+bitcoin blockhash results in a unique coinbase. The bitcoin blockhash
+will be unique as the nonce will be unique each time.
+
+[graphviz, share-commitment, svg]
+.The commitment ties the shareblock to its proof of work
+....
+digraph commitment {
+  compound=true
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.5
+  ranksep=0.12
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fillcolor="#121212", color="#FFFFFF66",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=2.5, fixedsize=true, height=0.32]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_committed {
+    label="Shareblock header\ncommitted fields"
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+    prevhash [label="previous shareblock hash"]
+    uncles [label="uncles"]
+    sharebits [label="bits: sharechain target"]
+    sharetime [label="time"]
+    fees [label="donation and fee"]
+    btcaddr [label="miner bitcoin address"]
+    shareaddr [label="miner sharechain address"]
+  }
+
+  subgraph cluster_othertx {
+    label="Sharechain transactions"
+    color="#FFFFFF66"
+    style=filled
+    fillcolor="#121212"
+    othertx [label="non-coinbase transactions"]
+  }
+
+  commitment [label="Share commitment\nSHA256 of the committed\nfields and the\nnon-coinbase root",
+              width=2.1, height=0.9, color="#F7931A", penwidth=2]
+
+  subgraph cluster_coinbase {
+    label="Bitcoin coinbase"
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+    height [label="scriptSig: height"]
+    extranonce [label="scriptSig: extranonce"]
+    cbhash [label="scriptSig: commitment hash", fillcolor="#F7931A",
+            color="#F7931A", fontcolor="#0B0B0C"]
+    nsecs [label="scriptSig: nsecs"]
+    payouts [label="outputs: PPLNS payouts"]
+    witness [label="outputs: witness commitment"]
+  }
+
+  subgraph cluster_bitcoin_header {
+    label="Bitcoin header\nembedded in shareblock header"
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+    version [label="version"]
+    prevbtc [label="previous bitcoin block hash"]
+    merkle [label="merkle root", fillcolor="#F7931A", color="#F7931A",
+            fontcolor="#0B0B0C"]
+    btctime [label="time"]
+    btcbits [label="bits: bitcoin target"]
+    nonce [label="nonce"]
+  }
+
+  pow [label="Proof of work\nweak block hash", width=1.7, height=0.6,
+       color="#F7931A", penwidth=2]
+
+  subgraph cluster_share_coinbase {
+    label="Sharechain coinbase"
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+    sharecb_hash [label="scriptSig: weak block hash", fillcolor="#F7931A",
+                  color="#F7931A", fontcolor="#0B0B0C"]
+    sharecb_out [label="output: one share unit"]
+  }
+
+  // Stack each structure's fields top to bottom.
+  edge [style=invis]
+  prevhash -> uncles -> sharebits -> sharetime -> fees -> btcaddr -> shareaddr -> othertx
+  height -> extranonce -> cbhash -> nsecs -> payouts -> witness
+  version -> prevbtc -> merkle -> btctime -> btcbits -> nonce
+  sharecb_hash -> sharecb_out
+  // Three columns: each bottom-row structure sits under a top-row one.
+  othertx -> sharecb_hash
+  commitment -> pow [minlen=6]
+  witness -> version
+  edge [style=solid]
+
+  {rank=same; sharetime; commitment; cbhash}
+  {rank=same; merkle; pow; sharecb_hash}
+
+  // Top row flows left to right, bottom row right to left.
+  sharetime -> commitment [ltail=cluster_committed]
+  othertx -> commitment [ltail=cluster_othertx]
+  commitment -> cbhash
+  cbhash -> merkle [ltail=cluster_coinbase, label="coinbase txid and
+merkle branches"]
+  sharecb_hash -> pow [dir=back]
+  pow -> merkle [dir=back, lhead=cluster_bitcoin_header, label="hashed"]
+}
+....
+
+The share commitment is checked as part of the xref:validation.adoc[share validation scheme].
