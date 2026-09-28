@@ -1,5 +1,5 @@
-= Compared With SV2 & DATUM
-:page-nav_order: 40
+= Comparison With SV2 & DATUM
+:page-nav_order: 140
 
 SV2 with Job Declaration and OCEAN's DATUM both let a centralized pool
 operator offload transaction selection to miners. Both decentralize
