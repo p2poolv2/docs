@@ -2,3 +2,97 @@
 :page-parent: Sharechain
 :page-nav_order: 30
 
+Each share has enough data to reconstruct the bitcoin block's coinbase
+transaction. Given the payout distribution in the bitcoin coinbase
+p2poolv2 nodes compare it to the payout distribution derived from the
+local view of the sharechain. If these match, the share is valid, else
+it is rejected with a PPLNS mismatch error.
+
+== Coinbase Maturity, PPLNS Window and Trading Window
+
+The N in the pay-per-last-N-shares in P2Poolv2 is 120,960 which maps
+to the number of target block interval periods of 10s in a two week
+window.
+
+A coinbase can only be spent once it is 6048 deep from the
+chain tip. This is chosen to be the same time period as 100 bitcoin
+blocks. So the PPLNS window starts after the first 6048 blocks on the
+chain, that is the maturity window shares are excluded from the PPLNS
+accounting.
+
+The window shares between coinbase maturity and the PPLNS expiry
+height is called the trading window. The diagram below shows these
+concepts.
+
+[graphviz, pplns-windows, svg]
+.Maturity, PPLNS, and trading windows, counted back from the tip
+....
+digraph pplns_window {
+  rankdir=LR
+  bgcolor="#0B0B0C"
+  nodesep=0.2
+  ranksep=0.12
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fillcolor="#121212", color="#FFFFFF66",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        label="", width=0.3, height=0.3, fixedsize=true]
+  edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
+
+  subgraph cluster_expired {
+    label="Expired\ncannot be spent"
+    color="#FFFFFF66"
+    style=dashed
+    node [color="#FFFFFF40"]
+    e1; e2; e3
+  }
+
+  subgraph cluster_window {
+    label="PPLNS window and trading window: 120,960 shares\ncounted for payouts, can be traded"
+    color="#F7931A"
+    penwidth=2
+    style=filled
+    fillcolor="#121212"
+    node [fillcolor="#F7931A", color="#F7931A"]
+    w1; w2; w3
+    wdots [shape=plaintext, style="", label="…", fontsize=16,
+           fontcolor="#F7931A"]
+    w4; w5; w6
+  }
+
+  subgraph cluster_maturity {
+    label="Maturity window: 6,048 shares\nnot counted, cannot be spent"
+    color="#FFFFFF66"
+    style=filled
+    fillcolor="#121212"
+    m1; m2
+    mdots [shape=plaintext, style="", label="…", fontsize=16,
+           fontcolor="#FFFFFFC7"]
+    m3
+  }
+
+  tip [shape=plaintext, style="", width=0.6, label="tip",
+       fontcolor="#F7931A"]
+
+  e1 -> e2 -> e3 -> w1 -> w2 -> w3 -> wdots -> w4 -> w5 -> w6
+  w6 -> m1 -> m2 -> mdots -> m3
+  m3 -> tip [color="#F7931A", arrowhead=normal, style=dashed]
+}
+....
+
+// == Spending Coinbases and Root Height
+
+// Coinbases can be spent and new UTXOs are generated with each
+// spend. This results in a chain of UTXOs rooted at the coinbase where
+// the coins were first created. We call the height of the root coinbase
+// as the root height. As UTXOs are spent, the root height is tracked
+// with descendant UTXOs, and as a UTXO's root height - the chain tip
+// height exceeds the PPLNS window
+
+// When a coinbase is create the height of the chain for the shareblock
+// is tracked as the `root height` of the coinbase
+
+// == UTXO Expiry
+
+// A coinbase can be spent to create new UTXOs and each 

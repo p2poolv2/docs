@@ -89,6 +89,7 @@ exclude:
   - README.md
   - AGENTS.md
   - CLAUDE.md
+  - DOC_CODE_REVIEW.md
   - LICENSE
   - .jekyll-cache
 
