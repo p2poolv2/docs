@@ -1,5 +1,5 @@
 = Node Components
-:page-nav_order: 21
+:page-nav_order: 60
 
 
 A P2Poolv2 node has two components: a Stratum server that miners

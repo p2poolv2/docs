@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 2
 :sectnums:
-:page-nav_order: 70
+:page-nav_order: 120
 
 A list of well-studied attacks on mining pools, with references and candidate mitigations for P2Poolv2.
 

@@ -1,5 +1,5 @@
 = Stories
-:page-nav_order: 90
+:page-nav_order: 140
 :page-has_children: true
 
 This section will contain pages similar to "User Stories" or "Use Case Scenarios", which we call "Stories" for now.

@@ -1,5 +1,6 @@
 = Single Miner Story
-:page-nav_order: 91
+:page-parent: Stories
+:page-nav_order: 10
 
 == Introduction
 

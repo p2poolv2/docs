@@ -1,5 +1,5 @@
 = P2P Network of Miners
-:page-nav_order: 20
+:page-nav_order: 50
 
 P2Poolv2 is a peer-to-peer network in which every peer is a P2Poolv2
 mining node. Each node serves one or more locally connected mining rigs
@@ -11,7 +11,7 @@ frequency lets the node estimate the hashrate of each connected miner.
 Not all of these shares, however, meet the P2Poolv2 pool difficulty,
 which targets one share every 10 seconds. P2Poolv2 uses ASERT as the
 difficulty adjustment algorithm to hold that 10s share interval. See
-xref:architecture/stratum.adoc[Stratum Server & Vardiff] for details
+xref:stratum.adoc[Stratum Server & Vardiff] for details
 on the difficulty adjustment algorithm.
 
 Nodes gossip the shares that meet the pool difficulty over the

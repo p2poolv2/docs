@@ -1,5 +1,5 @@
 = Stratum Server & Vardiff
-:page-nav_order: 22
+:page-nav_order: 70
 
 Each P2Poolv2 node comes with its own Stratum server, which generates
 work for the mining rigs and keeps them at a target share interval.

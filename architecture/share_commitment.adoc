@@ -1,6 +1,6 @@
 = Share Commitments
 :page-parent: Sharechain
-:page-nav_order: 0
+:page-nav_order: 10
 
 Each share is committed to in the bitcoin coinbase for the header
 embedded in the shareblock header. The goal is twofold:

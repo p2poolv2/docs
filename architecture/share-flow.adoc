@@ -1,6 +1,6 @@
 = Share Flow
 :page-parent: Sharechain
-:page-nav_order: 4
+:page-nav_order: 50
 
 NOTE: This sample page demonstrates PlantUML sequence, state, and
 activity diagrams. The flow is illustrative and will be checked against

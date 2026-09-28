@@ -1,5 +1,5 @@
 = Writing Documentation
-:page-nav_order: 100
+:page-nav_order: 150
 
 Pages are written in AsciiDoc and built with Jekyll and the Just the Docs
 theme. This page is both the guide and the test page: every feature below

@@ -1,5 +1,5 @@
 = Pool Vardiff
-:page-nav_order: 23
+:page-nav_order: 80
 
 We use the ASERT difficulty adjustment for pool's difficulty
 adjustment. We ran simulations (using LLMs) to analyse various

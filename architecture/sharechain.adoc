@@ -1,6 +1,6 @@
 = Sharechain
 :page-has_children: true
-:page-nav_order: 24
+:page-nav_order: 90
 
 A sharechain is a blockchain of shareblocks, and each shareblock embeds
 a bitcoin header. The sharechain difficulty is much lower than the

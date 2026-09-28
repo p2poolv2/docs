@@ -1,5 +1,5 @@
 = Why Do We Need P2Poolv2
-:page-nav_order: 3
+:page-nav_order: 30
 
 
 Bitcoin mining pools are a centralization pressure on bitcoin.
