@@ -29,15 +29,15 @@ headers have been received during initial sync. During normal
 operations all ancestors are available, or we wait for them if some
 are missing.
 
-== Timestamps Limits
+== Timestamp Limits
 
 ASERT sets the difficulty from share times and height. Miners are not
 be able to manipulate share timestamps that results in lower
 difficulty for their shares.
 
-P2Poolv2 uses a tight bound on medium time past over 12 blocks and
-enforces that a share be no more than 120 seconds ahead of the median
-time past.
+P2Poolv2 uses a tight bound on medium time past (MTP) over 11 blocks
+and enforces that a share's timestamp is greater than the MTP, and not
+more than 120s ahead of the local clock.
 
 == Unique PoW for Each Share
 
@@ -62,9 +62,9 @@ block. Also, nephews are given a bonus reward for including uncles and
 uncles are discounted for being not on the main chain.
 
 Each shareblock can have three uncles and each uncle has to be within
-three depth of the nephew referring to the uncle. Also, an uncle can
-only be uncle to single nephew block. If multiple nephews refer to the
-same uncle, the later one is rejected.
+three depth of the nephew referring to the uncle. Also, an shareblock
+can is included as an uncle only if it has not already an uncle to
+another shareblock.
 
 == Bitcoin Payouts Follow the PPLNS Window
 
@@ -72,20 +72,22 @@ All bitcoin coinbases follow the PPLNS window on the sharechain. No
 share includes a bitcoin block header with a coinbase in the bitcoin
 block that doesn't follow the sharechain PPLNS reward distribution.
 
-P2Poolv2 uses a PPLNS window of shares over the last 14 days. This
-time period is selected to allow miners enough time to trade their
-shares for payment in bitcoin. This trading is required for paying out
-smaller miners with tiny payouts. xref:payouts/marketplace.adoc[ Sell
-Shares for Payouts] page describes the various ways a share can be traded for bitcoin.
+P2Poolv2 uses a PPLNS window of shares over the last 120,960 share
+blocks, which is number of 10s intervals in two weeks. This period is
+selected to allow miners enough time to trade their shares for payment
+in bitcoin. This trading is required for paying out smaller miners
+with tiny payouts. xref:../payouts/marketplace.adoc[ Sell Shares for
+Payouts] page describes the various ways a share can be traded for
+bitcoin.
 
-Nakamoto consensus provides eventual consistency and shares have to
-wait till they are replicated and consensus is formed on their
-confirmation. The coinbase in shareblocks are not spendable until an
-hours worth of blocks have been mined on top of it. This is a much
-smaller limit than bitcoin (~ 1 day), and allows for earlier share
-trading and payouts for shares. Once a share is more than two weeks
-old, it is no longer rewarded for work in bitcoin blocks and therefore
-can not be spent/traded any more.
+// Nakamoto consensus provides eventual consistency and shares have to
+// wait till they are replicated and consensus is formed on their
+// confirmation. The coinbase in shareblocks are not spendable until an
+// hours worth of blocks have been mined on top of it. This is a much
+// smaller limit than bitcoin (~ 1 day), and allows for earlier share
+// trading and payouts for shares. Once a share is out of the PPLNS
+// window, it is no longer rewarded for work in bitcoin blocks and
+// therefore can not be spent/traded any more.
 
 == Share Transactions Are Valid
 
@@ -96,7 +98,7 @@ Just like in bitcoin all shareblock transactions are validated for
 double spend, the amount being spent so that share value is not
 created out of thin air.
 
-== Mine on Current Bitcoin Chain
+== Mine on the Current Bitcoin Chain
 
 The bitcoin header builds on the current bitcoin chain, not an
 adversarial fork of bitcoin.
@@ -110,7 +112,7 @@ chain, shares mining on their blocks are rejected by all nodes. The
 bitcoin fork followed by the pool is the one that majority of the
 hashrate on the pool is following.
 
-== Bitcoin Blocks are not Validated
+== Bitcoin Blocks Are Not Validated
 
 As seen on <<Mine on Current Bitcoin Chain>> each share builds on the
 same chain that the majority of hashrate is following. The bitcoin
