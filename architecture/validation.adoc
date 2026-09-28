@@ -2,56 +2,130 @@
 :page-parent: Sharechain
 :page-nav_order: 20
 
-== Why Do We Need to Validate Shares
 
 Shares carry a claimed proof of work and are rewarded for it. The
 sharechain validates all shares that are added to the chain so that
-the share is valid and cannot be rewarded twice for the same work. If
+the share cannot be rewarded twice for the same proof of work. If
 nodes don't validate shares received from other nodes, a sending node
 can send the same proof of work for multiple shares and earn multiple
-payouts for the same work done.
+payouts for the same work done. Shares are also validated for their
+transactions validity and timestamps enabling verifiable transaction
+support in the sharechain.
 
-== What Are the Requirements of Share Validation
+A share validation covers a number of core validity concerns.
 
-A share validation should cover the following to make sure no miner
-can take more than their work is due:
+== Proof of Work Meets Pool Difficulty
 
-Proof of Work Meets Pool Difficulty:: Payouts depend on proof of work
-submitted by miners. The pool difficulty comes from the ASERT
-algorithm applied over a share's ancestors and a share's declared
-target should match what the pool expects according to ASERT.
+Payouts depend on proof of work submitted by miners. The pool
+difficulty comes from the ASERT algorithm applied over a share's
+ancestors and a share's declared target matches what the pool expects
+according to ASERT.
 
-Timestamps Limits:: ASERT sets the difficulty from share times and
-height. Miners should not be able to manipulate share timestamps that
-results in lower difficulty for their shares.
+Sharechain headers carry all the information to validate ASERT
+difficulty of a new share received from a peer. This check can be run
+on headers once all their ancestors are available - this is a quirk of
+ASERT. The share PoW validation therefore is done in serial once all
+headers have been received during initial sync. During normal
+operations all ancestors are available, or we wait for them if some
+are missing.
 
-Unique PoW for Each Share:: No two shares should be able to use the
-same PoW from the bitcoin block to earn more than one reward for a
-single PoW.
+== Timestamps Limits
 
-Uncles Follow the Rules:: Uncle shares earn rewards and uncles have to
-follow all of the validation rules discussed here.
+ASERT sets the difficulty from share times and height. Miners are not
+be able to manipulate share timestamps that results in lower
+difficulty for their shares.
 
-Bitcoin Payouts Follow the PPLNS Window:: All bitcoin coinbases should
-follow the PPLNS window on the sharechain. No share should include a
-bitcoin block header with a coinbase in the bitcoin block that doesn't
-follow the sharechain PPLNS reward distribution.
+P2Poolv2 uses a tight bound on medium time past over 12 blocks and
+enforces that a share be no more than 120 seconds ahead of the median
+time past.
 
-Share Transactions Are Valid:: All shareblock transactions, including
-the coinbase are valid in terms of value spent, scripts, spent
-outputs.
+== Unique PoW for Each Share
 
-Mine on Current Bitcoin Chain:: The bitcoin header should build on the
-current bitcoin chain, not an adverserial fork of bitcoin.
+No two shares can use the same PoW from the bitcoin block to earn more
+than one reward for a single PoW. We use share commitments (see
+xref:share_commitment.adoc[Share Commitment] on the details on how a
+share is committed to a bitcoin header. Once a share is committed to a
+bitcoin header and a bitcoin blockhash is found for the current pool
+difficulty no other share can embed the given bitcoin header. A
+bitcoin header with PoW can only be embedded in a share header it
+commits to. Each share has a unique proof of work that no other share
+can claim as its own.
 
-== For Each Requirement, Describe How Validation Works
+== Uncles Follow the Rules
 
-Each share is validated in the context of the chain, i.e. it is
-validated knowing the height and previous shareblock hash of the
-share. This context dependent validation is required before confirming
-the share. The ASERT based proof of work and output spend validation
-can only run once the share position in the chain is known.
+Uncle shares earn rewards and uncles have to follow all of the
+validation rules discussed here.
 
-== What is Not Validated and Why?
+Uncle blocks are fully validated as a normal shareblock. There are
+additional rules about how deep an uncle block can be from the nephew
+block. Also, nephews are given a bonus reward for including uncles and
+uncles are discounted for being not on the main chain.
 
-Capture the lack of need for validating bitcoin blocks
+Each shareblock can have three uncles and each uncle has to be within
+three depth of the nephew referring to the uncle. Also, an uncle can
+only be uncle to single nephew block. If multiple nephews refer to the
+same uncle, the later one is rejected.
+
+== Bitcoin Payouts Follow the PPLNS Window
+
+All bitcoin coinbases follow the PPLNS window on the sharechain. No
+share includes a bitcoin block header with a coinbase in the bitcoin
+block that doesn't follow the sharechain PPLNS reward distribution.
+
+P2Poolv2 uses a PPLNS window of shares over the last 14 days. This
+time period is selected to allow miners enough time to trade their
+shares for payment in bitcoin. This trading is required for paying out
+smaller miners with tiny payouts. xref:payouts/marketplace.adoc[ Sell
+Shares for Payouts] page describes the various ways a share can be traded for bitcoin.
+
+Nakamoto consensus provides eventual consistency and shares have to
+wait till they are replicated and consensus is formed on their
+confirmation. The coinbase in shareblocks are not spendable until an
+hours worth of blocks have been mined on top of it. This is a much
+smaller limit than bitcoin (~ 1 day), and allows for earlier share
+trading and payouts for shares. Once a share is more than two weeks
+old, it is no longer rewarded for work in bitcoin blocks and therefore
+can not be spent/traded any more.
+
+== Share Transactions Are Valid
+
+All shareblock transactions, including the coinbase are valid in terms
+of value spent, scripts, spent outputs.
+
+Just like in bitcoin all shareblock transactions are validated for
+double spend, the amount being spent so that share value is not
+created out of thin air.
+
+== Mine on Current Bitcoin Chain
+
+The bitcoin header builds on the current bitcoin chain, not an
+adversarial fork of bitcoin.
+
+Each shareheader's bitcoin block header (see
+xref:sharechain.adoc[Sharechain]) is verified to be reachable from the
+parent share's bitcoin block header. This enforces that each share
+extending the sharechain is mining on the same bitcoin chain that the
+parent share mined on. If there are bitcoin forks attacking the main
+chain, shares mining on their blocks are rejected by all nodes. The
+bitcoin fork followed by the pool is the one that majority of the
+hashrate on the pool is following.
+
+== Bitcoin Blocks are not Validated
+
+As seen on <<Mine on Current Bitcoin Chain>> each share builds on the
+same chain that the majority of hashrate is following. The bitcoin
+block contents are not validated by P2Poolv2 - only the header is
+verified to follow the correct bitcoin chain.
+
+The coinbase transaction from the bitcoin block body is verified. Each
+shareblock header captures the bitcoin header and shareblock itself
+carries the merkle branches of the bitcoin block - this is how we
+verify the share commitment and the bitcoin coinbase payout meets the
+verifying node's PPLNS window.
+
+Validating full bitcoin blocks will introduce latency to the system
+increasing the uncle rate and thus reducing the total capacity of the
+pool to handle mining nodes. The details around this are further
+discussed in the
+<<../handling_known_attacks.adoc#block-withholding-sabotage,Block
+Withholding Attack>> section.
