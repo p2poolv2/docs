@@ -1,0 +1,65 @@
+= Pool Requirements
+:page-nav_order: 35
+
+P2Poolv2 has the following requirements. The original P2Pool had
+similar requirements but ran into the coinbase size limitations and
+the problems of orphan blocks not being rewarded. The design presented
+enables the pool to scale to larger number of miner without running
+into coinbase size restrictions firmwares can impose on the pool.
+
+
+== Functional Requirements
+
+Nakamoto Consensus:: The sharechain follows the nakamoto consensus
+with eventual consistency on sharechain view.
+
+All Work Rewarded:: Stale blocks should rewarded instead of being
+orphaned. The original P2Pool did not reward stale blocks and marked
+them as orphans denying miners payouts for honest work done.
+
+No centralized operator:: No centralized service is required for
+for accounting or for payouts handling.
+
+Permissionless:: No KYC or permission from a TTP required to join the
+pool and start mining.
+
+Trustless Joins:: New nodes can join the pool without needing to trust
+any other nodes - the state should be replicated without trusting any
+fixed set of nodes.
+
+Sovereign Templates:: All mining nodes should build their own
+templates without requiring approval from anyone. Each node needs to
+run a bitcoin node to build templates.
+
+Mine on current chain:: Miner templates should build on current
+bitcoin chain, any work on forks not agreed upon by majority hashrate
+is rejected. P2Poolv2 cannot be used to create chaos during fork wars.
+
+Precise hashrate reporting:: All miners should be see a high precision
+reporting of their hashrate on their node's dashboard. The hashrate
+should be derived from miner's stratum shares, not from the miner's
+shares that made it to the pool.
+
+== Payouts Requirements
+
+Unilateral exits:: no entity should hold payouts for miners or
+required to sign any transactions for miners to take custody of their
+rewards. Such entities can hold miners hostage if they are required to
+sign off on rewards.
+
+Payout commitment at template time:: work that miners hash on should
+commit to payouts. Miners should be able to verify the work they are
+hashing includes their payouts in the correct proportion.
+
+Deterministic and verifiable:: Payouts should be deterministic based
+on the state of the share chain, so all miners can recompute the
+payout and verify all received shares.
+
+Scalability:: The pool should be able to support upto a thousand
+p2poolv2 nodes, each serving thousands of ASICS miners - without
+running into coinbase size limitations.
+
+Small miners support:: Small miners with tiny payouts should still be
+able to spend their earnings - again without requiring third parties
+to sign.
+
