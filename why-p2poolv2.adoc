@@ -4,12 +4,19 @@
 
 Bitcoin mining pools are a centralization pressure on bitcoin.
 
-We need an open source software stack that participants can run to
-pool their hashrate without a central operator that
+Given the https://mempool.space/graphs/mining/pools[pool distribution
+on mempool.space], the **goal of P2Poolv2 is to let miners mine blocks
+without depending on a centralized server** that a single organization
+controls.
 
-. decides which transactions go into a block, or
-. pays miners from its custodial wallet.
+P2Poolv2 provides an open source software stack that participants can
+run to pool their hashrate and can reach agreement on how much each
+miners is paid for their work. The p2poolv2 nodes collectively
+validate all work and make sure pool's progress cannot be stalled or
+hijacked by a single malicious operator. The control on mining is
+therefore taken away from centralised operators and handed back to the
+miners.
 
-P2Poolv2 reboots the original P2Pool for bitcoin. It builds on the latest advances in bitcoin and uses modern programming languages and libraries, such as rust-bitcoin.
-
-Given the https://mempool.space/graphs/mining/pools[pool distribution on mempool.space], the **goal of P2Poolv2 is to let miners mine blocks without depending on a centralized server** that a single organization controls.
+P2Poolv2 reboots the original P2Pool for bitcoin. It builds on the
+latest advances in bitcoin and uses modern programming languages and
+libraries, such as rust-bitcoin.

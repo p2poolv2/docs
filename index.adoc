@@ -6,11 +6,20 @@
 [.fs-6.fw-300]
 Mission: Replace pool operators with miners
 
+xref:getting_started.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
+https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
+
 P2Poolv2 is a permissionless mining pool where miners build block templates,
 continuously audit accounting, and are paid directly to their wallets.
 
-xref:getting_started.adoc[Get started,role="btn btn-primary fs-5 mb-4 mb-md-0 mr-2"]
-https://github.com/p2poolv2/p2poolv2[View on GitHub,role="btn fs-5 mb-4 mb-md-0"]
+P2Poolv2 runs a sharechain of weak bitcoin blocks, where the
+sharechain runs the Nakamoto consensus with a weaker target than
+bitcoin. The is able to run share accounting in a decentralized
+manner - all nodes have reach eventual consistency on the sharechain
+accounting and can validate all shares and payouts.
+
+The following pages describe the requirements and design decisions of
+P2Poolv2.
 
 == What Is Here
 
