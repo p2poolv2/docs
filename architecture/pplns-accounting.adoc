@@ -81,6 +81,76 @@ digraph pplns_window {
 }
 ....
 
+== Uncle Blocks and Rewards
+
+Each shareblock header can refer to maximum of three uncle blocks, and
+each uncle referenced from a shareblock should not be more than three
+blocks deep from itself. A shareblock referenced as an uncle by a
+shareblock cannot be referenced as an uncle shareblock from another
+shareblock.
+
+
+[graphviz, uncle-blocks, svg]
+.Shareblock 4 references two uncles
+....
+digraph uncles {
+  rankdir=LR
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.5
+  ranksep=0.6
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.5, height=0.55, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  s1 [label="Shareblock 1", group=main]
+  s2 [label="Shareblock 2", group=main]
+  s3 [label="Shareblock 3", group=main]
+  s4 [label="Shareblock 4\nnephew", group=main, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  s5 [label="Shareblock 5", group=main]
+
+  u2 [label="Uncle A", color="#FFFFFFC7", style="filled,dashed"]
+  u3 [label="Uncle B", color="#FFFFFFC7", style="filled,dashed"]
+
+  // Main chain: each shareblock points back to its parent.
+  s1 -> s2 -> s3 -> s4 -> s5 [dir=back, weight=10]
+
+  // Uncles are valid shares that lost the race to the main chain.
+  u2 -> s1 [color="#FFFFFF66"]
+  u3 -> s2 [color="#FFFFFF66"]
+
+  {rank=same; s2; u2}
+  {rank=same; s3; u3}
+
+  // The nephew references both uncles in its header.
+  s4 -> u2 [style=dashed, color="#FFFFFFC7", constraint=false,
+            label="uncle"]
+  s4 -> u3 [style=dashed, color="#FFFFFFC7", constraint=false,
+            label="uncle"]
+}
+....
+
+In the diagram, Uncle A and Uncle B are valid shares that lost the
+race to join the main chain. Uncle A and uncle B are both uncles of
+Shareblock 4.
+
+PPLNS accounting counts an uncle's work in full but splits it between
+two miners:
+
+* The uncle's miner earns 90% of the uncle's difficulty.
+* The nephew's miner earns the nephew's own difficulty plus 10% of each
+  uncle's difficulty.
+
+Suppose every share in the diagram has difficulty _d_. The miners of
+Uncle A and Uncle B each earn 0.9__d__, and the miner of Shareblock 4
+earns 1.2__d__: its own _d_ plus 0.1__d__ for each uncle. Together they
+earn 3__d__, the same as three shares on the main chain, so no work goes
+uncounted. The bonus gives miners a reason to include uncles, and the
+discount keeps a share on the main chain worth more than an uncle.
+
 // == Spending Coinbases and Root Height
 
 // Coinbases can be spent and new UTXOs are generated with each
