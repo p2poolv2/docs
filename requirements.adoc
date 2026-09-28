@@ -1,39 +1,38 @@
 = Pool Requirements
 :page-nav_order: 35
 
-P2Poolv2 has the following requirements. The original P2Pool had
-similar requirements but ran into the coinbase size limitations and
-the problems of orphan blocks not being rewarded. The design presented
-enables the pool to scale to more miners without running into
-coinbase size restrictions firmware can impose on the pool.
+P2Poolv2 is designed to meet the requirements below. Original P2Pool
+had similar goals but its design didn't handle coinbase size
+limitations and didn't reward orphan blocks. P2Poolv2 scales to more
+miners and solves the problems with original P2Pool's design.
 
 == Functional Requirements
 
-Nakamoto Consensus:: The sharechain follows the Nakamoto consensus
-with eventual consistency on sharechain view.
+Nakamoto Consensus:: The sharechain uses Nakamoto consensus with nodes
+reaching eventual consistency on sharechain view.
 
-Reward for All Work:: Stale blocks are rewarded instead of being
+Reward for All Work:: Stale shares are rewarded instead of being
 orphaned. The original P2Pool did not reward stale blocks and marked
-them as orphans, denying miners payouts for honest work done.
+them as orphans, denying miners payouts for honest work.
 
 No Centralized Operator:: No centralized service is required for
 accounting or for payout handling.
 
-Permissionless Mining:: No KYC or permission from a trusted third
-party (TTP) is required to join the pool and start mining.
+Permissionless Mining:: Anyone can join the pool and start mining
+without KYC or permission from a trusted third party.
 
 Trustless Joins:: New nodes join the pool without trusting any other
-node: they replicate the state without trusting any fixed set of
-nodes.
+node. New nodes replicate the sharechain state by trusting the PoW and
+highest work chain.
 
 Sovereign Templates:: All mining nodes build their own templates
-without approval from anyone. Each node runs a bitcoin node to build
-templates.
+without approval from anyone. Each node runs a bitcoin node as a
+block template provider.
 
 Mining on the Current Chain:: Miner templates build on the current
 bitcoin chain; the pool rejects any work on forks that the majority
-hashrate has not agreed upon. P2Poolv2 cannot be used to create chaos
-during fork wars.
+hashrate has not agreed upon. No one can use P2Poolv2 to mine a
+minority fork of bitcoin.
 
 Precise Hashrate Reporting:: All miners see high-precision reporting
 of their hashrate on their node's dashboard. The hashrate is derived
@@ -51,13 +50,13 @@ Payout Commitment at Template Time:: The work miners hash commits to
 the payouts. Miners can verify that the work they are hashing includes
 their payouts in the correct proportion.
 
-Deterministic, Verifiable Payouts:: Payouts are deterministic, based
-on the state of the sharechain, so all miners can recompute the payout
-and verify all received shares.
+Deterministic, Verifiable Payouts:: Payouts are deterministic and are
+based on the state of the sharechain. All miners recompute the payouts
+in a received share and verify they match the local sharechain view.
 
 Scalability:: The pool supports up to a thousand P2Poolv2 nodes, each
 serving thousands of ASIC miners, without running into coinbase size
 limitations.
 
 Small Miner Support:: Small miners with tiny payouts can still spend
-their earnings, again without requiring third parties to sign.
+their earnings without requiring third parties to sign transactions.
