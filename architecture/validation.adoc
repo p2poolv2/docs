@@ -69,14 +69,14 @@ payouts need that trading to get paid. The
 xref:../payouts/marketplace.adoc[Sell Shares for Payouts] page
 describes how a share can be traded for bitcoin.
 
-// Nakamoto consensus provides eventual consistency and shares have to
-// wait till they are replicated and consensus is formed on their
-// confirmation. The coinbase in shareblocks are not spendable until an
-// hours worth of blocks have been mined on top of it. This is a much
-// smaller limit than bitcoin (~ 1 day), and allows for earlier share
-// trading and payouts for shares. Once a share is out of the PPLNS
-// window, it is no longer rewarded for work in bitcoin blocks and
-// therefore can not be spent/traded any more.
+Nakamoto consensus provides eventual consistency and shares have to
+wait till they are replicated and they are considered confirmed. The
+coinbase in shareblocks are not spendable until 6048 blocks have been
+mined on top of it. This is similar in terms of time to bitcoins 100
+block. Once a share is out of the PPLNS window, it is no longer
+rewarded for work in bitcoin blocks and therefore can not be
+spent/traded any more. See the xref:pplns_accounting.adoc[PPLNS Share
+Accounting] page for details.
 
 == Share Transactions Are Valid
 
