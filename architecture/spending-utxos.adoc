@@ -2,14 +2,13 @@
 :page-parent: Sharechain
 :page-nav_order: 45
 
-Coinbases can be spent and new UTXOs are generated with each
-spend. This results in a chain of UTXOs rooted at the coinbase where
-the coins were first created. The height of the root coinbase as
-called the `root height`. As UTXOs are spent, the root height is
-tracked with descendant UTXOs. As UTXO's root height falls out of the
-PPLNS window, the UTXO is no longer spendable. This rule caps the
-longevity of a coinbase to receive payout rewards to that of the
-original proof of work that created the root coinbase.
+Spending a coinbase creates new UTXOs, and each later spend creates
+more. The result is a chain of UTXOs rooted at the coinbase where the
+coins were first created. The height of that root coinbase is called
+the _root height_, and each descendant UTXO carries it. When a UTXO's
+root height falls out of the PPLNS window, the UTXO can no longer be
+spent. This rule limits every output to the lifetime of the proof of
+work behind its root coinbase.
 
 [graphviz, utxo-root-height, svg]
 .Every output in a spending chain keeps the coinbase's root height
@@ -42,8 +41,8 @@ digraph root_height_chain {
 
 == Splitting Outputs
 
-When a coinbase or a descendant is split into multiple outputs each of
-the outputs inherit the root height from the previous output.
+When a coinbase or a descendant is split into multiple outputs, each
+output inherits the root height from the output it spends.
 
 [graphviz, utxo-split, svg]
 .Both outputs of a split keep the input's root height
@@ -74,15 +73,10 @@ digraph split_outputs {
 
 == Merging Outputs
 
-When multiple outputs are used as input into a transaction, all
-outputs inherit the lowest root height of all the inputs previous
-outputs. This means, if two outputs from two txs are spent into a
-single transaction, all the outputs now will expire when the earliest
-root coinbase will expire.
-
-This requires that wallets and applications that split and merge
-outputs have to make careful decision here and if needed should inform
-the user and/or ask the user the confirmation to proceed.
+When multiple outputs are used as inputs to a transaction, every new
+output inherits the lowest root height among the outputs being spent.
+If a transaction spends outputs from two transactions, every new
+output expires when the oldest root coinbase expires.
 
 [graphviz, utxo-merge, svg]
 .A merge gives every output the oldest input's root height
@@ -115,3 +109,7 @@ digraph merge_outputs {
   tx -> outb
 }
 ....
+
+Wallets and applications that split and merge outputs must therefore
+choose inputs carefully, and should warn the user or ask for
+confirmation before merging.
