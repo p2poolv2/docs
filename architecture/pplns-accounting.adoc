@@ -150,19 +150,3 @@ earns 1.2__d__: its own _d_ plus 0.1__d__ for each uncle. Together they
 earn 3__d__, the same as three shares on the main chain, so no work goes
 uncounted. The bonus gives miners a reason to include uncles, and the
 discount keeps a share on the main chain worth more than an uncle.
-
-// == Spending Coinbases and Root Height
-
-// Coinbases can be spent and new UTXOs are generated with each
-// spend. This results in a chain of UTXOs rooted at the coinbase where
-// the coins were first created. We call the height of the root coinbase
-// as the root height. As UTXOs are spent, the root height is tracked
-// with descendant UTXOs, and as a UTXO's root height - the chain tip
-// height exceeds the PPLNS window
-
-// When a coinbase is create the height of the chain for the shareblock
-// is tracked as the `root height` of the coinbase
-
-// == UTXO Expiry
-
-// A coinbase can be spent to create new UTXOs and each 

@@ -18,7 +18,9 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
 - [ ] **Shares expire at the end of the window.** Per the page, a share
   expires 6,048 + 120,960 shares deep. The code expires outputs whose
   coinbase root is more than one window (120,960 shares) old
-  (`p2pool-v2/docs/architecture/pruning.md`).
+  (`p2pool-v2/docs/architecture/pruning.md`). The same rule decides
+  when a spent output expires in
+  `architecture/spending-coinbases-and-root-heights.adoc`.
 - [ ] **Mining on the current bitcoin chain.**
   `architecture/validation.adoc` ("Mine on the Current Bitcoin Chain"
   and "Bitcoin Blocks Are Not Validated") and `requirements.adoc`

@@ -1,0 +1,117 @@
+= Spending UTXOs
+:page-parent: Sharechain
+:page-nav_order: 45
+
+Coinbases can be spent and new UTXOs are generated with each
+spend. This results in a chain of UTXOs rooted at the coinbase where
+the coins were first created. The height of the root coinbase as
+called the `root height`. As UTXOs are spent, the root height is
+tracked with descendant UTXOs. As UTXO's root height falls out of the
+PPLNS window, the UTXO is no longer spendable. This rule caps the
+longevity of a coinbase to receive payout rewards to that of the
+original proof of work that created the root coinbase.
+
+[graphviz, utxo-root-height, svg]
+.Every output in a spending chain keeps the coinbase's root height
+....
+digraph root_height_chain {
+  rankdir=LR
+  bgcolor="#0B0B0C"
+  nodesep=0.4
+  ranksep=0.5
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.7, height=0.7, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  coinbase [label="Coinbase output\nroot height 1,000", fillcolor="#F7931A",
+            fontcolor="#0B0B0C"]
+  out1 [label="Output\nroot height 1,000"]
+  out2 [label="Output\nroot height 1,000"]
+  rejected [label="Spend rejected", color="#E5484D", fontcolor="#E5484D",
+            style="filled,dashed"]
+
+  coinbase -> out1 [label="spent at\nheight 8,000"]
+  out1 -> out2 [label="spent at\nheight 40,000"]
+  out2 -> rejected [label="spent after height 1,000\nleaves the PPLNS window",
+                    color="#E5484D", style=dashed]
+}
+....
+
+== Splitting Outputs
+
+When a coinbase or a descendant is split into multiple outputs each of
+the outputs inherit the root height from the previous output.
+
+[graphviz, utxo-split, svg]
+.Both outputs of a split keep the input's root height
+....
+digraph split_outputs {
+  rankdir=LR
+  bgcolor="#0B0B0C"
+  nodesep=0.3
+  ranksep=0.5
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.7, height=0.7, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  input [label="Output\nroot height 1,000"]
+  tx [label="Transaction", shape=ellipse, width=1.3, height=0.5,
+      color="#FFFFFF66"]
+  outa [label="Output A\nroot height 1,000"]
+  outb [label="Output B\nroot height 1,000"]
+
+  input -> tx
+  tx -> outa
+  tx -> outb
+}
+....
+
+== Merging Outputs
+
+When multiple outputs are used as input into a transaction, all
+outputs inherit the lowest root height of all the inputs previous
+outputs. This means, if two outputs from two txs are spent into a
+single transaction, all the outputs now will expire when the earliest
+root coinbase will expire.
+
+This requires that wallets and applications that split and merge
+outputs have to make careful decision here and if needed should inform
+the user and/or ask the user the confirmation to proceed.
+
+[graphviz, utxo-merge, svg]
+.A merge gives every output the oldest input's root height
+....
+digraph merge_outputs {
+  rankdir=LR
+  bgcolor="#0B0B0C"
+  nodesep=0.3
+  ranksep=0.5
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.7, height=0.7, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  older [label="Output\nroot height 1,000", fillcolor="#F7931A",
+         fontcolor="#0B0B0C"]
+  newer [label="Output\nroot height 5,000"]
+  tx [label="Transaction", shape=ellipse, width=1.3, height=0.5,
+      color="#FFFFFF66"]
+  outa [label="Output A\nroot height 1,000", fillcolor="#F7931A",
+        fontcolor="#0B0B0C"]
+  outb [label="Output B\nroot height 1,000", fillcolor="#F7931A",
+        fontcolor="#0B0B0C"]
+
+  older -> tx
+  newer -> tx
+  tx -> outa
+  tx -> outb
+}
+....
