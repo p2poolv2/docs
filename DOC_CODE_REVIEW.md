@@ -10,7 +10,7 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
 ## Where the Code Differs From the Docs
 
 - [ ] **PPLNS window excludes immature shares.**
-  `architecture/pplns-accounting.adoc` says the newest 6,048 shares are
+  `architecture/pplns_accounting.adoc` says the newest 6,048 shares are
   left out of PPLNS accounting and the 120,960-share window starts after
   them. The code measures the window back from the tip, immature shares
   included (`is_in_pplns_zone` in `shares/validation/mod.rs`,
@@ -65,7 +65,7 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
 
 - [ ] **Where a share starts earning.** `architecture/sharechain.adoc`
   ("Shares Have a Valuation") says every share within a certain depth of
-  the tip earns. `architecture/pplns-accounting.adoc` now excludes the
+  the tip earns. `architecture/pplns_accounting.adoc` now excludes the
   newest 6,048 shares.
 - [ ] **Old maturity figure.** The commented-out paragraph in
   `architecture/validation.adoc` says coinbases mature after an hour and
@@ -75,19 +75,19 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
   bitcoin blocks that supports blocks".
 - [ ] **Likely typo in a command.** `README.adoc`:
   `bundle exec jekyll serve --livereloadshare` (probably `--livereload`).
-- [ ] **ASERT link.** `p2p-network-of-miners.adoc` links to "Stratum
+- [ ] **ASERT link.** `p2p_network_of_miners.adoc` links to "Stratum
   Server & Vardiff" for details on ASERT, but that page covers per-miner
   vardiff. "Pool Vardiff" (`pool_difficulty_adjustment.adoc`) may be the
   right target.
-- [ ] **Unverified OCEAN claim.** `compare-datum-sv2.adoc` ("At a
+- [ ] **Unverified OCEAN claim.** `compare_datum_sv2.adoc` ("At a
   Glance") says OCEAN holds small balances. Check against OCEAN's
   documentation.
-- [ ] **Coinbase-only mode caveat.** `compare-datum-sv2.adoc` should say
+- [ ] **Coinbase-only mode caveat.** `compare_datum_sv2.adoc` should say
   an SV2 pool can be ordered to disable coinbase-only mode.
-- [ ] **51% claim.** `compare-datum-sv2.adoc` should note that
+- [ ] **51% claim.** `compare_datum_sv2.adoc` should note that
   sharechain hashrate is small, so a majority is cheaper than on
   bitcoin, and that forking the pool has a cost.
-- [ ] **Do shares carry full transaction lists?** `compare-datum-sv2.adoc`
+- [ ] **Do shares carry full transaction lists?** `compare_datum_sv2.adoc`
   compares P2Poolv2 with SV2 coinbase-only mode. If shares carry the
   bitcoin block's transactions, peers can see them, which weakens that
   comparison.

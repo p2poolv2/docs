@@ -180,7 +180,7 @@ they all determine the same payout distribution when building shares.
 Every node can therefore check that every share on the sharechain pays
 out honestly. When a peer sends a share whose payouts do not match the
 receiving node's local view, the receiving node rejects it. See
-xref:pplns-accounting.adoc[PPLNS Share Accounting] for how a
+xref:pplns_accounting.adoc[PPLNS Share Accounting] for how a
 decentralized network handles share accounting.
 
 Without the consensus the sharechain provides, a node cannot validate

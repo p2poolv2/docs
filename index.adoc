@@ -25,7 +25,7 @@ P2Poolv2.
 
 Run a node:: Run a node from source and connect your miners. See xref:getting_started.adoc[Getting started].
 
-P2P Network:: How miners join a peer-to-peer network to reduce their variance. See xref:p2p-network-of-miners.adoc[P2P Network of Miners].
+P2P Network:: How miners join a peer-to-peer network to reduce their variance. See xref:p2p_network_of_miners.adoc[P2P Network of Miners].
 
 Sharechain:: The design of the sharechain, including how shares are validated and how PPLNS accounts for them. See xref:architecture/sharechain.adoc[Sharechain Design].
 

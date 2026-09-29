@@ -6,7 +6,7 @@ This section will contain pages similar to "User Stories" or "Use Case Scenarios
 
 The first, "Single Miner Story", will explore how a P2Poolv2 network behaves with a single miner.
 
-* xref:single-miner.adoc[Single Miner]
+* xref:single_miner.adoc[Single Miner]
 
 
 

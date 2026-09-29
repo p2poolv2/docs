@@ -10,8 +10,8 @@ This documentation project is a work in progress, and the rendered site is not p
 
 * xref:index.adoc[P2Poolv2 Documentation] (docs home page)
 * xref:getting_started.adoc[Getting Started]
-* xref:stories/single-miner.adoc[Single Miner Story]
-* xref:writing-docs.adoc[Writing documentation]
+* xref:stories/single_miner.adoc[Single Miner Story]
+* xref:writing_docs.adoc[Writing documentation]
 
 ==== Additional Contents
 
@@ -64,7 +64,7 @@ can fail when a site is down or rate-limits the requests.
 
 === Writing Pages
 
-See xref:writing-docs.adoc[Writing documentation]. In short: a
+See xref:writing_docs.adoc[Writing documentation]. In short: a
 `.adoc` file with `= Title` and `:page-nav++_++order:`, `:page-parent:`
 and `:page-has++_++children:` attributes for the sidebar, and
 `++[++plantuml, name, svg++]++` blocks for diagrams.
