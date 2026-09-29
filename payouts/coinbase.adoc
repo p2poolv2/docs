@@ -4,3 +4,105 @@
 
 == Payout Over Coinbase
 
+When a pool is small and all miners can be paid directly from the
+coinbase, then directly paying all miners from coinbase works the
+best.
+
+When building a share all mining nodes compute the payout distribution
+as per the xref:../architecture/pplns_accounting.adoc[PPLNS
+Accounting] section and build a bitcoin coinbase to pay the miners
+directly from the coinbase transaction.
+
+All mining nodes that receive a share validate this payout
+distribution as per the
+xref:../architecture/validation.adoc[Validation] section.
+
+
+The diagram below shows three miners with various payout distribution
+being paid directly from the bitcoin coinbase based on the PPLNS
+accounting.
+
+[graphviz, coinbase-payout, svg]
+.Three miners paid from one bitcoin coinbase by PPLNS
+....
+digraph coinbase_payout {
+  compound=true
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.15
+  ranksep=0.7
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fontname="DejaVu Sans", fontsize=11,
+        fillcolor="#F7931A", color="#F7931A", fontcolor="#0B0B0C",
+        width=0.4, height=0.4, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  // Shares in the PPLNS window, oldest first, labelled by miner.
+  subgraph cluster_window {
+    label="PPLNS window"
+    color="#F7931A"
+    penwidth=2
+    style=filled
+    fillcolor="#121212"
+    w1 [label="A"]; w2 [label="B"]; w3 [label="A"]
+    w4 [label="C"]; w5 [label="A"]; w6 [label="B"]
+  }
+
+  subgraph cluster_coinbase {
+    label="Bitcoin coinbase: 3.125 BTC"
+    labelloc=b
+    color="#F7931A"
+    penwidth=2
+    style=filled
+    fillcolor="#121212"
+    node [width=1.7, height=0.75, fillcolor="#121212", fontcolor="#FFFFFF"]
+    oa [label="Miner A\n3 shares, 50%\n1.5625 BTC"]
+    ob [label="Miner B\n2 shares, 33.3%\n1.0417 BTC"]
+    oc [label="Miner C\n1 share, 16.7%\n0.5208 BTC"]
+  }
+
+  {rank=same; w1; w2; w3; w4; w5; w6}
+  {rank=same; oa; ob; oc}
+  edge [style=invis]
+  w1 -> w2 -> w3 -> w4 -> w5 -> w6
+  oa -> ob -> oc
+  edge [style=solid]
+
+  w3 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
+            label="  split by share"]
+}
+....
+
+Miners A, B, and C have mined the six shares in the PPLNS window.
+Every share in this example has the same difficulty, so each miner's
+portion is its count of shares: Miner A mined 3 of the 6, or 50%.
+xref:../architecture/pplns_accounting.adoc[PPLNS Share Accounting]
+explains which shares the window holds and how difficulty weights
+them.
+
+When a miner builds a share, the share's bitcoin coinbase splits the
+3.125 BTC reward in those proportions and pays each miner's bitcoin
+address directly. If the share meets the bitcoin target, that coinbase
+becomes the bitcoin block's coinbase and the payouts land on the
+bitcoin chain.
+
+For simplicity, the diagram doesn't show any uncle blocks or fee
+rewards in the coinbase outputs.
+
+== Coinbase Outputs
+
+. The bitcoin address provided in the stratum username field is paid
+directly from the coinbase.
+
+. The coinbase ouput also handle other details like an output for a
+donation address, if configured by miners.
+
+== Uncle Blocks
+
+Uncle blocks are discounted and referring shares given a bonus as per
+<<../architecture/pplns_accounting.adoc#uncle-blocks-and-rewards,Uncle
+Blocks and Rewards>> section.
+

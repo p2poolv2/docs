@@ -15,6 +15,14 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
   them. The code measures the window back from the tip, immature shares
   included (`is_in_pplns_zone` in `shares/validation/mod.rs`,
   `MAX_PPLNS_WINDOW_SHARES`).
+- [ ] **PPLNS window size.** The docs define N as 120,960 shares. The
+  code walks back until the shares' total difficulty reaches the bitcoin
+  network difficulty times `difficulty_multiplier` (1.0 by default),
+  capped at 120,960 shares (`pplns_total_difficulty` in
+  `sim_overrides.rs`, `PplnsWindow` in
+  `accounting/payout/sharechain_pplns/pplns_window.rs`). Affects
+  `architecture/pplns_accounting.adoc`, `payouts/coinbase.adoc`, and
+  their diagrams.
 - [ ] **Shares expire at the end of the window.** Per the page, a share
   expires 6,048 + 120,960 shares deep. The code expires outputs whose
   coinbase root is more than one window (120,960 shares) old
