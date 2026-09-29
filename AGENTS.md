@@ -146,3 +146,21 @@ site's conventions or with modern technical writing.
 - **Names in prose**: write "P2Poolv2" (not "p2poolv2" or "P2poolv2")
   and "Stratum" for the protocol, except in URLs, code, file names, and
   commands.
+
+## Diagrams
+
+- **Diagrams run vertically.** Vertical diagrams stay narrow and read
+  well on mobile. Avoid `rankdir=LR` for chains and timelines.
+- **Chains put the tip at the top.** Sharechains, bitcoin chains, and
+  other chain structures grow upward: the oldest block at the bottom,
+  the tip at the top. This matches the prose, where blocks are mined
+  "on top of" others and shares sit "6,048 deep". In Graphviz, use
+  `rankdir=BT`, and set `labelloc=b` on labelled clusters, because a
+  bottom-to-top layout flips label placement.
+- **Event timelines and flowcharts run top to bottom.** Diagrams that
+  tell a sequence of events, such as payouts over time or a share's
+  lifecycle, read downward like a sequence diagram: first event at the
+  top. In Graphviz, keep the default rank direction.
+- **Side information goes in a second column.** Put payouts, labels,
+  or a related chain in a column beside the main one, level with the
+  item it belongs to, rather than widening the diagram.

@@ -28,6 +28,7 @@ concepts.
 .Maturity, PPLNS, and trading windows, counted back from the tip
 ....
 digraph pplns_window {
+  rankdir=BT
   newrank=true
   bgcolor="#0B0B0C"
   nodesep=0.35
@@ -107,6 +108,7 @@ shareblock.
 .Shareblock 4 references two uncles
 ....
 digraph uncles {
+  rankdir=BT
   newrank=true
   bgcolor="#0B0B0C"
   nodesep=0.5

@@ -113,6 +113,7 @@ network.
 .Shareblocks build on the bitcoin tip, and Shareblock 3 found Block 101
 ....
 digraph sharechain {
+  rankdir=BT
   newrank=true
   bgcolor="#0B0B0C"
   nodesep=1.1
@@ -127,6 +128,7 @@ digraph sharechain {
 
   subgraph cluster_sharechain {
     label="Sharechain"
+    labelloc=b
     fontsize=12
     color="#FFFFFF66"
     s1 [label="Shareblock 1"]
@@ -139,6 +141,7 @@ digraph sharechain {
 
   subgraph cluster_bitcoin {
     label="Bitcoin blockchain"
+    labelloc=b
     fontsize=12
     color="#FFFFFF66"
     b100 [label="Block 100"]

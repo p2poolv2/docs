@@ -64,16 +64,18 @@ digraph coinbase_payout {
     oc [label="Miner C\n1 share, 16.7%\n0.5208 BTC"]
   }
 
-  // Shares run top to bottom; each output sits level with the window.
+  // The window is a slice of the sharechain, so the newest share is at
+  // the top and each share points back to its parent below it.
+  w6 -> w5 -> w4 -> w3 -> w2 -> w1 [arrowsize=0.6]
+
   edge [style=invis]
-  w1 -> w2 -> w3 -> w4 -> w5 -> w6
   oa -> ob -> oc
   edge [style=solid]
-  {rank=same; w2; oa}
-  {rank=same; w4; ob}
-  {rank=same; w6; oc}
+  {rank=same; w5; oa}
+  {rank=same; w3; ob}
+  {rank=same; w1; oc}
 
-  w4 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
+  w3 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
             label="split\nby share"]
 }
 ....

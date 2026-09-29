@@ -61,7 +61,7 @@ digraph hold_share {
         width=1.6, height=0.4, fixedsize=true]
   edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
 
-  chain_head [label="Sharechain", shape=plaintext, style="",
+  chain_head [label="Timeline", shape=plaintext, style="",
               fontcolor="#FFFFFFC7"]
   pay_head [label="Payouts", shape=plaintext, style="",
             fontcolor="#FFFFFFC7"]
@@ -148,7 +148,7 @@ digraph sell_share {
         width=1.6, height=0.4, fixedsize=true]
   edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
 
-  chain_head [label="Sharechain", shape=plaintext, style="",
+  chain_head [label="Timeline", shape=plaintext, style="",
               fontcolor="#FFFFFFC7"]
   pay_head [label="Payouts", shape=plaintext, style="",
             fontcolor="#FFFFFFC7"]
