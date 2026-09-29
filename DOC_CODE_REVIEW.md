@@ -60,6 +60,15 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
 - [ ] **Uncle ancestry rule.** Validation rejects an uncle that is an
   ancestor of its nephew. `architecture/validation.adoc` does not list
   this rule.
+- [ ] **Transaction fees.** `architecture/transactions.adoc` ("Handling
+  Fees") says fees go to the miner who mines the share, and that fee
+  outputs keep their root height under the splitting rules. The code lets a transaction's inputs
+  exceed its outputs, but the share coinbase always pays exactly one
+  share unit (`build_sharechain_coinbase_transaction` in
+  `shares/transactions/coinbase.rs`), so fees are not collected today.
+- [ ] **Script library.** `architecture/transactions.adoc` plans a move
+  to `rust-miniscript`, with its version part of sharechain consensus.
+  The code verifies scripts with `bitcoinconsensus::verify`.
 
 ## Open Issues in the Docs
 

@@ -92,6 +92,8 @@ exclude:
   - DOC_CODE_REVIEW.md
   - LICENSE
   - .jekyll-cache
+  - architecture/share_flow.adoc
+  - architecture/pool_scalability_limits.adoc
 
 # The theme's Sass still uses @import and global colour functions; keep
 # the build log readable until it migrates.

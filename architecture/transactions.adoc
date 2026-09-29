@@ -2,3 +2,134 @@
 :page-parent: Sharechain
 :page-nav_order: 40
 
+Miners on the original P2Pool were paid in the coinbase. Coinbase size
+limits, imposed by some firmware and by block space economics, kept
+the pool from growing to more miners and so from lowering their
+variance further.
+
+P2Poolv2 still pays larger miners directly from the bitcoin coinbase.
+Smaller miners get paid by selling their shares to other miners or to
+market makers, who then earn the shares' rewards in the bitcoin
+coinbase. The xref:../payouts/marketplace.adoc[Sell Shares for Payouts]
+section describes payouts through share trading.
+
+To support share trading, and other payout mechanisms in the future,
+the sharechain has a UTXO- and Script-based transaction system.
+
+Transactions and blocks follow bitcoin's validation rules, with these
+differences:
+
+. Coinbase maturity is 6,048 shares rather than 100 blocks; see
+  xref:pplns_accounting.adoc[PPLNS Share Accounting].
+. A shareblock's transactions total at most 200 KB, and a shareblock
+  holds at most 100 transactions.
+. The coinbase pays a fixed one share unit, with no block subsidy. Fees
+  go to the miner who creates the share.
+. Outputs expire by root height; see
+  xref:spending_utxos.adoc[Spending UTXOs].
+. Share outputs use the P2Poolv2 address type; see
+  <<Addresses in Sharechain>>.
+
+== Share Coinbase and Its Value
+
+Each shareblock has a coinbase that pays the miner who found it. The
+share commitment in the bitcoin coinbase's scriptSig commits to this
+payout; see xref:share_commitment.adoc[Share Commitments].
+
+The coinbase pays one share unit, which equals 10^8^ of the
+sharechain's smallest unit of account.
+
+== Addresses in Sharechain
+
+The sharechain uses its own address type so that its addresses never
+clash with bitcoin addresses. The human-readable part of a P2Poolv2
+address depends on the bitcoin network:
+
+[cols="1,2",options="header"]
+|===
+|Network
+|Human-readable part
+
+|Mainnet
+|`p2pool`
+
+|Testnet4
+|`tp2pool`
+
+|Signet
+|`sp2pool`
+
+|Regtest
+|`rp2pool`
+|===
+
+== Handling Fees
+
+A transaction that spends a UTXO pays a fee set by the fee market. The
+fee goes only to the miner who mines the share, not to all
+miners. Each fee output retains root height as per the splitting UTXOs
+rules. Rules xref:spending_utxos.adoc[for merging and splitting UTXOs]
+apply to fee outputs too. The share's miner earns rewards for fee
+outputs until the tracked root height falls out of the PPLNS window.
+
+== Crates Used
+
+`rust-bitcoin` builds transactions, and
+https://github.com/rust-bitcoin/rust-bitcoinconsensus/[bitcoinconsensus]
+validates them. Block validation checks every transaction's validity,
+double spends, and the other rules above.
+
+P2Poolv2 will switch to
+https://github.com/rust-bitcoin/rust-miniscript[rust-miniscript] for
+building and verifying sharechain scripts. The `rust-miniscript`
+version will be part of sharechain consensus, so upgrading the crate
+will require a consensus version change.
+
+== Share Coinbase Value Lifecycle
+
+A miner creates sharechain value by mining a share: the share's
+coinbase output holds that value. The miner can keep the output and
+collect its rewards from bitcoin coinbases, provided the miner has
+enough hashrate to earn a slot in the bitcoin coinbase. The miner can
+instead transfer the output to another miner, who then collects the
+future bitcoin rewards for the work the share represents. Each transfer
+pays a transaction fee to the miner who found the shareblock, and that
+miner collects the bitcoin reward for the fee in future bitcoin
+coinbases. Transfers can continue until the root coinbase that created
+the value falls out of the PPLNS window.
+
+[plantuml, share-lifecycle, svg]
+.A share's coinbase output from mining to expiry
+....
+@startuml
+<style>
+activityDiagram {
+  circle {
+    BackgroundColor #F7931A
+    LineColor #F7931A
+  }
+}
+</style>
+start
+:Miner mines a share;
+:Share coinbase output created
+one share unit, root height = share's height;
+:Output is immature for 6,048 shares
+and cannot be spent;
+while (Root height inside the PPLNS window?) is ([yes])
+  :Owner earns bitcoin rewards
+  from bitcoin coinbases;
+  if (Owner transfers the output?) then ([yes])
+    :Transfer transaction;
+    note right
+      The fee output goes to
+      the share's miner.
+    end note
+    :New owner holds the output;
+  else ([no])
+  endif
+endwhile ([no])
+:Output expires;
+stop
+@enduml
+....
