@@ -1,6 +1,0 @@
-= Swaps With Ark
-:page-nav_order: 20
-:page-parent: Sell Shares for Payouts
-:page-grand_parent: Payouts
-
-== Running Swaps With Ark

@@ -1,4 +1,4 @@
-= On Chain Swaps
+= On-Chain Swaps
 :page-nav_order: 10
 :page-parent: Sell Shares for Payouts
 :page-grand_parent: Payouts

@@ -5,8 +5,158 @@
 
 == Need for Marketplace
 
+When the pool grows so that all miners' payouts cannot be included in
+the bitcoin coinbase, alternative methods are needed to pay the
+smaller miners. Given the pool
+<<../requirements.adoc#payout-requirements,requirements>> of
+Unilateral Exits for all miners,
+https://bitcoinops.org/en/topics/joinpools/[coinpools/joinpools] using
+https://covenants.info/[covenants] will provide a scalable payout
+mechanism for all miners on a pool with unilateral exit. However,
+covenants might take a while to be included in bitcoin and there are
+ways to solve the payout for P2Poolv2 problem with the current bitcoin
+protocol.
+
+P2Poolv2's first effort to solve the payouts problem is to enable a
+marketplace for shares where miners sell their share to the highest
+bidder. The buyers of the shares mine or buy enough shares to be
+included in the coinbase. The payouts for larger miners or market
+makers are made through the xref:coinbase.adoc[coinbase payout] path.
+
+
 == Constraints From Sharechain on Marketplace
 
-== User Story of a Miner Selling Shares
+The sharechain imposes constraints on the design of the market place:
 
-== User Story of a Marketplace Buying Shares
+. Shares need to be confirmed before they can be traded.
+. Shares cannot be be traded once their root coinbase height is out of the PPLNS window.
+
+These requirements are explained in the xref:../architecture/pplns_accounting.adoc[PPLNS Accounting] section.
+
+== Buying and Selling Shares
+
+A miner that has mined shares and has a coinbase on the sharechain can
+spend the share instead of waiting for the payouts to accumulate over
+the PPLNS window. The seller is therefore reducing the risk of pool
+hashrate changes and is also getting a payout today for what will come
+slowly over two weeks' time.
+
+The figure below shows a miner being paid repeatedly over a PPLNS
+window each time a bitcoin block is found - assuming the miner is
+being paid from the coinbase.
+
+[graphviz, hold-share, svg]
+.Holding a share: the miner is paid a little with each block
+....
+digraph hold_share {
+  rankdir=LR
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.3
+  ranksep=0.25
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=10, fontcolor="#FFFFFF",
+        width=1.05, height=0.6, fixedsize=true]
+  edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
+
+  mined [label="Miner\nmines share"]
+
+  subgraph cluster_maturity {
+    label="Maturity window"
+    color="#FFFFFF66"
+    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7",
+          width=1.3]
+  }
+
+  // Blocks arrive at random times, so the gaps between them vary.
+  subgraph cluster_window {
+    label="PPLNS window: about two weeks"
+    color="#F7931A"
+    penwidth=2
+    node [fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    b1 [label="Block found\nMiner\n+0.02 BTC"]
+    b2 [label="Block found\nMiner\n+0.02 BTC"]
+    b3 [label="Block found\nMiner\n+0.02 BTC"]
+    b4 [label="Block found\nMiner\n+0.02 BTC"]
+    b5 [label="Block found\nMiner\n+0.02 BTC"]
+  }
+
+  expires [label="Share expires\nMiner total\n0.10 BTC", width=1.2,
+           height=0.7]
+
+  mined -> wait -> b1
+  b1 -> b2 [minlen=3]
+  b2 -> b3 [minlen=1]
+  b3 -> b4 [minlen=4]
+  b4 -> b5 [minlen=2]
+  b5 -> expires [arrowhead=normal, color="#F7931A"]
+}
+....
+
+The next figure shows a miner selling the shares at the start of a
+PPLNS window, once the maturity window is passed, and gets a lump sum
+payout immediately. While the buyer of the share get smaller payouts
+directly from coinbase over the rest of the PPLNS window.
+
+[graphviz, sell-share, svg]
+.Selling a share: the miner is paid once, and the buyer collects
+....
+digraph sell_share {
+  rankdir=LR
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.3
+  ranksep=0.25
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=10, fontcolor="#FFFFFF",
+        width=1.05, height=0.6, fixedsize=true]
+  edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
+
+  mined [label="Miner\nmines share"]
+
+  subgraph cluster_maturity {
+    label="Maturity window"
+    color="#FFFFFF66"
+    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7",
+          width=1.3]
+  }
+
+  // The miner is paid once, at the sale; the buyer collects afterwards.
+  subgraph cluster_window {
+    label="PPLNS window: about two weeks"
+    color="#F7931A"
+    penwidth=2
+    sale [label="Miner sells\nMiner\n+0.09 BTC", fillcolor="#F7931A",
+          fontcolor="#0B0B0C"]
+    b1 [label="Block found\nBuyer\n+0.02 BTC"]
+    b2 [label="Block found\nBuyer\n+0.02 BTC"]
+    b3 [label="Block found\nBuyer\n+0.02 BTC"]
+    b4 [label="Block found\nBuyer\n+0.02 BTC"]
+    b5 [label="Block found\nBuyer\n+0.02 BTC"]
+  }
+
+  expires [label="Share expires\nMiner: 0.09 BTC\nBuyer: 0.10 BTC",
+           width=1.3, height=0.7]
+
+  mined -> wait -> sale -> b1
+  b1 -> b2 [minlen=3]
+  b2 -> b3 [minlen=1]
+  b3 -> b4 [minlen=4]
+  b4 -> b5 [minlen=2]
+  b5 -> expires [arrowhead=normal, color="#F7931A"]
+}
+....
+
+The two figures capture the value of trading share.
+
+. Miners are offloading their risk for immediate payouts.
+. Market makers are buying the risk for discount in the share price.
+
+How the market will decide on the value of the shares is covered in
+xref:pricing_shares_as_options.adoc[Pricing Shares As Options] page.

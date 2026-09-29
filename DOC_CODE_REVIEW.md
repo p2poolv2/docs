@@ -59,11 +59,20 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
   the payout pages rely on miners spending and trading shares. There is
   no transaction construction, submission path, or wallet yet
   (`p2pool-v2/WALLET_API_PLAN.md`, `docs/architecture/address-format.md`).
+- [ ] **Bitcoin payouts follow the share's owner.**
+  `payouts/marketplace.adoc` (Figure 2) and `architecture/transactions.adoc`
+  ("Share Coinbase Value Lifecycle") say that after a share is sold, the
+  buyer receives its future bitcoin payouts. The code pays each share's
+  PPLNS portion to the `miner_bitcoin_address` in the share header, fixed
+  when the share is mined, so transferring the share's output does not
+  change who the bitcoin coinbase pays (`ShareHeader` in
+  `shares/share_block/mod.rs`, `validate_bitcoin_payout` in
+  `shares/validation/mod.rs`).
 - [ ] **Swap timelocks.** Atomic swaps need timelocks longer than the
   reorg depth that coinbase maturity guards against. They are not
   specified yet (`p2pool-v2/docs/atomic-swap/p2pool-2-lightinig-example.md`).
 - [ ] **Unilateral exits and Ark.** `requirements.adoc` ("Unilateral
-  Exits") and `payouts/ark.adoc` have no counterpart in the code or the
+  Exits") and `payouts/l2_swaps.adoc` have no counterpart in the code or the
   node's design documents.
 - [ ] **Uncle ancestry rule.** Validation rejects an uncle that is an
   ancestor of its nephew. `architecture/validation.adoc` does not list
