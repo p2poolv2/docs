@@ -23,16 +23,44 @@ P2Poolv2.
 
 == What Is Here
 
-Run a node:: Run a node from source and connect your miners. See xref:getting_started.adoc[Getting started].
+Getting Started:: Run a node from source and connect your miners. See
+xref:getting_started.adoc[Getting Started].
 
-P2P Network:: How miners join a peer-to-peer network to reduce their variance. See xref:p2p_network_of_miners.adoc[P2P Network of Miners].
+Motivation and Requirements:: Why bitcoin needs a pool without a
+central operator, and the requirements for P2Poolv2. See
+xref:why_p2poolv2.adoc[Why Do We Need P2Poolv2] and
+xref:requirements.adoc[Pool Requirements].
 
-Sharechain:: The design of the sharechain, including how shares are validated and how PPLNS accounts for them. See xref:architecture/sharechain.adoc[Sharechain Design].
+P2P Network:: How miners join a peer-to-peer network to reduce their
+variance. See xref:p2p_network_of_miners.adoc[P2P Network of Miners].
 
-Payout Mechanisms:: How the pool pays miners without letting the coinbase size
-limit its scalability. See how miners are paid directly xref:payouts/coinbase.adoc[from the bitcoin coinbase] and how small miners can xref:payouts/marketplace.adoc[sell shares for payouts].
+Node Design:: The parts of a node: the Stratum server, per-miner
+vardiff, and the pool difficulty algorithm. See
+xref:node_components.adoc[Node Components],
+xref:stratum.adoc[Stratum Server & Vardiff], and
+xref:pool_difficulty_adjustment.adoc[Pool Vardiff].
 
-Dashboards:: Dashboards that track the hashrate of the miners attached to a node and the global sharechain view. See xref:dashboards.adoc[Dashboards].
+Sharechain:: The sharechain of weak bitcoin blocks: share commitments,
+share validation, PPLNS accounting, and sharechain transactions. See
+xref:architecture/sharechain.adoc[Sharechain].
+
+Payouts:: How larger miners are paid directly from the bitcoin
+coinbase, and how smaller miners sell their shares for payouts. See
+xref:payouts/index.adoc[Payouts].
+
+Known Attacks:: How P2Poolv2 handles known attacks on mining pools.
+See xref:handling_known_attacks.adoc[Handling Known Attacks].
+
+Dashboards:: Dashboards that track the hashrate of the miners attached
+to a node and the global sharechain view. See
+xref:dashboards.adoc[Dashboards].
+
+Comparison With SV2 and DATUM:: How P2Poolv2 differs from pools running
+SV2 Job Declaration or OCEAN's DATUM. See
+xref:compare_datum_sv2.adoc[Comparison With SV2 & DATUM].
+
+Stories:: Walkthroughs of the pool at work, starting with a single
+miner. See xref:stories/index.adoc[Stories].
 
 == Elsewhere
 
