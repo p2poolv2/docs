@@ -25,18 +25,21 @@ one node can find a share at the same time.
 [graphviz, p2p-mesh, svg]
 ....
 graph p2p {
+  // Pinned positions keep the layout the same across Graphviz versions.
   layout=neato
-  overlap=false
-  splines=true
-  sep="-10"
   bgcolor="#0B0B0C"
   node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
         fontcolor="#FFFFFF", fontname="DejaVu Sans", fontsize=12]
   edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
         fontsize=10, penwidth=1.2]
 
-  A [label="Node A"]; B [label="Node B"]; C [label="Node C"]; D [label="Node D"]
-  E [label="Node E"]; F [label="Node F"]; G [label="Node G"]
+  A [label="Node A", pos="3.6,5.2!"]
+  B [label="Node B", pos="4.8,3.0!"]
+  C [label="Node C", pos="3.8,0.6!"]
+  D [label="Node D", pos="1.2,4.4!"]
+  E [label="Node E", pos="2.4,2.2!"]
+  F [label="Node F", pos="1.2,0!"]
+  G [label="Node G", pos="0,2.2!"]
 
   A -- B [label="share a1"]
   A -- D [label="share a1"]
@@ -45,7 +48,7 @@ graph p2p {
   C -- F
   D -- E
   D -- G [label="share g1"]
-  E -- F 
+  E -- F
   E -- G [label="share g1"]
   F -- G [label="share g1"]
   C -- E
