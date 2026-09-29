@@ -14,10 +14,9 @@ work behind its root coinbase.
 .Every output in a spending chain keeps the coinbase's root height
 ....
 digraph root_height_chain {
-  rankdir=LR
   bgcolor="#0B0B0C"
   nodesep=0.4
-  ranksep=0.5
+  ranksep=0.45
   fontname="DejaVu Sans"
   node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
         fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
@@ -32,9 +31,9 @@ digraph root_height_chain {
   rejected [label="Spend rejected", color="#E5484D", fontcolor="#E5484D",
             style="filled,dashed"]
 
-  coinbase -> out1 [label="spent at\nheight 8,000"]
-  out1 -> out2 [label="spent at\nheight 40,000"]
-  out2 -> rejected [label="spent after height 1,000\nleaves the PPLNS window",
+  coinbase -> out1 [label="  spent at height 7,048\l  first height after the\l  6,048-share maturity\l"]
+  out1 -> out2 [label="  spent at height 60,000\l"]
+  out2 -> rejected [label="  spent after height 128,008 = \l  1,000 + 6,048 maturity\l  + 120,960 PPLNS window\l",
                     color="#E5484D", style=dashed]
 }
 ....

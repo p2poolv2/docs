@@ -113,11 +113,10 @@ network.
 .Shareblocks build on the bitcoin tip, and Shareblock 3 found Block 101
 ....
 digraph sharechain {
-  rankdir=LR
   newrank=true
   bgcolor="#0B0B0C"
-  nodesep=1.4
-  ranksep=0.45
+  nodesep=1.1
+  ranksep=0.3
   fontname="DejaVu Sans"
   fontcolor="#FFFFFFC7"
   node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
@@ -140,7 +139,6 @@ digraph sharechain {
 
   subgraph cluster_bitcoin {
     label="Bitcoin blockchain"
-    labelloc=b
     fontsize=12
     color="#FFFFFF66"
     b100 [label="Block 100"]
@@ -158,7 +156,7 @@ digraph sharechain {
 
   // Previous bitcoin block hash in each shareblock's bitcoin header.
   edge [style=dashed, color="#FFFFFFC7", constraint=false]
-  s1 -> b100 [xlabel="builds on    "]
+  s1 -> b100 [label="builds on"]
   s2 -> b100
   s3 -> b100
   s4 -> b101
@@ -168,7 +166,7 @@ digraph sharechain {
   // Shareblock 3's bitcoin header met the bitcoin target and became
   // Block 101, which already links it to Block 100.
   s3 -> b101 [style=bold, color="#F7931A", penwidth=2,
-              xlabel="found block:      \lheader met\lbitcoin target\l"]
+              taillabel="found block", labelangle=-12, labeldistance=6, labelfontcolor="#FFFFFFC7", labelfontsize=10, labelfontname="DejaVu Sans"]
 }
 ....
 

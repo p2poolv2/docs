@@ -476,8 +476,11 @@ h1, h2, h3, h4, h5, h6,
 // PlantUML diagrams carry the brand skin from _plantuml/p2poolv2.config,
 // so they are drawn on the page black and need no frame.
 .main-content .imageblock {
+  // Narrow, vertical diagrams sit in the middle of the column rather
+  // than against its left edge.
   .content {
     overflow-x: auto;
+    text-align: center;
   }
 
   img,

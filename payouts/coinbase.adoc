@@ -29,8 +29,8 @@ digraph coinbase_payout {
   compound=true
   newrank=true
   bgcolor="#0B0B0C"
-  nodesep=0.15
-  ranksep=0.7
+  nodesep=0.9
+  ranksep=0.15
   fontname="DejaVu Sans"
   fontcolor="#FFFFFFC7"
   fontsize=11
@@ -64,15 +64,17 @@ digraph coinbase_payout {
     oc [label="Miner C\n1 share, 16.7%\n0.5208 BTC"]
   }
 
-  {rank=same; w1; w2; w3; w4; w5; w6}
-  {rank=same; oa; ob; oc}
+  // Shares run top to bottom; each output sits level with the window.
   edge [style=invis]
   w1 -> w2 -> w3 -> w4 -> w5 -> w6
   oa -> ob -> oc
   edge [style=solid]
+  {rank=same; w2; oa}
+  {rank=same; w4; ob}
+  {rank=same; w6; oc}
 
-  w3 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
-            label="  split by share"]
+  w4 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
+            label="split\nby share"]
 }
 ....
 

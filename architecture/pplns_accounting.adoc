@@ -28,9 +28,9 @@ concepts.
 .Maturity, PPLNS, and trading windows, counted back from the tip
 ....
 digraph pplns_window {
-  rankdir=LR
+  newrank=true
   bgcolor="#0B0B0C"
-  nodesep=0.2
+  nodesep=0.35
   ranksep=0.12
   fontname="DejaVu Sans"
   fontcolor="#FFFFFFC7"
@@ -40,8 +40,9 @@ digraph pplns_window {
         label="", width=0.3, height=0.3, fixedsize=true]
   edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
 
+  // Oldest shares at the top, the tip at the bottom.
   subgraph cluster_expired {
-    label="Expired\ncannot be spent"
+    label=""
     color="#FFFFFF66"
     style=dashed
     node [color="#FFFFFF40"]
@@ -49,25 +50,25 @@ digraph pplns_window {
   }
 
   subgraph cluster_window {
-    label="PPLNS window and trading window: 120,960 shares\ncounted for payouts, can be traded"
+    label=""
     color="#F7931A"
     penwidth=2
     style=filled
     fillcolor="#121212"
     node [fillcolor="#F7931A", color="#F7931A"]
     w1; w2; w3
-    wdots [shape=plaintext, style="", label="…", fontsize=16,
+    wdots [shape=plaintext, style="", label="⋮", fontsize=16,
            fontcolor="#F7931A"]
     w4; w5; w6
   }
 
   subgraph cluster_maturity {
-    label="Maturity window: 6,048 shares\nnot counted, cannot be spent"
+    label=""
     color="#FFFFFF66"
     style=filled
     fillcolor="#121212"
     m1; m2
-    mdots [shape=plaintext, style="", label="…", fontsize=16,
+    mdots [shape=plaintext, style="", label="⋮", fontsize=16,
            fontcolor="#FFFFFFC7"]
     m3
   }
@@ -78,6 +79,18 @@ digraph pplns_window {
   e1 -> e2 -> e3 -> w1 -> w2 -> w3 -> wdots -> w4 -> w5 -> w6
   w6 -> m1 -> m2 -> mdots -> m3
   m3 -> tip [color="#F7931A", arrowhead=normal, style=dashed]
+
+  // Descriptions in a second column, level with each window.
+  node [shape=plaintext, style="", fixedsize=false, width=0, height=0,
+        fontcolor="#FFFFFFC7"]
+  expired_text [label="Expired\lcannot be spent\l"]
+  window_text [label="PPLNS and trading window\l120,960 shares\lcounted, can be traded\l",
+               fontcolor="#F7931A"]
+  maturity_text [label="Maturity window\l6,048 shares\lnot counted, cannot be spent\l"]
+
+  {rank=same; e2; expired_text}
+  {rank=same; wdots; window_text}
+  {rank=same; mdots; maturity_text}
 }
 ....
 
@@ -94,7 +107,6 @@ shareblock.
 .Shareblock 4 references two uncles
 ....
 digraph uncles {
-  rankdir=LR
   newrank=true
   bgcolor="#0B0B0C"
   nodesep=0.5
