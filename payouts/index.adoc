@@ -1,0 +1,8 @@
+= Payouts
+:page-nav_order: 100
+:page-has_children: true
+
+P2Poolv2 pays miners in two ways. Larger miners are paid directly from
+the bitcoin coinbase. Smaller miners get paid by selling their shares
+to other miners or to market makers, who then earn the shares' rewards
+in the bitcoin coinbase.

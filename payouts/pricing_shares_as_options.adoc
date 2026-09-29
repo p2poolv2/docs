@@ -1,5 +1,6 @@
 = Pricing Shares as Options
 :page-nav_order: 30
 :page-parent: Sell Shares for Payouts
+:page-grand_parent: Payouts
 
 == Data Available to Miners and Buyers to Buy Shares

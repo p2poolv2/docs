@@ -1,6 +1,7 @@
 = Marketplace Application Mocks
 :page-nav_order: 40
 :page-parent: Sell Shares for Payouts
+:page-grand_parent: Payouts
 
 == Miner UX
 

@@ -1,5 +1,6 @@
 = Coinbase Payouts
-:page-nav_order: 100
+:page-parent: Payouts
+:page-nav_order: 10
 
 == Payout Over Coinbase
 
