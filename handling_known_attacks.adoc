@@ -4,147 +4,150 @@
 :sectnums:
 :page-nav_order: 120
 
-A list of well-studied attacks on mining pools, with references and candidate mitigations for P2Poolv2.
+Note: COMING SOON
+
+
+// A list of well-studied attacks on mining pools, with references and candidate mitigations for P2Poolv2.
 
 == Pool hopping
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1112.4980[Rosenfeld 2011, Analysis of Bitcoin Pooled Mining Reward Systems (arXiv:1112.4980)]
+// Reference:: https://arxiv.org/abs/1112.4980[Rosenfeld 2011, Analysis of Bitcoin Pooled Mining Reward Systems (arXiv:1112.4980)]
 
-Attack:: Under proportional payouts, miners join a pool early in a round, when shares are worth more, and leave later.
+// Attack:: Under proportional payouts, miners join a pool early in a round, when shares are worth more, and leave later.
 
-p2poolv2 mitigation::
-* PPLNS is already hopping-resistant.
-* Define N in units of work, not share count, so ASERT-driven difficulty changes do not reintroduce time dependence.
-* Check that Cobb-Douglas fee weighting does not make a share's value depend on when in the window it was submitted.
+// p2poolv2 mitigation::
+// * PPLNS is already hopping-resistant.
+// * Define N in units of work, not share count, so ASERT-driven difficulty changes do not reintroduce time dependence.
+// * Check that Cobb-Douglas fee weighting does not make a share's value depend on when in the window it was submitted.
 
 == Block withholding (sabotage)
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1112.4980[Rosenfeld 2011 (arXiv:1112.4980), Section 6.2]
+// Reference:: https://arxiv.org/abs/1112.4980[Rosenfeld 2011 (arXiv:1112.4980), Section 6.2]
 
-Attack:: The attacker submits shares but discards any hash that also meets the Bitcoin target.
+// Attack:: The attacker submits shares but discards any hash that also meets the Bitcoin target.
 
-p2poolv2 mitigation::
-* Every node must be able to reconstruct and broadcast the full block from any share that meets the Bitcoin target. This forces the attacker to drop the whole share, including its PPLNS credit.
-* Add a block-finder bonus so withholding always costs the attacker something.
+// p2poolv2 mitigation::
+// * Every node must be able to reconstruct and broadcast the full block from any share that meets the Bitcoin target. This forces the attacker to drop the whole share, including its PPLNS credit.
+// * Add a block-finder bonus so withholding always costs the attacker something.
 
 == Miner's dilemma / pool infiltration
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1411.7099[Eyal 2015, The Miner's Dilemma (arXiv:1411.7099)]
+// Reference:: https://arxiv.org/abs/1411.7099[Eyal 2015, The Miner's Dilemma (arXiv:1411.7099)]
 
-Attack:: A pool sends part of its hashrate into a victim pool and withholds blocks there. It collects PPLNS payouts without contributing blocks. When two pools attack each other, both end up worse off.
+// Attack:: A pool sends part of its hashrate into a victim pool and withholds blocks there. It collects PPLNS payouts without contributing blocks. When two pools attack each other, both end up worse off.
 
-p2poolv2 mitigation::
-* Same defenses as block withholding.
-* The finder bonus matters most here, because the attacker is a large, economically rational pool.
+// p2poolv2 mitigation::
+// * Same defenses as block withholding.
+// * The finder bonus matters most here, because the attacker is a large, economically rational pool.
 
 == Fork after withholding (FAW)
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1708.09790[Kwon et al., CCS 2017, Be Selfish and Avoid Dilemmas (arXiv:1708.09790)]
+// Reference:: https://arxiv.org/abs/1708.09790[Kwon et al., CCS 2017, Be Selfish and Avoid Dilemmas (arXiv:1708.09790)]
 
-Attack:: The attacker holds a found block and releases it only when a competing block appears, deliberately causing a fork. It earns more than plain BWH and can break the miner's dilemma.
+// Attack:: The attacker holds a found block and releases it only when a competing block appears, deliberately causing a fork. It earns more than plain BWH and can break the miner's dilemma.
 
-p2poolv2 mitigation::
-* The uncle rule (90% credit) is the weak spot, because a late-released block-grade share still earns most of its reward.
-* Cut or zero the uncle credit for block-grade shares whose Bitcoin prevhash was already stale when peers first saw them.
-* Honest orphans are also affected by this rule, so model its cost.
+// p2poolv2 mitigation::
+// * The uncle rule (90% credit) is the weak spot, because a late-released block-grade share still earns most of its reward.
+// * Cut or zero the uncle credit for block-grade shares whose Bitcoin prevhash was already stale when peers first saw them.
+// * Honest orphans are also affected by this rule, so model its cost.
 
 == Power adjusting withholding (PAW)
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://doi.org/10.1145/3319535.3354203[Gao et al., CCS 2019, Power Adjusting and Bribery Racing]
+// Reference:: https://doi.org/10.1145/3319535.3354203[Gao et al., CCS 2019, Power Adjusting and Bribery Racing]
 
-Attack:: The attacker dynamically shifts hashrate between infiltration and its own mining. This can also avoid the miner's dilemma.
+// Attack:: The attacker dynamically shifts hashrate between infiltration and its own mining. This can also avoid the miner's dilemma.
 
-p2poolv2 mitigation::
-* Covered by the block withholding and FAW defenses.
-* Watch per-address hashrate volatility in Grafana, as monitoring only.
+// p2poolv2 mitigation::
+// * Covered by the block withholding and FAW defenses.
+// * Watch per-address hashrate volatility in Grafana, as monitoring only.
 
 == Selfish mining on the share chain
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-References::
-* https://arxiv.org/abs/1311.0243[Eyal & Sirer 2013, Majority is not Enough (arXiv:1311.0243)]
-* https://arxiv.org/abs/1507.06183[Sapirshtein et al., Optimal Selfish Mining Strategies in Bitcoin (arXiv:1507.06183)]
+// References::
+// * https://arxiv.org/abs/1311.0243[Eyal & Sirer 2013, Majority is not Enough (arXiv:1311.0243)]
+// * https://arxiv.org/abs/1507.06183[Sapirshtein et al., Optimal Selfish Mining Strategies in Bitcoin (arXiv:1507.06183)]
 
-Attack:: The attacker withholds shares to orphan honest shares and grow its own PPLNS fraction. Short share intervals make this worse, because latency gives the attacker a larger γ.
+// Attack:: The attacker withholds shares to orphan honest shares and grow its own PPLNS fraction. Short share intervals make this worse, because latency gives the attacker a larger γ.
 
-p2poolv2 mitigation::
-* Uncles blunt it by reducing honest orphan losses.
-* Uncle rewards can also make selfish mining more profitable in some parameter ranges, as Ethereum analyses found. Model the 90/10 split with an MDP like Sapirshtein's.
-* Fast share propagation, plus a randomized or earliest-seen tie-break.
+// p2poolv2 mitigation::
+// * Uncles blunt it by reducing honest orphan losses.
+// * Uncle rewards can also make selfish mining more profitable in some parameter ranges, as Ethereum analyses found. Model the 90/10 split with an MDP like Sapirshtein's.
+// * Fast share propagation, plus a randomized or earliest-seen tie-break.
 
 == Stubborn mining + eclipse
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-References::
-* https://eprint.iacr.org/2015/796[Nayak et al. 2016, Stubborn Mining (eprint 2015/796)]
-* https://eprint.iacr.org/2015/263[Heilman et al., USENIX Security 2015, Eclipse Attacks on Bitcoin's Peer-to-Peer Network (eprint 2015/263)]
+// References::
+// * https://eprint.iacr.org/2015/796[Nayak et al. 2016, Stubborn Mining (eprint 2015/796)]
+// * https://eprint.iacr.org/2015/263[Heilman et al., USENIX Security 2015, Eclipse Attacks on Bitcoin's Peer-to-Peer Network (eprint 2015/263)]
 
-Attack:: The attacker isolates nodes so they mine on a stale share-chain tip, which amplifies selfish-mining gains.
+// Attack:: The attacker isolates nodes so they mine on a stale share-chain tip, which amplifies selfish-mining gains.
 
-p2poolv2 mitigation::
-* Diversify outbound peers across ASNs.
-* Keep anchor peers across restarts.
-* Cap inbound connections per IP range in libp2p.
-* DCUtR-connected home miners are the most exposed, so give them a few trusted outbound peers.
+// p2poolv2 mitigation::
+// * Diversify outbound peers across ASNs.
+// * Keep anchor peers across restarts.
+// * Cap inbound connections per IP range in libp2p.
+// * DCUtR-connected home miners are the most exposed, so give them a few trusted outbound peers.
 
-== BGP hijacking / partitioning
+=== BGP hijacking / partitioning
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1605.07524[Apostolaki et al. 2017, Hijacking Bitcoin: Routing Attacks on Cryptocurrencies (arXiv:1605.07524)]
+// Reference:: https://arxiv.org/abs/1605.07524[Apostolaki et al. 2017, Hijacking Bitcoin: Routing Attacks on Cryptocurrencies (arXiv:1605.07524)]
 
-Attack:: Routing attacks split or delay the network. A share-chain partition wastes shares and makes share-chain selfish mining easier.
+// Attack:: Routing attacks split or delay the network. A share-chain partition wastes shares and makes share-chain selfish mining easier.
 
-p2poolv2 mitigation::
-* Noise encryption hides share traffic but does not prevent a partition.
-* Multi-homed seed nodes and relay diversity.
-* Alert when the share-chain tip stops advancing.
+// p2poolv2 mitigation::
+// * Noise encryption hides share traffic but does not prevent a partition.
+// * Multi-homed seed nodes and relay diversity.
+// * Alert when the share-chain tip stops advancing.
 
 == Stratum hijacking and eavesdropping
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://arxiv.org/abs/1703.06545[Recabarren & Carbunar, PETS 2017, Hardening Stratum, the Bitcoin Pool Mining Protocol (arXiv:1703.06545)]
+// Reference:: https://arxiv.org/abs/1703.06545[Recabarren & Carbunar, PETS 2017, Hardening Stratum, the Bitcoin Pool Mining Protocol (arXiv:1703.06545)]
 
-Attack:: Stratum v1 is unencrypted, so attackers can infer miner earnings and actively hijack submitted shares and their payouts.
+// Attack:: Stratum v1 is unencrypted, so attackers can infer miner earnings and actively hijack submitted shares and their payouts.
 
-p2poolv2 mitigation::
-* The biggest defense is running the node on the miner's LAN.
-* Support Stratum V2 or another Noise-encrypted transport for remote miners.
-* The payout address is committed in the coinbase, so a hijacker has to swap the job itself, and encryption blocks that.
+// p2poolv2 mitigation::
+// * The biggest defense is running the node on the miner's LAN.
+// * Support Stratum V2 or another Noise-encrypted transport for remote miners.
+// * The payout address is committed in the coinbase, so a hijacker has to swap the job itself, and encryption blocks that.
 
 == Share withholding / delayed share submission
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: https://link.springer.com/chapter/10.1007/978-3-030-63095-9_9[Chang, SecureComm 2020, Share Withholding in Blockchain Mining]
+// Reference:: https://link.springer.com/chapter/10.1007/978-3-030-63095-9_9[Chang, SecureComm 2020, Share Withholding in Blockchain Mining]
 
-Attack:: The attacker times share submissions strategically, often combined with FAW-style forks.
+// Attack:: The attacker times share submissions strategically, often combined with FAW-style forks.
 
-p2poolv2 mitigation::
-* Tight timestamp bounds against median time past, plus a max future drift.
-* Decay credit for shares that arrive late relative to their parent.
+// p2poolv2 mitigation::
+// * Tight timestamp bounds against median time past, plus a max future drift.
+// * Decay credit for shares that arrive late relative to their parent.
 
 == Timestamp / difficulty manipulation on the share chain
 
-Status:: [ ] Open
+// Status:: [ ] Open
 
-Reference:: No single canonical paper; this is the share-chain version of Bitcoin's time-warp attack.
+// Reference:: No single canonical paper; this is the share-chain version of Bitcoin's time-warp attack.
 
-Attack:: An attacker skews timestamps to lower ASERT difficulty and mint cheap shares.
+// Attack:: An attacker skews timestamps to lower ASERT difficulty and mint cheap shares.
 
-p2poolv2 mitigation::
-* ASERT's anchor-based design resists slow drift, but only with strict MTP and future-time rules.
-* Integer fixed-point math ensures every node computes identical targets.
+// p2poolv2 mitigation::
+// * ASERT's anchor-based design resists slow drift, but only with strict MTP and future-time rules.
+// * Integer fixed-point math ensures every node computes identical targets.
