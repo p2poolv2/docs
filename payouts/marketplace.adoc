@@ -49,50 +49,81 @@ being paid from the coinbase.
 .Holding a share: the miner is paid a little with each block
 ....
 digraph hold_share {
-  rankdir=LR
   newrank=true
   bgcolor="#0B0B0C"
-  nodesep=0.3
-  ranksep=0.25
+  nodesep=0.6
+  ranksep=0.18
   fontname="DejaVu Sans"
   fontcolor="#FFFFFFC7"
   fontsize=11
   node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
-        fontname="DejaVu Sans", fontsize=10, fontcolor="#FFFFFF",
-        width=1.05, height=0.6, fixedsize=true]
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.6, height=0.4, fixedsize=true]
   edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
 
-  mined [label="Miner\nmines share"]
+  chain_head [label="Sharechain", shape=plaintext, style="",
+              fontcolor="#FFFFFFC7"]
+  pay_head [label="Payouts", shape=plaintext, style="",
+            fontcolor="#FFFFFFC7"]
+
+  mined [label="Miner mines share"]
 
   subgraph cluster_maturity {
     label="Maturity window"
+    labeljust=l
     color="#FFFFFF66"
-    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7",
-          width=1.3]
+    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7"]
   }
 
   // Blocks arrive at random times, so the gaps between them vary.
   subgraph cluster_window {
     label="PPLNS window: about two weeks"
+    labeljust=l
     color="#F7931A"
     penwidth=2
-    node [fillcolor="#F7931A", fontcolor="#0B0B0C"]
-    b1 [label="Block found\nMiner\n+0.02 BTC"]
-    b2 [label="Block found\nMiner\n+0.02 BTC"]
-    b3 [label="Block found\nMiner\n+0.02 BTC"]
-    b4 [label="Block found\nMiner\n+0.02 BTC"]
-    b5 [label="Block found\nMiner\n+0.02 BTC"]
+    b1 [label="Block found"]
+    b2 [label="Block found"]
+    b3 [label="Block found"]
+    b4 [label="Block found"]
+    b5 [label="Block found"]
   }
 
-  expires [label="Share expires\nMiner total\n0.10 BTC", width=1.2,
-           height=0.7]
+  expires [label="Share expires"]
 
+  // Payouts to the miner, one beside each block.
+  node [fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  p1 [label="Miner +0.02 BTC"]
+  p2 [label="Miner +0.02 BTC"]
+  p3 [label="Miner +0.02 BTC"]
+  p4 [label="Miner +0.02 BTC"]
+  p5 [label="Miner +0.02 BTC"]
+  total [label="Miner total\n0.10 BTC", height=0.55, fillcolor="#121212",
+         fontcolor="#FFFFFF"]
+
+  chain_head -> mined [style=invis]
+  pay_head -> p1 [style=invis]
   mined -> wait -> b1
   b1 -> b2 [minlen=3]
   b2 -> b3 [minlen=1]
   b3 -> b4 [minlen=4]
   b4 -> b5 [minlen=2]
   b5 -> expires [arrowhead=normal, color="#F7931A"]
+
+  {rank=same; chain_head; pay_head}
+  {rank=same; b1; p1}
+  {rank=same; b2; p2}
+  {rank=same; b3; p3}
+  {rank=same; b4; p4}
+  {rank=same; b5; p5}
+  {rank=same; expires; total}
+
+  edge [color="#F7931A", arrowhead=normal]
+  b1 -> p1
+  b2 -> p2
+  b3 -> p3
+  b4 -> p4
+  b5 -> p5
+  expires -> total [color="#FFFFFF66"]
 }
 ....
 
@@ -105,51 +136,83 @@ directly from coinbase over the rest of the PPLNS window.
 .Selling a share: the miner is paid once, and the buyer collects
 ....
 digraph sell_share {
-  rankdir=LR
   newrank=true
   bgcolor="#0B0B0C"
-  nodesep=0.3
-  ranksep=0.25
+  nodesep=0.6
+  ranksep=0.18
   fontname="DejaVu Sans"
   fontcolor="#FFFFFFC7"
   fontsize=11
   node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
-        fontname="DejaVu Sans", fontsize=10, fontcolor="#FFFFFF",
-        width=1.05, height=0.6, fixedsize=true]
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=1.6, height=0.4, fixedsize=true]
   edge [color="#FFFFFF66", arrowhead=none, penwidth=1]
 
-  mined [label="Miner\nmines share"]
+  chain_head [label="Sharechain", shape=plaintext, style="",
+              fontcolor="#FFFFFFC7"]
+  pay_head [label="Payouts", shape=plaintext, style="",
+            fontcolor="#FFFFFFC7"]
+
+  mined [label="Miner mines share"]
 
   subgraph cluster_maturity {
     label="Maturity window"
+    labeljust=l
     color="#FFFFFF66"
-    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7",
-          width=1.3]
+    wait [label="No payouts", color="#FFFFFF66", fontcolor="#FFFFFFC7"]
   }
 
-  // The miner is paid once, at the sale; the buyer collects afterwards.
+  // Blocks arrive at random times, so the gaps between them vary.
   subgraph cluster_window {
     label="PPLNS window: about two weeks"
+    labeljust=l
     color="#F7931A"
     penwidth=2
-    sale [label="Miner sells\nMiner\n+0.09 BTC", fillcolor="#F7931A",
-          fontcolor="#0B0B0C"]
-    b1 [label="Block found\nBuyer\n+0.02 BTC"]
-    b2 [label="Block found\nBuyer\n+0.02 BTC"]
-    b3 [label="Block found\nBuyer\n+0.02 BTC"]
-    b4 [label="Block found\nBuyer\n+0.02 BTC"]
-    b5 [label="Block found\nBuyer\n+0.02 BTC"]
+    sale [label="Miner sells share"]
+    b1 [label="Block found"]
+    b2 [label="Block found"]
+    b3 [label="Block found"]
+    b4 [label="Block found"]
+    b5 [label="Block found"]
   }
 
-  expires [label="Share expires\nMiner: 0.09 BTC\nBuyer: 0.10 BTC",
-           width=1.3, height=0.7]
+  expires [label="Share expires"]
 
+  // The miner is paid once, at the sale; the buyer collects afterwards.
+  ps [label="Miner +0.098 BTC", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  p1 [label="Buyer +0.02 BTC"]
+  p2 [label="Buyer +0.02 BTC"]
+  p3 [label="Buyer +0.02 BTC"]
+  p4 [label="Buyer +0.02 BTC"]
+  p5 [label="Buyer +0.02 BTC"]
+  total [label="Miner: 0.098 BTC\nBuyer: 0.100 BTC", height=0.55]
+
+  chain_head -> mined [style=invis]
+  pay_head -> ps [style=invis]
   mined -> wait -> sale -> b1
   b1 -> b2 [minlen=3]
   b2 -> b3 [minlen=1]
   b3 -> b4 [minlen=4]
   b4 -> b5 [minlen=2]
   b5 -> expires [arrowhead=normal, color="#F7931A"]
+
+  {rank=same; chain_head; pay_head}
+  {rank=same; sale; ps}
+  {rank=same; b1; p1}
+  {rank=same; b2; p2}
+  {rank=same; b3; p3}
+  {rank=same; b4; p4}
+  {rank=same; b5; p5}
+  {rank=same; expires; total}
+
+  edge [color="#F7931A", arrowhead=normal]
+  sale -> ps
+  b1 -> p1
+  b2 -> p2
+  b3 -> p3
+  b4 -> p4
+  b5 -> p5
+  expires -> total [color="#FFFFFF66"]
 }
 ....
 
