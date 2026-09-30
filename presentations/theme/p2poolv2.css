@@ -88,6 +88,24 @@
   box-shadow: none;
 }
 
+/* Feature slides: a subheading naming the feature, then one diagram. */
+.reveal .feature .feature-title p {
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--r-heading-font);
+  font-size: 0.8em;
+  margin-top: 0;
+}
+
+.reveal .feature .imageblock img {
+  height: 380px;
+}
+
+/* A short diagram stretched to 380px gets oversized text. The compact
+   role caps it so its text matches the other feature slides. */
+.reveal .feature .imageblock.compact img {
+  height: 310px;
+}
+
 /* Question slides: one large line and no heading. */
 .reveal .slides section.question p {
   font-family: var(--r-heading-font);

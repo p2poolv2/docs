@@ -148,28 +148,183 @@ Vienna 2026 deck.
 Transition: "We're building a fix. First, what P2Poolv2 is."
 --
 
-// 5b. What P2Poolv2 is: the sharechain and its tooling.
-
+// 5b. What P2Poolv2 is: one feature per slide.
+[.feature]
 == What Is P2Poolv2
 
-* A sharechain of weak bitcoin blocks, one share every 10 seconds
-* *Decentralized accounting:* every node agrees on who mined what
-* *Decentralized templates:* every miner builds its own block
+[.feature-title]
+Sharechain of weak bitcoin blocks
+
+[graphviz, intro-sharechain, svg]
+....
+digraph intro_sharechain {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  rankdir=BT
+  nodesep=0.3
+  ranksep=0.35
+  s1 [label="share", width=1.4]
+  s2 [label="share", width=1.4]
+  s3 [label="share", width=1.4, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  s1 -> s2 -> s3 [dir=back, label=" 10s"]
+}
+....
 
 [.notes]
 --
-P2Poolv2 revives P2Pool's idea: the sharechain runs Nakamoto consensus
-with a lower target than bitcoin, so every node reaches the same PPLNS
-accounting and checks every share's payouts. No operator keeps the
-books, and no operator picks the transactions.
+P2Poolv2 revives P2Pool's idea: a sharechain of weak bitcoin blocks,
+one share every 10 seconds, running Nakamoto consensus with a lower
+target than bitcoin.
 --
 
-== A Sharechain With Transactions
+[.feature]
+== What Is P2Poolv2
 
-* UTXO and Script transactions, validated like bitcoin
-* Think Litecoin: bitcoin's transaction model on another chain
-* But each coinbase is minted when a miner finds a share
-* One share, one coinbase output, owned by the miner's key
+[.feature-title]
+Decentralized accounting: every node agrees
+
+[graphviz, intro-accounting, svg]
+....
+digraph intro_accounting {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.4
+  ranksep=0.5
+  node [width=2.0, height=0.9]
+  n1 [label="Node\nA 50% · B 33%"]
+  n2 [label="Node\nA 50% · B 33%"]
+  n3 [label="Node\nA 50% · B 33%"]
+  {rank=same; n1; n2}
+  n1 -> n2 [dir=both, arrowsize=0.7]
+  n1 -> n3 [dir=both, arrowsize=0.7]
+  n2 -> n3 [dir=both, arrowsize=0.7]
+}
+....
+
+[.notes]
+--
+Every node reaches the same PPLNS accounting and checks every share's
+payouts, so no operator keeps the books.
+--
+
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+Decentralized templates: every miner builds its own
+
+[graphviz, intro-templates, svg]
+....
+digraph intro_templates {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.3
+  ranksep=0.5
+  m1 [label="Miner A", width=1.3]
+  m2 [label="Miner B", width=1.3]
+  t1 [label="own\ntemplate", width=1.3, height=0.8, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  t2 [label="own\ntemplate", width=1.3, height=0.8, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  m1 -> t1
+  m2 -> t2
+}
+....
+
+[.notes]
+--
+Every miner builds its own block template, so no operator picks the
+transactions.
+--
+
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+UTXO and Script transactions: think Litecoin
+
+[graphviz, intro-utxo, svg]
+....
+digraph intro_utxo {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  rankdir=LR
+  nodesep=0.3
+  ranksep=0.5
+  in [label="UTXO", width=1.2]
+  tx [label="tx\nScript", width=1.2, height=0.8, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  o1 [label="UTXO", width=1.2]
+  o2 [label="UTXO", width=1.2]
+  in -> tx
+  tx -> o1
+  tx -> o2
+}
+....
+
+[.notes]
+--
+Think Litecoin: bitcoin's transaction model on another chain,
+validated like bitcoin.
+--
+
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+Minted per share: one share, one output
+
+[graphviz, intro-mint, svg]
+....
+digraph intro_mint {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.3
+  ranksep=0.45
+  compound=true
+  found [label="Miner finds\na share", height=0.8]
+
+  // The minted output sits in the shareblock's coinbase, paying the
+  // miner's key like any bitcoin output.
+  subgraph cluster_shareblock {
+    label="Shareblock"
+    fontcolor="#FFFFFFC7"
+    fontsize=16
+    color="#F7931A"
+    subgraph cluster_coinbase {
+      label="Coinbase transaction"
+      fontcolor="#FFFFFFC7"
+      fontsize=14
+      color="#FFFFFF66"
+      cb [label="Output: 1 share unit\nP2WPKH to the miner", width=3.3,
+          height=0.9, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    }
+  }
+  found -> cb [label=" mints", lhead=cluster_shareblock]
+}
+....
 
 [.notes]
 --
@@ -179,35 +334,158 @@ who found it. That output is an ordinary UTXO: the miner can hold it,
 split it, or sell it.
 --
 
-== Bitcoin Tooling Carries Over
+[.feature]
+== What Is P2Poolv2
 
-[.landscape]
-Script · Taproot · PSBT · Descriptors · BDK · Electrum API
+[.feature-title]
+Electrum API: wallets and explorers query the sharechain
 
-* *Electrum API:* wallets and explorers query the sharechain
-* *BDK:* a wallet with descriptors, PSBTs, and hardware signers
+[graphviz, intro-electrum, svg]
+....
+digraph intro_electrum {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.3
+  ranksep=0.45
+  compound=true
+  w [label="Wallet", width=1.4]
+  e [label="Explorer", width=1.4]
+
+  // The node ships with the Electrum API built in.
+  subgraph cluster_node {
+    label="P2Poolv2 node"
+    labelloc=b
+    fontcolor="#FFFFFFC7"
+    fontsize=16
+    color="#F7931A"
+    api [label="Electrum API", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    chain [label="Sharechain"]
+  }
+  w -> api
+  e -> api
+  api -> chain
+}
+....
 
 [.notes]
 --
 Status to be careful about on stage: the Electrum server is planned as
-stage 4 of WALLET_API_PLAN.md in the node repository, and the BDK
-wallet is not built yet. Stock Electrum clients also have no concept of
-an output that expires with its root height, so wallets need to show
-that.
+stage 4 of WALLET_API_PLAN.md in the node repository. Stock Electrum
+clients also have no concept of an output that expires with its root
+height, so wallets need to show that.
 --
 
-== What Can You Build?
+[.feature]
+== What Is P2Poolv2
 
-* Sell shares for bitcoin by atomic swap
-* Marketplaces that price shares by time left in the window
-* Wallets that hold shares next to bitcoin
-* Multisig and timelocked shares for pools of small miners
+[.feature-title]
+Compatible with ecosystem tooling
+
+[graphviz, intro-tooling, svg]
+....
+digraph intro_tooling {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  compound=true
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.3
+  ranksep=0.5
+
+  // One BDK wallet holds bitcoin and shares side by side.
+  subgraph cluster_wallet {
+    label="BDK wallet"
+    fontcolor="#FFFFFFC7"
+    fontsize=16
+    color="#F7931A"
+    btc [label="0.05 BTC", width=1.5]
+    shares [label="12 shares", width=1.5, fillcolor="#F7931A",
+            fontcolor="#0B0B0C"]
+    {rank=same; btc; shares}
+  }
+  psbt [label="Descriptors\nand PSBTs", height=0.8]
+
+  // Two edges keep the PSBT box centred; only one is drawn.
+  btc -> psbt [ltail=cluster_wallet, style=invis]
+  shares -> psbt [ltail=cluster_wallet]
+}
+....
 
 [.notes]
 --
-Motivate the room: once shares are UTXOs with Script, the whole bitcoin
-toolbox applies to them. The first use is getting small miners paid,
-which is where the rest of the talk goes.
+Script, Taproot, PSBTs, and descriptors all carry over to the
+sharechain, so one BDK wallet can hold shares next to bitcoin. The BDK
+wallet is not built yet.
+--
+
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+Swaps: sell shares for bitcoin
+
+[graphviz, build-swap, svg]
+....
+digraph build_swap {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.5
+  ranksep=0.8
+  m [label="Miner", width=1.2]
+  b [label="Buyer", width=1.2]
+  m -> b [label=" share"]
+  b -> m [label=" bitcoin"]
+}
+....
+
+[.notes]
+--
+Once shares are UTXOs with Script, the whole bitcoin toolbox applies
+to them. The first use is getting small miners paid, which is where
+the rest of the talk goes.
+--
+
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+Options: price shares by time left
+
+[graphviz, build-market, svg]
+....
+digraph build_market {
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=1.9, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+  nodesep=0.3
+  ranksep=0.4
+  young [label="12 days left\nhigher price", height=0.8, fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  old [label="2 days left\nlower price", height=0.8]
+  young -> old [label=" time"]
+}
+....
+
+[.notes]
+--
+A share earns only while it is in the PPLNS window, so its price falls
+as its time left runs out.
 
 Transition: "And beyond the sharechain, the landscape has changed since
 2011."
