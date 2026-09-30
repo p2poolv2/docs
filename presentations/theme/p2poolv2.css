@@ -1,0 +1,169 @@
+/* P2Poolv2 brand for reveal.js decks, layered on the "black" theme.
+
+   Same four colours as the docs site: Bitcoin Orange #F7931A, Black
+   #0B0B0C, Near Black #121212, and White. Shades are one of the four at
+   reduced opacity. White on orange fails contrast, so anything on a
+   filled orange surface is black. JetBrains Mono sets headings and
+   Inter sets prose, both self-hosted through fonts.css. */
+
+@import url("fonts.css");
+
+:root {
+  --r-background-color: #0b0b0c;
+  --r-main-font: "Inter", ui-sans-serif, system-ui, "Helvetica Neue", arial, sans-serif;
+  --r-main-font-size: 38px;
+  --r-main-color: #ffffff;
+  --r-heading-font: "JetBrains Mono", ui-monospace, "SFMono-Regular", menlo, monospace;
+  --r-heading-color: #ffffff;
+  --r-heading-font-weight: 700;
+  --r-heading-text-transform: none;
+  --r-heading-letter-spacing: -0.01em;
+  --r-heading1-size: 2.1em;
+  --r-heading2-size: 1.5em;
+  --r-code-font: "JetBrains Mono", ui-monospace, "SFMono-Regular", menlo, monospace;
+  --r-link-color: #f7931a;
+  --r-link-color-hover: rgba(247, 147, 26, 0.82);
+  --r-selection-background-color: rgba(247, 147, 26, 0.26);
+  --r-selection-color: #ffffff;
+}
+
+.reveal-viewport {
+  background: #0b0b0c;
+}
+
+/* An orange rule under each slide heading, as on the site. */
+.reveal .slides section > h2::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 4px;
+  margin: 0.4em auto 0;
+  background: #f7931a;
+}
+
+.reveal ul {
+  display: block;
+}
+
+.reveal li {
+  margin: 0.35em 0;
+}
+
+.reveal li::marker {
+  color: #f7931a;
+}
+
+.reveal .subtitle,
+.reveal .title-slide p {
+  color: rgba(255, 255, 255, 0.56);
+  font-family: var(--r-heading-font);
+  font-size: 0.8em;
+}
+
+.reveal pre,
+.reveal code {
+  background: #121212;
+  border-radius: 0;
+}
+
+.reveal pre {
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+/* Diagrams are drawn on the page black, with no frame or shadow, and
+   scale up to fill most of the slide. Sizes are in slide pixels, not
+   vh: reveal.js scales the 1280x720 slide to the window, so viewport
+   units would overflow the slide on screens of other shapes. 440px
+   leaves room for a heading and one line of text below. */
+.reveal .imageblock img,
+.reveal .imageblock svg {
+  height: 440px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Question slides: one large line and no heading. */
+.reveal .slides section.question p {
+  font-family: var(--r-heading-font);
+  font-size: 1.35em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.reveal .slides section.question h2 {
+  display: none;
+}
+
+.reveal .slides section.question .links p {
+  font-family: var(--r-main-font);
+  font-size: 0.6em;
+  font-weight: 400;
+}
+
+.reveal .landscape p {
+  font-family: var(--r-heading-font);
+  font-size: 1.1em;
+  color: #f7931a;
+}
+
+/* Tables: quiet rules, orange headings. */
+.reveal table {
+  font-size: 0.55em;
+  border-collapse: collapse;
+  margin: 0.5em auto;
+}
+
+.reveal table th {
+  color: #f7931a;
+  font-family: var(--r-heading-font);
+  font-weight: 700;
+}
+
+.reveal table th,
+.reveal table td {
+  padding: 0.45em 0.7em;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+  text-align: left;
+}
+
+.reveal table tbody tr:first-child td {
+  border-top: 1px solid rgba(247, 147, 26, 0.26);
+}
+
+/* Check and cross marks in tables. Green and red sit outside the four
+   brand colours, so they are kept for yes/no marks only. */
+.reveal .yes {
+  color: #3fb950;
+  font-weight: 700;
+}
+
+.reveal .no {
+  color: #e5484d;
+  font-weight: 700;
+}
+
+.reveal ol li::marker {
+  color: #f7931a;
+  font-family: var(--r-heading-font);
+}
+
+.reveal .slide-number {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.56);
+  font-family: var(--r-heading-font);
+}
+
+.reveal .progress {
+  color: #f7931a;
+}
+
+.reveal .controls {
+  color: #f7931a;
+}

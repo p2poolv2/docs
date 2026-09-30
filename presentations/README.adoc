@@ -1,0 +1,102 @@
+= P2Poolv2 Presentations
+
+Standalone slide decks for talks. They are written in AsciiDoc, built
+into https://revealjs.com[reveal.js] decks with
+https://docs.asciidoctor.org/reveal.js-converter/latest/[asciidoctor-revealjs],
+and styled to match the docs site. This folder is excluded from the
+docs website build.
+
+== Layout
+
+....
+presentations/
+  build.sh                     builds one deck
+  Gemfile                      Ruby dependencies for building decks
+  theme/p2poolv2.css           brand theme, layered on reveal.js "black"
+  <deck>/slides.adoc           one folder per talk
+  build/<deck>/                built deck (not committed)
+  .cache/                      downloaded reveal.js and diagram cache (not committed)
+....
+
+== Requirements
+
+* Ruby and Bundler, as for the docs site
+* A Java runtime, for PlantUML diagrams
+* Graphviz (`dot`), for Graphviz diagrams
+* `curl` and `tar`, to download reveal.js on the first build
+
+Install the Ruby dependencies once, from this folder:
+
+....
+bundle config set --local path vendor/bundle
+bundle install
+....
+
+== Building a Deck
+
+From this folder, run `build.sh` with the deck's folder name:
+
+....
+./build.sh 2026-btcpp-berlin-payments
+....
+
+The first build downloads reveal.js 4.6.1 into `.cache/`. Each build
+writes a self-contained deck to `build/<deck>/`: `index.html`, the
+rendered diagrams, reveal.js, the brand theme, and the fonts. Nothing
+loads from the network, so the deck runs offline.
+
+== Presenting
+
+Open `build/<deck>/index.html` in a browser. Useful keys:
+
+* kbd:[F] full screen
+* kbd:[S] speaker view, with the `[.notes]` blocks and a timer
+* kbd:[Esc] or kbd:[O] slide overview
+
+To make a PDF, open `index.html?print-pdf` in Chrome or Chromium and
+print to PDF with the margins set to none.
+
+== Writing a Deck
+
+Create a folder named after the event, such as `2026-btcpp-berlin-payments`,
+with a `slides.adoc` file. The document title is the title slide, and
+each `==` heading starts a new slide.
+
+[source,asciidoc]
+----
+= Talk Title
+Speaker Name
+:revealjs_theme: black
+
+== First Slide
+
+* A point
+* Another point
+
+[.notes]
+--
+Speaker notes, shown only in the speaker view.
+--
+----
+
+Other features:
+
+* Show each slide whole. Do not reveal points one at a time with
+  `[%step]` or other fragments.
+* `[graphviz, name, svg]` and `[plantuml, name, svg]` blocks work as
+  on the docs site, and PlantUML diagrams get the site's brand skin.
+  Diagrams scale to fill most of the slide height.
+* Slides are 16:9 landscape (`:revealjs_width: 1280` and
+  `:revealjs_height: 720`). The vertical-diagram rules in `../AGENTS.md`
+  are for the docs site on phones; on slides, prefer layouts that fill
+  a wide screen, such as timelines running left to right. Use font
+  sizes of 14–18 in diagrams so they read from the back of a room.
+* The prose rules in `../AGENTS.md` apply to slides too.
+
+== Styling
+
+`theme/p2poolv2.css` sets the brand for every deck: Bitcoin Orange
+`#F7931A` for accents, Black `#0B0B0C` for the page, Near Black
+`#121212` for code, and White for text, with JetBrains Mono headings
+and Inter body text. The fonts come from `../assets/fonts/`, the same
+files the docs site uses.

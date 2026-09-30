@@ -90,6 +90,7 @@ exclude:
   - AGENTS.md
   - CLAUDE.md
   - DOC_CODE_REVIEW.md
+  - presentations
   - LICENSE
   - .jekyll-cache
   - architecture/share_flow.adoc

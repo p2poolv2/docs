@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+# Presentations are built separately from the docs site, so they keep
+# their own dependencies. See README.adoc.
+gem "asciidoctor-revealjs", "~> 5.2"
+gem "asciidoctor-diagram", "~> 3.0"
+gem "asciidoctor-diagram-plantuml"

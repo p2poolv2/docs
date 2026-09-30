@@ -1,0 +1,707 @@
+= Paying Miners Without Custody
+Kulpreet Singh (jungly) · P2Poolv2
+:revealjs_theme: black
+:revealjs_hash: true
+:revealjs_slideNumber: c/t
+:revealjs_width: 1280
+:revealjs_height: 720
+:source-highlighter: highlight.js
+
+[.subtitle]
+BTC++ Berlin 2026
+
+// 1. The question (1 min)
+
+[.question]
+== {nbsp}
+
+How do you pay thousands of miners without anyone holding their
+rewards?
+
+[.notes]
+--
+Open with the question and leave it on screen. Every later section
+returns to it.
+--
+
+// 2. Custody is control (2.5 min)
+
+== Custody Is Control
+
+* A pool does not need to reject your template
+* It just stops counting your shares
+* The accounting is the lever
+* A pool is a company in a jurisdiction, so that is where pressure lands
+
+[.notes]
+--
+From p2poolv2.org: "Governments are good at cutting off the heads of a
+centrally controlled network… the accounting is the lever."
+--
+
+// 3. Today every pool is custodial (2.5 min)
+
+== Every Pool Is Custodial Today
+
+* The coinbase pays the pool
+* The pool pays miners later, under FPPS or PPLNS
+* Payout thresholds keep small balances in custody for weeks
+* SV2 and DATUM decentralize templates, not payouts
+
+[.notes]
+--
+The industry has decentralized template construction but not payouts.
+With SV2 Job Declaration or DATUM, small miners are still paid from the
+pool's custody. Source: the comparison page on docs.p2poolv2.org.
+--
+
+// 4. P2Pool did it (3 min)
+
+== P2Pool Did It in 2011
+
+* A chain of shares, each a weak bitcoin block
+* Every share's coinbase pays the PPLNS window
+* A share that meets the bitcoin target becomes a block
+* Miners are paid on-chain, directly, with no operator
+
+[.notes]
+--
+This is the only prior custody-free solution at pool scale.
+--
+
+== The Coinbase Pays the Window
+
+[graphviz, coinbase-payout, svg]
+....
+digraph coinbase_payout {
+  compound=true
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.25
+  ranksep=0.9
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=16
+  node [shape=box, style=filled, fontname="DejaVu Sans", fontsize=16,
+        fillcolor="#F7931A", color="#F7931A", fontcolor="#0B0B0C",
+        width=0.6, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=14, penwidth=1.5]
+
+  // Slides are landscape, so the window runs left to right, oldest
+  // first, and each share points back to its parent.
+  subgraph cluster_window {
+    label="PPLNS window"
+    color="#F7931A"
+    penwidth=2
+    style=filled
+    fillcolor="#121212"
+    w1 [label="A"]; w2 [label="B"]; w3 [label="A"]
+    w4 [label="C"]; w5 [label="A"]; w6 [label="B"]
+  }
+
+  subgraph cluster_coinbase {
+    label="Bitcoin coinbase: 3.125 BTC"
+    labelloc=b
+    color="#F7931A"
+    penwidth=2
+    style=filled
+    fillcolor="#121212"
+    node [width=2.4, height=1.0, fillcolor="#121212", fontcolor="#FFFFFF"]
+    oa [label="Miner A\n3 shares, 50%\n1.5625 BTC"]
+    ob [label="Miner B\n2 shares, 33.3%\n1.0417 BTC"]
+    oc [label="Miner C\n1 share, 16.7%\n0.5208 BTC"]
+  }
+
+  {rank=same; w1; w2; w3; w4; w5; w6}
+  {rank=same; oa; ob; oc}
+  w1 -> w2 -> w3 -> w4 -> w5 -> w6 [dir=back, arrowsize=0.7]
+  edge [style=invis]
+  oa -> ob -> oc
+  edge [style=solid]
+
+  w3 -> ob [ltail=cluster_window, lhead=cluster_coinbase,
+            label="  split by share"]
+}
+....
+
+[.notes]
+--
+Every share commits to a coinbase that pays the PPLNS split. When one
+meets the bitcoin target, that coinbase becomes the block's coinbase.
+--
+
+// 5. But the coinbase doesn't scale (2 min)
+
+== The Coinbase Does Not Scale
+
+* *Firmware cap:* Bitmain firmware limits coinbase outputs
+* *Blockspace:* 1,000 outputs take about 3.4% of a block
+* *Dust:* tiny payouts cannot be spent alone
+
+[.notes]
+--
+The firmware cap directly capped how many miners P2Pool could pay, and
+so how far it could reduce variance. The blockspace figure is from the
+Vienna 2026 deck.
+
+Transition: "We're building a fix. First, what P2Poolv2 is."
+--
+
+// 5b. What P2Poolv2 is: the sharechain and its tooling.
+
+== What Is P2Poolv2
+
+* A sharechain of weak bitcoin blocks, one share every 10 seconds
+* *Decentralized accounting:* every node agrees on who mined what
+* *Decentralized templates:* every miner builds its own block
+
+[.notes]
+--
+P2Poolv2 revives P2Pool's idea: the sharechain runs Nakamoto consensus
+with a lower target than bitcoin, so every node reaches the same PPLNS
+accounting and checks every share's payouts. No operator keeps the
+books, and no operator picks the transactions.
+--
+
+== A Sharechain With Transactions
+
+* UTXO and Script transactions, validated like bitcoin
+* Think Litecoin: bitcoin's transaction model on another chain
+* But each coinbase is minted when a miner finds a share
+* One share, one coinbase output, owned by the miner's key
+
+[.notes]
+--
+The sharechain has no block subsidy schedule of its own. Its only new
+value is the one share unit each shareblock's coinbase pays the miner
+who found it. That output is an ordinary UTXO: the miner can hold it,
+split it, or sell it.
+--
+
+== Bitcoin Tooling Carries Over
+
+[.landscape]
+Script · Taproot · PSBT · Descriptors · BDK · Electrum API
+
+* *Electrum API:* wallets and explorers query the sharechain
+* *BDK:* a wallet with descriptors, PSBTs, and hardware signers
+
+[.notes]
+--
+Status to be careful about on stage: the Electrum server is planned as
+stage 4 of WALLET_API_PLAN.md in the node repository, and the BDK
+wallet is not built yet. Stock Electrum clients also have no concept of
+an output that expires with its root height, so wallets need to show
+that.
+--
+
+== What Can You Build?
+
+* Sell shares for bitcoin by atomic swap
+* Marketplaces that price shares by time left in the window
+* Wallets that hold shares next to bitcoin
+* Multisig and timelocked shares for pools of small miners
+
+[.notes]
+--
+Motivate the room: once shares are UTXOs with Script, the whole bitcoin
+toolbox applies to them. The first use is getting small miners paid,
+which is where the rest of the talk goes.
+
+Transition: "And beyond the sharechain, the landscape has changed since
+2011."
+--
+
+// 6. Tease and the new landscape (2 min)
+
+== The Landscape Has Changed
+
+[.landscape]
+Lightning · Ark · Ecash · Statechains · Covenants
+
+None of these existed when P2Pool hit its wall.
+
+[.notes]
+--
+"We have a solution. Hold that thought."
+
+"Can any of these pay miners? First, what does 'pay miners' actually
+require?"
+--
+
+// 7. The requirements (2.5 min)
+
+== What Paying Miners Requires
+
+. *Unilateral exits*
+. *Commitment at template time*
+. *Deterministic, verifiable payouts*
+. *Scalability*
+. *Small miner support*
+
+[.notes]
+--
+These are the requirements on docs.p2poolv2.org. The argument for
+unilateral exits: any entity that must sign can hold miners hostage.
+For commitment at template time: miners verify that the work they hash
+pays them in the correct proportion.
+--
+
+// 8. The txid problem (2 min)
+
+== The Txid Problem
+
+[graphviz, txid-problem, svg]
+....
+digraph txid {
+  bgcolor="#0B0B0C"
+  nodesep=0.8
+  ranksep=0.3
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=2.6, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=11, penwidth=1.2]
+
+  // Each hash batch rolls the extranonce, so the txid changes.
+  cb1 [label="Coinbase tx\nextranonce 0001"]
+  cb2 [label="Coinbase tx\nextranonce 0002"]
+  cb3 [label="Coinbase tx\nextranonce 0003"]
+  t1 [label="txid 3f9a…", fillcolor="#F7931A", fontcolor="#0B0B0C",
+      width=1.6]
+  t2 [label="txid c417…", fillcolor="#F7931A", fontcolor="#0B0B0C",
+      width=1.6]
+  t3 [label="txid 08be…", fillcolor="#F7931A", fontcolor="#0B0B0C",
+      width=1.6]
+
+  cb1 -> cb2 -> cb3 [label="  roll extranonce", color="#FFFFFF66"]
+  cb1 -> t1 [label="sha256d"]
+  cb2 -> t2 [label="sha256d"]
+  cb3 -> t3 [label="sha256d"]
+  {rank=same; cb1; t1}
+  {rank=same; cb2; t2}
+  {rank=same; cb3; t3}
+}
+....
+
+No stable outpoint exists until the block is found.
+
+[.notes]
+--
+Miners roll the extranonce inside the coinbase on every hash batch, and
+the txid is sha256d of the coinbase transaction. A protocol that needs a
+pre-signed spend of the coinbase output has nothing to sign at template
+time. Signing after the block is found makes the signer a gatekeeper who
+can refuse, which breaks unilateral exits.
+
+Lightning commitment transactions, Ark VTXO trees, and statechain backup
+transactions are all pre-signed spends of a known outpoint. The failure
+is structural, not a detail to work around.
+--
+
+// 9. Today's L2s can't sit under the coinbase (3 min)
+
+== Today's L2s Cannot Sit Under the Coinbase
+
+[cols="3,3,2,2",options="header"]
+|===
+| | Pre-signed spend of the coinbase outpoint | Takes custody | Unilateral exit
+
+| Lightning | [.yes]#✓# | [.no]#✗# | [.no]#✗#
+| Ark, no covenants | [.yes]#✓# | [.no]#✗# | [.no]#✗#
+| Statechains | [.yes]#✓# | [.no]#✗# | [.no]#✗#
+| Ecash | [.no]#✗# | [.yes]#✓# | [.no]#✗#
+| Federation | [.no]#✗# | [.yes]#✓# shared | [.no]#✗#
+|===
+
+[.notes]
+--
+Lightning needs a signed commitment transaction spending the funding
+output by txid before the channel opens; the 100-block coinbase maturity
+would delay the channel anyway. Ark without covenants needs a VTXO tree
+pre-signed by the ASP and participants, rooted at the shared output. A
+statechain needs a pre-signed backup transaction spending a known
+outpoint. Ecash avoids the txid problem only by taking custody.
+--
+
+== The Federation Detour
+
+* "Put the coinbase in a multisig instead of one custodian"
+* A t-of-n key is still custody, shared across a group
+* Miners still cannot exit without the federation signing
+* The lever remains: pressure t signers instead of one operator
+* *Sock puppets:* one adversary can quietly hold several seats
+
+[.notes]
+--
+The coinbase must commit to some key at template time. If that key is a
+multisig, the group holds miners' rewards until it signs a payout. The
+honest version is ecash: Fedimint makes the federation explicit and
+gives the best experience for tiny payouts, but it distributes custody
+rather than removing it.
+--
+
+== Ecash: Three Ways In
+
+[cols="2,3,2",options="header"]
+|===
+| Case | How it works | Trust
+
+| Separate Mint and Buyer (NUT-14)
+| A buyer pays in ecash locked to the same hash as the share HTLC
+| Atomic swap, trust-minimized
+
+| Mint is the buyer
+| The mint buys shares and holds the reward stream
+| Atomic in form, high trust
+
+| Skip sharechain
+| A PPLNS node or a federation credits earnings as ecash
+| Back to trusted operators
+|===
+
+Which would you recommend for a home miner earning a few thousand sats a day?
+
+[.notes]
+--
+Case 1 uses Cashu NUT-11 and NUT-14 locks. The miner redeems the tokens
+and reveals the secret; the buyer learns it from the mint's spent-proof
+witness and claims the share. The free option still applies.
+
+Case 2: after learning the secret, the mint could simply refuse the
+swap. The upside is simplicity: instant, private payouts priced by time
+left in the window.
+
+Case 3 is Hydrapool-style, the ecash version of the federation detour,
+with the same sock puppet risk.
+
+Framing: the sharechain holds trustless value; ecash is the private,
+instant last mile.
+--
+
+// 10. Covenants fix it (2 min)
+
+== Covenants Fix It
+
+* *CTV (BIP 119):* commits to outputs, not inputs
+* *APO:* signatures skip the prevout, so refunds can be signed early
+* *CCV / MATT:* a coinpool with unilateral exit from any leaf
+
+Meets all five requirements, with no interaction at template time.
+It needs a soft fork.
+
+[.notes]
+--
+A coinbase output carrying a CTV hash commits non-interactively to a
+payout tree; an Ark round tree could be committed the same way. With
+APO, a channel refund can be signed before the coinbase txid exists.
+
+Ask the room: which proposal fits the payout tree best? What does a leaf
+exit cost at depth 10 against depth 20?
+--
+
+== A Payout Tree in One Output
+
+[graphviz, ctv-tree, svg]
+....
+digraph ctv_tree {
+  bgcolor="#0B0B0C"
+  nodesep=0.3
+  ranksep=0.45
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#FFFFFF66",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.5, height=0.55, fixedsize=true]
+  edge [color="#FFFFFF66", penwidth=1.2]
+
+  root [label="Coinbase output\nCTV hash", width=2.0, fillcolor="#F7931A",
+        color="#F7931A", fontcolor="#0B0B0C"]
+  l [label="CTV", color="#F7931A"]
+  r [label="CTV"]
+  m1 [label="Miner 1"]
+  m2 [label="Miner 2", fillcolor="#F7931A", color="#F7931A",
+      fontcolor="#0B0B0C"]
+  m3 [label="Miner 3"]
+  m4 [label="Miner 4"]
+
+  // The exit path for Miner 2, published without anyone's signature.
+  root -> l [color="#F7931A", penwidth=2.5]
+  l -> m2 [color="#F7931A", penwidth=2.5]
+  root -> r
+  l -> m1
+  r -> m3
+  r -> m4
+}
+....
+
+A miner exits alone by publishing the transactions on its path.
+Economic viability breaks for smaller miners.
+
+// 11. Our answer today (2.5 min)
+
+== Our Answer Today
+
+* Pay the top N miners directly in the coinbase
+* Every other miner earns a sharechain UTXO on its own key
+* That UTXO is sold to a market maker by atomic swap
+
+[.notes]
+--
+The coinbase is sized today for about 500 P2WPKH outputs, using
+blockmaxweight=3930000. Once swaps run, the target is 10 to 50 market
+makers in the coinbase.
+--
+
+== When a Share Can Be Traded
+
+[graphviz, trading-window, svg]
+....
+digraph trading_window {
+  rankdir=LR
+  bgcolor="#0B0B0C"
+  nodesep=0.4
+  ranksep=0.5
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=16
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=16, fontcolor="#FFFFFF",
+        width=2.4, height=0.9, fixedsize=true]
+  edge [color="#F7931A", penwidth=1.5]
+
+  // Slides are landscape, so time runs left to right.
+  mined [label="Share mined"]
+
+  subgraph cluster_maturity {
+    label="Maturity window\n6,048 shares"
+    color="#FFFFFF66"
+    wait [label="Cannot be\ntraded", color="#FFFFFF66",
+          fontcolor="#FFFFFFC7"]
+  }
+
+  subgraph cluster_trading {
+    label="Trading window\n120,960 shares"
+    color="#F7931A"
+    penwidth=2
+    trade [label="Can be traded", fillcolor="#F7931A",
+           fontcolor="#0B0B0C"]
+  }
+
+  expired [label="Share leaves the\nPPLNS window"]
+
+  mined -> wait -> trade -> expired
+}
+....
+
+[.notes]
+--
+At 10s shares, maturity is about 17 hours and the trading window about
+two weeks. The whole swap must close before the share leaves the
+window.
+--
+
+== The Atomic Swap
+
+[plantuml, atomic-swap, svg]
+....
+@startuml
+<style>
+root {
+  FontSize 18
+}
+</style>
+hide footbox
+participant "Alice\n(miner)" as A
+participant "Sharechain" as S
+participant "Lightning / Ark" as L
+participant "Bob\n(market maker)" as B
+
+B -> A : Bob's public key
+A -> A : pick preimage R\nH = SHA256(R)
+A -> L : invoice or VHTLC for H
+A -> S : lock share UTXO in HTLC(H, Bob's key)
+B -> S : verify the HTLC
+B -> L : verify the invoice
+alt happy path
+  B -> L : pay the invoice, locked to H
+  L -> A : incoming payment locked to H
+  A -> L : claim the payment by revealing R
+  L --> B : R, as proof of payment
+  B -> S : claim the share with R
+else Bob never pays
+  A -> S : reclaim the share after the CSV delay
+end
+@enduml
+....
+
+== The HTLC on the Sharechain
+
+[graphviz, htlc-tree, svg]
+....
+digraph htlc {
+  bgcolor="#0B0B0C"
+  nodesep=0.35
+  ranksep=0.5
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=2.2, height=0.75, fixedsize=true]
+  edge [color="#F7931A", penwidth=1.2]
+
+  out [label="P2TR output", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  key [label="Key path\nNUMS point: disabled", color="#FFFFFF66",
+       fontcolor="#FFFFFFC7", style="filled,dashed"]
+  tree [label="Script path"]
+  redeem [label="Redeem\npreimage R +\nBob's signature", height=0.95]
+  mutual [label="Mutual refund\n2-of-2,\nno timelock", height=0.95]
+  timeout [label="Initiator refund\nCSV delay +\nAlice's signature", height=0.95]
+
+  out -> key [color="#FFFFFF66", style=dashed]
+  out -> tree
+  tree -> redeem
+  tree -> mutual
+  tree -> timeout
+}
+....
+
+[.notes]
+--
+From docs/atomic-swap/htlc_scripts.md in the repository. The hash is
+SHA256. The key path uses a NUMS point, so no key-path spend is
+possible.
+--
+
+== Where Each Payment Flows
+
+[graphviz, architecture, svg]
+....
+digraph architecture {
+  bgcolor="#0B0B0C"
+  nodesep=0.6
+  ranksep=0.55
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=12
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=2.3, height=0.6, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=11, penwidth=1.2]
+
+  coinbase [label="Bitcoin coinbase", fillcolor="#F7931A",
+            fontcolor="#0B0B0C"]
+  share [label="Sharechain UTXO"]
+  rail [label="Lightning / Ark"]
+  large [label="Large miners and\nmarket makers"]
+  small [label="Small miners"]
+
+  coinbase -> large [label="  paid directly"]
+  share -> small [label="  earned per share"]
+  small -> large [label="sells share", constraint=false]
+  large -> rail [label="  pays"]
+  rail -> small [label="  bitcoin"]
+
+  {rank=same; coinbase; share}
+  {rank=same; large; small}
+}
+....
+
+== If You Saw Vienna
+
+This is the market those swaps create.
+
+Today: the payments infrastructure underneath it.
+
+https://youtu.be/7ximtqDoaEU?si=1KUxV_GXFuu9FAD9[BTC++ Vienna 2026: the hashrate market]
+
+[.notes]
+--
+Vienna covered the hashrate market, pricing shares as options, and the
+Rigly / Braiins comparison. Do not repeat them here.
+--
+
+// 12. The challenges (2 min)
+
+== Open Problems: Covenant Authors
+
+* Which proposal fits the payout tree: CTV, APO, CCV, or TXHASH?
+* What does a unilateral exit cost a small miner deep in the tree?
+* Can tiny miners afford to exit, or do they still need more?
+
+== Open Problems: L2 Builders
+
+* *Timelocks:* the sharechain CSV must exceed the L2 expiry plus confirmation, inside the window
+* *The free option:* Bob can wait before deciding to pay
+* *Receiving:* which rail makes a few thousand sats painless to receive?
+
+[.notes]
+--
+These timelock parameters are not specified yet.
+
+Share value moves two ways: slow drift, which is near zero over an hour,
+and block-find jumps. The chance of a block per hour is about h·T/600s,
+where h is the pool's share of network hashrate: well under 1% at about
+0.5 EH/s, and about 6% at 1% of the network.
+--
+
+== Closing the Free Option
+
+. *Price it:* an upfront premium (Liu 2018; Han, Lin & Yu 2019)
+. *Forfeitable deposit:* escrowed premium (Xue & Herlihy 2021)
+. *Shrink the window:* settle the bitcoin leg over Lightning or Ark
+. *Attribution rule:* the seller keeps block payouts until the claim confirms
+. *Bitcoin-verified transfers:* no hashlock at all
+
+[.notes]
+--
+Fix 2 also covers Nadahalli, Khabbazian & Wattenhofer, "Grief-free
+Atomic Swaps" (2022); it works in Bitcoin script today. For fix 3, the
+10s sharechain does not help alone: the bitcoin leg sets the option's
+duration.
+--
+
+== Bitcoin-Verified Share Transfers
+
+. The seller locks the share to a buyer, price, expiry, and depth _k_
+. The buyer pays the price on bitcoin
+. The buyer claims the share with a merkle proof
+. Sharechain nodes check the payment against bitcoin headers
+
+No secret to withhold, and the seller need not be online.
+
+[.notes]
+--
+P2Poolv2 nodes already track bitcoin headers, so the sharechain can
+verify SPV proofs directly. The payment goes to a per-offer destination
+derived from the seller's key, so one payment cannot satisfy two offers.
+The seller's refund is valid only after expiry plus k plus a grace
+period, with no qualifying payment. The buyer still holds a short
+option, limited by an expiry one to three blocks out.
+
+Costs: bitcoin reorgs deeper than k; nodes that have not seen the block
+must defer, not reject, the claim; the sharechain needs a way to verify
+merkle proofs; and every trade costs one bitcoin transaction. Prior art:
+BTC Relay.
+--
+
+[.question]
+== {nbsp}
+
+How do you pay thousands of miners without anyone holding their
+rewards?
+
+[.links]
+--
+Website: https://p2poolv2.org[p2poolv2.org]
+
+Docs: https://docs.p2poolv2.org[docs.p2poolv2.org]
+
+Github: https://github.com/p2poolv2[github.com/p2poolv2]
+--
+
+[.notes]
+--
+Close by putting the opening question back on screen.
+--

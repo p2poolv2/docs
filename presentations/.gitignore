@@ -1,0 +1,5 @@
+# Built decks and downloaded reveal.js; ./build.sh recreates both.
+build/
+.cache/
+.bundle/
+vendor/
