@@ -24,6 +24,20 @@ Open with the question and leave it on screen. Every later section
 returns to it.
 --
 
+// Agenda: Custody is control
+
+[.agenda]
+== Agenda
+
+. [.current]#Custody is control#
+. P2Pool and its limits
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. Covenants
+. Swaps today
+. Problems and opportunities
+
 // 2. Custody is control (2.5 min)
 
 == Custody Is Control
@@ -54,6 +68,20 @@ The industry has decentralized template construction but not payouts.
 With SV2 Job Declaration or DATUM, small miners are still paid from the
 pool's custody. Source: the comparison page on docs.p2poolv2.org.
 --
+
+// Agenda: P2Pool and its limits
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. [.current]#P2Pool and its limits#
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. Covenants
+. Swaps today
+. Problems and opportunities
 
 // 4. P2Pool did it (3 min)
 
@@ -148,6 +176,20 @@ Vienna 2026 deck.
 Transition: "We're building a fix. First, what P2Poolv2 is."
 --
 
+// Agenda: What is P2Poolv2
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. [.current]#What is P2Poolv2#
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. Covenants
+. Swaps today
+. Problems and opportunities
+
 // 5b. What P2Poolv2 is: one feature per slide.
 [.feature]
 == What Is P2Poolv2
@@ -166,12 +208,26 @@ digraph intro_sharechain {
   edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
         fontsize=14, penwidth=1.5]
   rankdir=BT
-  nodesep=0.3
+  newrank=true
+  nodesep=0.5
   ranksep=0.35
-  s1 [label="share", width=1.4]
-  s2 [label="share", width=1.4]
-  s3 [label="share", width=1.4, fillcolor="#F7931A", fontcolor="#0B0B0C"]
-  s1 -> s2 -> s3 [dir=back, label=" 10s"]
+  s1 [label="share", width=1.4, group=main]
+  s2 [label="share", width=1.4, group=main]
+  s3 [label="share", width=1.4, group=main]
+  s4 [label="share", width=1.4, group=main, fillcolor="#F7931A",
+      fontcolor="#0B0B0C"]
+  u [label="uncle", width=1.4, color="#FFFFFFC7", style="filled,dashed"]
+
+  // Main chain, tip at the top; each share points back to its parent.
+  s1 -> s2 [dir=back, label=" 10s", weight=10]
+  s2 -> s3 -> s4 [dir=back, weight=10]
+
+  // A share found at the same time as s2 becomes an uncle, and a later
+  // share references it so its work still earns.
+  s1 -> u [dir=back, color="#FFFFFF66"]
+  {rank=same; s2; u}
+  s3 -> u [style=dashed, color="#FFFFFFC7", constraint=false,
+           label=" uncle"]
 }
 ....
 
@@ -180,6 +236,11 @@ digraph intro_sharechain {
 P2Poolv2 revives P2Pool's idea: a sharechain of weak bitcoin blocks,
 one share every 10 seconds, running Nakamoto consensus with a lower
 target than bitcoin.
+
+With shares this fast, two miners sometimes find a share at the same
+time. The one left off the main chain becomes an uncle: a later share
+references it, and its miner still earns 90% of its work. The original
+P2Pool dropped these shares as orphans.
 --
 
 [.feature]
@@ -334,8 +395,22 @@ who found it. That output is an ordinary UTXO: the miner can hold it,
 split it, or sell it.
 --
 
+// Agenda: P2Poolv2 as developer platform
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. What is P2Poolv2
+. [.current]#P2Poolv2 as developer platform#
+. Bitcoin's new tools since P2Pool
+. Covenants
+. Swaps today
+. Problems and opportunities
+
 [.feature]
-== What Is P2Poolv2
+== P2Poolv2 as Developer Platform
 
 [.feature-title]
 Electrum API: wallets and explorers query the sharechain
@@ -381,7 +456,7 @@ height, so wallets need to show that.
 --
 
 [.feature]
-== What Is P2Poolv2
+== P2Poolv2 as Developer Platform
 
 [.feature-title]
 Compatible with ecosystem tooling
@@ -427,10 +502,10 @@ wallet is not built yet.
 --
 
 [.feature]
-== What Is P2Poolv2
+== P2Poolv2 as Developer Platform
 
 [.feature-title]
-Swaps: sell shares for bitcoin
+Build swaps: sell shares for bitcoin
 
 [graphviz, build-swap, svg]
 ....
@@ -459,10 +534,10 @@ the rest of the talk goes.
 --
 
 [.feature]
-== What Is P2Poolv2
+== P2Poolv2 as Developer Platform
 
 [.feature-title]
-Options: price shares by time left
+Build options: price shares by time left
 
 [graphviz, build-market, svg]
 ....
@@ -491,6 +566,20 @@ Transition: "And beyond the sharechain, the landscape has changed since
 2011."
 --
 
+// Agenda: Bitcoin's new tools since P2Pool
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. [.current]#Bitcoin's new tools since P2Pool#
+. Covenants
+. Swaps today
+. Problems and opportunities
+
 // 6. Tease and the new landscape (2 min)
 
 == The Landscape Has Changed
@@ -510,7 +599,7 @@ require?"
 
 // 7. The requirements (2.5 min)
 
-== What Paying Miners Requires
+== Requirements for Paying Miners
 
 . *Unilateral exits*
 . *Commitment at template time*
@@ -585,7 +674,7 @@ is structural, not a detail to work around.
 
 [cols="3,3,2,2",options="header"]
 |===
-| | Pre-signed spend of the coinbase outpoint | Takes custody | Unilateral exit
+| | Pre-signed spend of the coinbase outpoint | Takes custody | Meets our requirements
 
 | Lightning | [.yes]#✓# | [.no]#✗# | [.no]#✗#
 | Ark, no covenants | [.yes]#✓# | [.no]#✗# | [.no]#✗#
@@ -602,6 +691,11 @@ would delay the channel anyway. Ark without covenants needs a VTXO tree
 pre-signed by the ASP and participants, rooted at the shared output. A
 statechain needs a pre-signed backup transaction spending a known
 outpoint. Ecash avoids the txid problem only by taking custody.
+
+None meets our requirements, and all fail the same one: unilateral
+exits. Either someone must sign after the block is found, or someone
+holds the rewards. These systems offer unilateral exit in normal use;
+they lose it only when funded straight from the coinbase.
 --
 
 == The Federation Detour
@@ -658,6 +752,20 @@ with the same sock puppet risk.
 Framing: the sharechain holds trustless value; ecash is the private,
 instant last mile.
 --
+
+// Agenda: Covenants
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. [.current]#Covenants#
+. Swaps today
+. Problems and opportunities
 
 // 10. Covenants fix it (2 min)
 
@@ -716,6 +824,20 @@ digraph ctv_tree {
 
 A miner exits alone by publishing the transactions on its path.
 Economic viability breaks for smaller miners.
+
+// Agenda: Swaps today
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. Covenants
+. [.current]#Swaps today#
+. Problems and opportunities
 
 // 11. Our answer today (2.5 min)
 
@@ -900,15 +1022,29 @@ Vienna covered the hashrate market, pricing shares as options, and the
 Rigly / Braiins comparison. Do not repeat them here.
 --
 
+// Agenda: Problems and opportunities
+
+[.agenda]
+== Agenda
+
+. Custody is control
+. P2Pool and its limits
+. What is P2Poolv2
+. P2Poolv2 as developer platform
+. Bitcoin's new tools since P2Pool
+. Covenants
+. Swaps today
+. [.current]#Problems and opportunities#
+
 // 12. The challenges (2 min)
 
-== Open Problems: Covenant Authors
+== Problems: Covenant Authors
 
 * Which proposal fits the payout tree: CTV, APO, CCV, or TXHASH?
 * What does a unilateral exit cost a small miner deep in the tree?
 * Can tiny miners afford to exit, or do they still need more?
 
-== Open Problems: L2 Builders
+== Problems: L2 Builders
 
 * *Timelocks:* the sharechain CSV must exceed the L2 expiry plus confirmation, inside the window
 * *The free option:* Bob can wait before deciding to pay
@@ -930,7 +1066,6 @@ where h is the pool's share of network hashrate: well under 1% at about
 . *Forfeitable deposit:* escrowed premium (Xue & Herlihy 2021)
 . *Shrink the window:* settle the bitcoin leg over Lightning or Ark
 . *Attribution rule:* the seller keeps block payouts until the claim confirms
-. *Bitcoin-verified transfers:* no hashlock at all
 
 [.notes]
 --
@@ -940,28 +1075,35 @@ Atomic Swaps" (2022); it works in Bitcoin script today. For fix 3, the
 duration.
 --
 
-== Bitcoin-Verified Share Transfers
+== Opportunities: Payments
 
-. The seller locks the share to a buyer, price, expiry, and depth _k_
-. The buyer pays the price on bitcoin
-. The buyer claims the share with a merkle proof
-. Sharechain nodes check the payment against bitcoin headers
-
-No secret to withhold, and the seller need not be online.
+* *Ecash swaps:* a Cashu mint enforces a share-for-ecash swap
+* *Ark payouts:* VHTLC swaps pay small miners without channels
+* *Lightning market making:* buy shares, pay invoices, earn the spread
 
 [.notes]
 --
-P2Poolv2 nodes already track bitcoin headers, so the sharechain can
-verify SPV proofs directly. The payment goes to a per-offer destination
-derived from the seller's key, so one payment cannot satisfy two offers.
-The seller's refund is valid only after expiry plus k plus a grace
-period, with no qualifying payment. The buyer still holds a short
-option, limited by an expiry one to three blocks out.
+Ecash: this is case 1 from the ecash slide, a neutral mint using NUT-11
+and NUT-14 locks, so the mint enforces the swap without being a party
+to it. Ark: the miner receives through a VHTLC under the same hash as
+the share HTLC, with no channel or inbound liquidity to manage. Market
+makers: once swaps run, 10 to 50 of them in the coinbase could pay
+every other miner.
+--
 
-Costs: bitcoin reorgs deeper than k; nodes that have not seen the block
-must defer, not reject, the claim; the sharechain needs a way to verify
-merkle proofs; and every trade costs one bitcoin transaction. Prior art:
-BTC Relay.
+== Opportunities: Tools
+
+* *Marketplaces:* price and trade shares by time left in the window
+* *Wallets:* show shares next to bitcoin, with their expiry
+* *Explorers and dashboards:* built on the node's Electrum API
+* *Covenant prototypes:* try CTV payout trees on signet
+
+[.notes]
+--
+Wallets need to show when a share expires, because stock clients have no
+concept of an output that expires with its root height. Covenant
+prototypes can run today on the Bitcoin Inquisition signet, where CTV
+and APO are active.
 --
 
 [.question]
