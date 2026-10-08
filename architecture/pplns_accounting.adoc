@@ -2,11 +2,12 @@
 :page-parent: Sharechain
 :page-nav_order: 30
 
-Each share has enough data to reconstruct the bitcoin block's coinbase
-transaction. Given the payout distribution in the bitcoin coinbase
-p2poolv2 nodes compare it to the payout distribution derived from the
-local view of the sharechain. If these match, the share is valid, else
-it is rejected with a PPLNS mismatch error.
+Each shareblock carries the bitcoin coinbase that the miner hashed. A
+P2Poolv2 node reads the aux flags, extranonce, nanosecond timestamp,
+and witness commitment out of that coinbase, rebuilds the coinbase
+from its own view of the PPLNS window, and compares the two whole. If
+they match, the share is valid; otherwise the node rejects it with a
+PPLNS mismatch error.
 
 == Coinbase Maturity, PPLNS Window and Trading Window
 

@@ -2,26 +2,34 @@
 :page-parent: Sharechain
 :page-nav_order: 10
 
-Each share is committed to in the bitcoin coinbase for the header
-embedded in the shareblock header. The goal is twofold:
+Each share is committed to in the bitcoin coinbase, which is committed
+to in the bitcoin header through the merkle root. This bitcoin header
+is embedded in the share header. The commitment serves two goals:
 
-. Each bitcoin PoW can be used to build a single share.
-. Each shareblock coinbase is unique, even if it generates shares for the same bitcoin block template.
+. Each bitcoin proof of work can build only one share.
+. Each sharechain coinbase is unique, even among shares mined on the
+  same bitcoin block template.
 
-The diagram below shows the fields in share that are committed to in
-the bitcoin coinbase. The commitment is placed in the bitcoin
-coinbase, which is accumulated with the merkle root from bitcoin
-header to get the bitcoin block hash. This results in the shareblock
-header's fields indirectly committing into the bitcoin header and the
-bitcoin blockhash. This guarantees that a bitcoin blockhash' PoW can
-not be represented by more than one shareblock, guaranteeing the first
-requirement - that each PoW can be used to build only a single share.
+The share commitment is a SHA256 hash of the shareblock header's
+fields and of the share witness root. The share witness root is the
+the BIP141 witness root of the share's non-coinbase sharechain
+transactions.
 
-By committing to the the bitcoin blockhash in shareblock coinbase, we
-are then guaranteed that each shareblock coinbase is unique. Even if
-the shareblock is generated for the same bitcoin block template, each
-bitcoin blockhash results in a unique coinbase. The bitcoin blockhash
-will be unique as the nonce will be unique each time.
+The diagram below shows the committed fields. The commitment sits in
+the last output of the bitcoin coinbase, the coinbase txid feeds into
+the bitcoin header's merkle root, and the miner hashes that
+header. The shareblock header's fields therefore commit to the bitcoin
+block hash, and one proof of work can stand behind only one
+shareblock, which meets the first goal.
+
+The sharechain coinbase's scriptSig carries the bitcoin block hash.
+Each proof of work has its own nonce and so its own block hash, which
+makes each sharechain coinbase unique and meets the second goal.
+
+The share coinbase cannot be in the commitment, because the block hash
+exists only once the work is done. The commitment binds the miner's
+sharechain address and the share witness root instead, and with those
+fixed, the header alone determines the share coinbase.
 
 [graphviz, share-commitment, svg]
 .The commitment ties the shareblock to its proof of work
@@ -56,14 +64,14 @@ digraph commitment {
   }
 
   subgraph cluster_othertx {
-    label="Sharechain transactions"
+    label="Non-coinbase share\ntransactions"
     color="#FFFFFF66"
     style=filled
     fillcolor="#121212"
-    othertx [label="non-coinbase transactions"]
+    witroot [label="share witness root"]
   }
 
-  commitment [label="Share commitment\nSHA256 of the committed\nfields and the\nnon-coinbase root",
+  commitment [label="Share commitment\nSHA256 of the committed\nfields and the\nshare witness root",
               width=2.1, height=0.9, color="#F7931A", penwidth=2]
 
   subgraph cluster_coinbase {
@@ -72,12 +80,14 @@ digraph commitment {
     style=filled
     fillcolor="#121212"
     height [label="scriptSig: height"]
+    auxflags [label="scriptSig: aux flags"]
     extranonce [label="scriptSig: extranonce"]
-    cbhash [label="scriptSig: commitment hash", fillcolor="#F7931A",
-            color="#F7931A", fontcolor="#0B0B0C"]
     nsecs [label="scriptSig: nsecs"]
     payouts [label="outputs: PPLNS payouts"]
     witness [label="outputs: witness commitment"]
+    padding [label="outputs: padding"]
+    cbhash [label="outputs: share commitment", fillcolor="#F7931A",
+            color="#F7931A", fontcolor="#0B0B0C"]
   }
 
   subgraph cluster_bitcoin_header {
@@ -105,26 +115,27 @@ digraph commitment {
     sharecb_hash [label="scriptSig: weak block hash", fillcolor="#F7931A",
                   color="#F7931A", fontcolor="#0B0B0C"]
     sharecb_out [label="output: one share unit"]
+    sharecb_wit [label="output: witness commitment"]
   }
 
   // Stack each structure's fields top to bottom.
   edge [style=invis]
-  prevhash -> uncles -> sharebits -> sharetime -> fees -> btcaddr -> shareaddr -> othertx
-  height -> extranonce -> cbhash -> nsecs -> payouts -> witness
+  prevhash -> uncles -> sharebits -> sharetime -> fees -> btcaddr -> shareaddr -> witroot
+  height -> auxflags -> extranonce -> nsecs -> payouts -> witness -> padding -> cbhash
   version -> prevbtc -> merkle -> btctime -> btcbits -> nonce
-  sharecb_hash -> sharecb_out
+  sharecb_hash -> sharecb_out -> sharecb_wit
   // Three columns: each bottom-row structure sits under a top-row one.
-  othertx -> sharecb_hash
+  witroot -> sharecb_hash
   commitment -> pow [minlen=6]
-  witness -> version
+  cbhash -> version
   edge [style=solid]
 
-  {rank=same; sharetime; commitment; cbhash}
+  {rank=same; sharetime; commitment; nsecs}
   {rank=same; merkle; pow; sharecb_hash}
 
   // Top row flows left to right, bottom row right to left.
   sharetime -> commitment [ltail=cluster_committed]
-  othertx -> commitment [ltail=cluster_othertx]
+  witroot -> commitment [ltail=cluster_othertx]
   commitment -> cbhash
   cbhash -> merkle [ltail=cluster_coinbase, label="coinbase txid and
 merkle branches"]
@@ -133,4 +144,111 @@ merkle branches"]
 }
 ....
 
-The share commitment is checked as part of the xref:validation.adoc[share validation scheme].
+== Checking the Commitment From the Header
+
+P2Poolv2 uses the commitment trick of the original P2Pool to tie the
+share header to the bitcoin coinbase. A node checks that tie from the
+header alone, before it has the shareblock body and without reading
+PPLNS data from its store.
+
+The miner splits the serialized bitcoin coinbase into a prefix and a
+tail. The prefix holds the version, the input with its scriptSig, the
+payout outputs, the witness commitment, and a padding output. The tail
+holds the share commitment output and the locktime. The padding brings
+the prefix to a whole number of 64-byte SHA256 blocks, so SHA256 can
+hash the prefix and pause. The state it pauses in, the midstate, stands
+in for the whole prefix. The miner puts the midstate and the prefix
+length in the share header's coinbase proof, beside the share witness
+root.
+
+[graphviz, coinbase-midstate, svg]
+.The midstate stands in for the coinbase prefix
+....
+digraph midstate {
+  compound=true
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.5
+  ranksep=0.25
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  fontsize=11
+  node [shape=box, style=filled, fillcolor="#121212", color="#FFFFFF66",
+        fontname="DejaVu Sans", fontsize=11, fontcolor="#FFFFFF",
+        width=2.6, fixedsize=true, height=0.32]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_coinbase {
+    label="Bitcoin coinbase, serialized"
+    color="#F7931A"
+    style=filled
+    fillcolor="#121212"
+
+    subgraph cluster_prefix {
+      label="Prefix: whole 64-byte blocks"
+      color="#FFFFFF66"
+      fillcolor="#0B0B0C"
+      version [label="version"]
+      input [label="input: height, aux flags,\nextranonce, nsecs", height=0.5]
+      payouts [label="outputs: PPLNS payouts"]
+      witness [label="output: witness commitment"]
+      padding [label="output: padding"]
+    }
+
+    subgraph cluster_tail {
+      label="Tail: 47 bytes"
+      color="#FFFFFF66"
+      fillcolor="#0B0B0C"
+      commitout [label="output: share commitment", fillcolor="#F7931A",
+                 color="#F7931A", fontcolor="#0B0B0C"]
+      locktime [label="locktime"]
+    }
+  }
+
+  midstate [label="Midstate\nin the coinbase proof", height=0.5,
+            color="#F7931A", penwidth=2]
+  commitment [label="Share commitment\nrebuilt from the header\nand share witness root",
+              height=0.7]
+  height [label="Bitcoin height\nin the header", height=0.5]
+  resume [label="Resume SHA256 over the tail,\nthen SHA256 again", height=0.5]
+  txid [label="Coinbase txid"]
+  fold [label="Fold in the coinbase\nmerkle branch", height=0.5]
+  check [label="Equals the bitcoin\nheader's merkle root", height=0.5,
+         color="#F7931A", penwidth=2]
+
+  // Stack each column top to bottom.
+  edge [style=invis]
+  version -> input -> payouts -> witness -> padding -> commitout -> locktime
+  midstate -> commitment -> height -> resume -> txid -> fold -> check
+  edge [style=solid]
+
+  {rank=same; witness; midstate}
+  {rank=same; commitout; commitment}
+  {rank=same; locktime; height}
+
+  // The miner hashes the prefix once; the node rebuilds the tail.
+  padding -> midstate [ltail=cluster_prefix, label="SHA256,\npaused"]
+  commitment -> commitout [style=dashed, label="fills"]
+  height -> locktime [style=dashed, label="height - 1"]
+  midstate -> resume [constraint=false]
+  locktime -> resume [ltail=cluster_tail]
+  resume -> txid -> fold -> check
+}
+....
+
+A node rebuilds the tail from the header: the commitment output from
+the share commitment, and the locktime from the bitcoin height. It
+checks the proof in three steps:
+
+. Rebuild the share commitment from the header fields and the share
+  witness root.
+. Resume SHA256 from the midstate over the commitment output and the
+  locktime, then hash again to get the coinbase txid.
+. Fold the coinbase merkle branch into the txid, and require the
+  result to equal the bitcoin header's merkle root.
+
+The proof of work fixes the merkle root, so a forged proof needs a
+SHA256 collision, and one bitcoin header can stand behind only one
+shareblock. The share commitment is checked as part of the
+xref:validation.adoc[share validation scheme].
