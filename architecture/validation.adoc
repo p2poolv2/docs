@@ -44,6 +44,26 @@ to a bitcoin header. A bitcoin header with proof of work can be
 embedded only in the share header it commits to, so each share has a
 unique proof of work that no other share can claim.
 
+== Body Matches the Header
+
+The shareblock hash covers the header and leaves out the body, so a
+peer could pair a valid header with an altered body. A node checks
+the body against the header before storing the shareblock, using only
+the shareblock itself:
+
+. Each non-coinbase share transaction appears once, and together they
+  have the share witness root that the header's coinbase proof
+  carries. The node rejects repeats because a merkle tree pairs the
+  last node of an odd level with itself, so a repeated last
+  transaction leaves the root unchanged (CVE-2012-2459).
+. The share coinbase is the one the header implies.
+. The bitcoin coinbase has the txid that the coinbase proof includes.
+
+A body that fails this check is a bad copy of the shareblock, not a
+bad shareblock. The node discards it and can fetch the shareblock
+again from another peer. Once a body passes, the proof of work fixes
+it, and any later validation failure rejects the share.
+
 == Uncles Follow the Rules
 
 Uncle shares earn rewards, so uncles follow the same validation rules
@@ -108,9 +128,9 @@ follows the correct bitcoin chain.
 
 Nodes do verify the coinbase transaction from the bitcoin block body.
 Each shareblock header holds the bitcoin header, and the shareblock
-carries the merkle branches of the bitcoin block. With these, a node
-verifies that the share commitment and the bitcoin coinbase payout
-match its own PPLNS window.
+carries the bitcoin coinbase and its merkle branch. With these, a node
+verifies the share commitment and checks that the bitcoin coinbase
+payouts match its own PPLNS window.
 
 Validating full bitcoin blocks would add latency, increasing the uncle
 rate and so reducing the number of mining nodes the pool can handle.
