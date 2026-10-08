@@ -47,10 +47,6 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
   checks against the PPLNS distribution ending at the share's parent
   (`prev_share_blockhash`), and drops a share without a verdict when the
   node no longer holds that window (`validate_bitcoin_payout`).
-- [ ] **Coinbase value is not committed.** `ShareCommitment` has a
-  `coinbase_value` field, but `commitment_digest` leaves it out of the
-  hash (`shares/share_commitment.rs`). Relevant to "Payout Commitment at
-  Template Time" in `requirements.adoc`.
 - [ ] **Coinbase size and top-N payouts.** `requirements.adoc`
   ("Scalability") relies on paying only the largest miners in the
   coinbase. No code limits coinbase outputs to N miners; the interim

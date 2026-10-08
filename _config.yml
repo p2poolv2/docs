@@ -30,6 +30,12 @@ aux_links_new_tab: false
 
 footer_content: "Copyright &copy; 2024-2026 P2Poolv2 Developers. Distributed under the MIT or Apache-2.0 license."
 
+# The p2poolv2 commit these docs were last brought up to date with. The
+# footer links to it (_includes/footer_custom.html). Update both fields
+# whenever the docs catch up with the code.
+p2poolv2_commit: dc5bb6526f6e878f37837410d353223d5d74481a
+p2poolv2_commit_date: 2026-10-08
+
 gh_edit_link: false
 gh_edit_link_text: "Edit this page on GitHub"
 gh_edit_repository: "https://github.com/p2poolv2/docs"

@@ -1,0 +1,13 @@
+{%- comment -%}
+  Replaces the theme's footer_custom.html, which only prints
+  footer_content. Adds the p2poolv2 commit the docs describe, set in
+  _config.yml.
+{%- endcomment -%}
+{%- if site.footer_content -%}
+  <p class="text-small mb-0">{{ site.footer_content }}</p>
+{%- endif -%}
+{%- if site.p2poolv2_commit -%}
+  <p class="text-small mb-0">Describes P2Poolv2 at commit
+    <a href="https://github.com/p2poolv2/p2poolv2/commit/{{ site.p2poolv2_commit }}"><code>{{ site.p2poolv2_commit | slice: 0, 8 }}</code></a>
+    {%- if site.p2poolv2_commit_date %} ({{ site.p2poolv2_commit_date }}){% endif %}.</p>
+{%- endif -%}
