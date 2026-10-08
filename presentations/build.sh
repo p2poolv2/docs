@@ -41,6 +41,11 @@ cp -R "${reveal_dir}/dist" "${reveal_dir}/plugin" "${out}/reveal.js/"
 cp "${here}/theme/p2poolv2.css" "${root}/assets/css/fonts.css" "${out}/css/"
 cp "${root}"/assets/fonts/*.woff2 "${root}"/assets/fonts/OFL-*.txt "${out}/fonts/"
 
+# Copy the deck's own images, such as screenshots, next to index.html.
+find "${here}/${name}" -maxdepth 1 -type f \
+  \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.svg' \) \
+  -exec cp {} "${out}/" \;
+
 cd "${here}"
 BUNDLE_GEMFILE="${here}/Gemfile" bundle exec asciidoctor-revealjs \
   -r asciidoctor-diagram \

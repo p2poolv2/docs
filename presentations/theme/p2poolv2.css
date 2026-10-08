@@ -106,6 +106,25 @@
   height: 310px;
 }
 
+/* Screenshots carry small text, so they take more of the slide and get
+   a thin frame to separate them from the black page. */
+.reveal .feature .imageblock.screenshot img {
+  height: 500px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Two or more screenshots sit side by side at a shared height. */
+.reveal .feature .screenshots > .content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.reveal .feature .screenshots .imageblock.screenshot img {
+  height: 440px;
+}
+
 /* Agenda slides: every topic dimmed except the upcoming one. */
 .reveal .agenda li {
   color: rgba(255, 255, 255, 0.4);

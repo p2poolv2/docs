@@ -395,6 +395,30 @@ who found it. That output is an ordinary UTXO: the miner can hold it,
 split it, or sell it.
 --
 
+[.feature]
+== What Is P2Poolv2
+
+[.feature-title]
+Live on testnet4
+
+[.screenshots]
+--
+[.screenshot]
+image::testnet4.jpg[P2Poolv2 explorer showing the testnet4 sharechain tip and recent shares]
+
+[.screenshot]
+image::testnet4-grafana.jpg["Grafana pool stats showing testnet4 hashrate, effort, and the latest coinbase split"]
+--
+
+[.notes]
+--
+The sharechain runs on testnet4 today. The explorer shows the chain tip
+past 231,000 shares, a new share every 10 to 25 seconds, and two
+miners finding them. The Grafana dashboard shows the pool's hashrate,
+around 2 TH/s, and the latest coinbase split between four addresses.
+You can mine on it now.
+--
+
 // Agenda: P2Poolv2 as developer platform
 
 [.agenda]
