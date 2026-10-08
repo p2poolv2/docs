@@ -63,10 +63,9 @@ can fail when a site is down or rate-limits the requests.
 
 === Writing Pages
 
-See xref:writing_docs.adoc[Writing documentation]. In short: a
-`.adoc` file with `= Title` and `:page-nav++_++order:`, `:page-parent:`
-and `:page-has++_++children:` attributes for the sidebar, and
-`++[++plantuml, name, svg++]++` blocks for diagrams.
+Each page is a `.adoc` file with `= Title` and `:page-nav++_++order:`,
+`:page-parent:`, and `:page-has++_++children:` attributes for the
+sidebar, and `++[++plantuml, name, svg++]++` blocks for diagrams.
 
 === Brand
 
