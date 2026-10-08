@@ -14,10 +14,9 @@ bitcoin header. The two `bits` fields hold one difficulty target each:
 the bitcoin header's `bits` for the bitcoin block, and the
 shareblock header's `bits` for the sharechain.
 
-The shareblock header has other bookkeeping fields that the diagram
-leaves out. The fields to note are the previous block hashes, the
-`bits` fields, and the time fields. The bitcoin header is shown in
-full.
+The diagram shows the previous block hashes, the `bits` fields, the
+time fields, and the full bitcoin header. It leaves out the other
+header fields; <<Shareblock Format>> lists them all.
 
 [graphviz, shareblock-headers, svg]
 .A shareblock's proof of work lives in its bitcoin header
@@ -92,6 +91,81 @@ digraph shareblock {
   merkle -> pow [ltail=cluster_bitcoin_header, constraint=false]
 }
 ....
+
+== Shareblock Format
+
+A shareblock has a header and a body. The shareblock hash covers every
+header field and none of the body. Each header field is fixed by the
+proof of work, so one proof of work can stand behind only one
+shareblock hash. The table below lists the header fields and how the
+proof of work fixes each one.
+
+.Shareblock header fields
+[cols="2,3,3"]
+|===
+| Field | Contents | Fixed by
+
+| Previous shareblock hash
+| Hash of the parent shareblock
+| Share commitment
+
+| Uncles
+| Hashes of up to three uncle shareblocks
+| Share commitment
+
+| Miner bitcoin address
+| Address that receives the miner's bitcoin payouts, with its network class
+| Share commitment
+
+| Miner sharechain address
+| Witness program that the share coinbase pays
+| Share commitment
+
+| Bitcoin header
+| The weak bitcoin block header the miner hashed
+| The proof of work itself
+
+| `bits`
+| Sharechain target in compact form
+| Share commitment
+
+| Time
+| Share timestamp set by the miner
+| Share commitment
+
+| Donation and fee
+| Developer donation and pool fee, each an address and basis points
+| Share commitment
+
+| Bitcoin height
+| Height of the bitcoin block being mined
+| Bitcoin coinbase locktime
+
+| Coinbase proof
+| SHA256 midstate of the bitcoin coinbase prefix, the prefix length,
+  and the share witness root
+| Bitcoin header's merkle root
+|===
+
+The share commitment and the coinbase proof are described on the
+xref:share_commitment.adoc[Share Commitments] page.
+
+The body holds the data that the proof of work fixes but the header
+cannot check by itself:
+
+Share transactions:: The share coinbase followed by the share's other
+transactions. The share witness root in the coinbase proof commits to
+the other transactions.
+Coinbase merkle branch:: The path from the bitcoin coinbase to the
+bitcoin header's merkle root. Shares mined on one block template share
+a branch.
+Bitcoin coinbase:: The coinbase transaction the miner hashed. Its
+scriptSig carries the aux flags, extranonce, and nanosecond timestamp,
+and its outputs carry the payouts, the BIP141 witness commitment, and
+the share commitment.
+
+A node checks the body against the header before storing it; see
+xref:validation.adoc#body-matches-the-header[Body Matches the Header].
 
 == Sharechain and Bitcoin Blockchain
 
