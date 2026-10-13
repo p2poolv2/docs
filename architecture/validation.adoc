@@ -109,22 +109,28 @@ out of thin air.
 
 == Mine on the Current Bitcoin Chain
 
-The bitcoin header builds on the current bitcoin chain, not on an
-miniorty hashrate fork of bitcoin.
+A coinbase pays a share in its PPLNS window only if that share's
+bitcoin block sits on the paying share's bitcoin chain, or one block
+off it. Every node rebuilds every coinbase, so a coinbase that pays
+other shares makes its share invalid. Work on a block that lost an
+orphan race still earns, and work on a made-up bitcoin block earns
+nothing. Miners on a hostile fork earn for at most the fork's first
+two blocks.
 
-Nodes verify that each shareblock header's bitcoin header (see
-xref:sharechain.adoc[Sharechain]) is reachable from the parent share's
-bitcoin header. Each share that extends the sharechain therefore mines
-on the same bitcoin chain as its parent. If bitcoin forks attack the
-main chain, all nodes reject shares mined on those forks. The pool
-follows the bitcoin fork that the majority of its hashrate follows.
+Shares carry the bitcoin headers that nodes need to place each share,
+and a node accepts a share only once it knows the header of the
+bitcoin block the share builds on. See
+xref:bitcoin_chain_validation.adoc[Bitcoin Chain Validation] for the
+rules and the reasons behind them.
 
 == Bitcoin Blocks Are Not Validated
 
-As <<Mine on the Current Bitcoin Chain>> describes, each share builds
-on the chain that the majority of the hashrate follows. P2Poolv2 does
-not validate bitcoin block contents; it verifies only that the header
-follows the correct bitcoin chain.
+P2Poolv2 does not validate the contents of the bitcoin block a share
+builds on. Nodes check only the bitcoin headers that shares carry, as
+xref:bitcoin_chain_validation.adoc[Bitcoin Chain Validation]
+describes. A header that passes cost a full block of proof of work,
+and the payout rule bounds how far off the paying chain paid work can
+sit.
 
 Nodes do verify the coinbase transaction from the bitcoin block body.
 Each shareblock header holds the bitcoin header, and the shareblock

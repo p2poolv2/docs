@@ -1,0 +1,651 @@
+= Bitcoin Chain Validation
+:page-parent: Sharechain
+:page-nav_order: 25
+
+P2Poolv2 pays a share only for work on the bitcoin chain that the
+paying block extends, give or take one block. Work on a made-up
+bitcoin block earns nothing, and work on a block that lost an orphan
+race still earns rewards. Miners on a hostile fork earn on the main
+chain for at most the fork's first two blocks.
+
+Every share names the bitcoin block it builds on, the previous block
+hash in its bitcoin header. This page calls that block the share's
+_bitcoin prev_. With no rule on it, a miner can name a bitcoin prev
+that does not exist, or one on a hostile fork, and still collect
+PPLNS weight. During a fork war, the fork's miners then earn from both
+chains for the same proof of work.
+
+The design has three parts:
+
+Payout rule:: A coinbase pays a share in its PPLNS window only if that
+share's bitcoin prev sits on the paying share's bitcoin chain, or one
+block off it. Every node rebuilds every coinbase, so this is a
+validity rule for shares.
+Carried bitcoin headers:: Share messages carry the bitcoin headers
+that each receiver needs to place every share's bitcoin prev. Each
+node checks these received headers without calling bitcoind RPC.
+Known bitcoin prev:: A node accepts a share only after it knows the
+header of the share's bitcoin prev. Until then it waits for the
+headers to arrive.
+
+Fork choice and the job builder stay as they are.
+
+[graphviz, bitcoin-chain-hostile-fork, svg]
+.A block paying from Block 102 pays shares on its chain or one block off it
+....
+digraph hostile {
+  // Positions are pinned: the bitcoin chains on the left, the
+  // sharechain on the right, the oldest blocks at the bottom.
+  layout=neato
+  inputscale=72
+  splines=true
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.2, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  // Bitcoin blockchain. Block 102 is the tip; Sibling 102 is a benign
+  // block at the same height; Hostile 102 starts a minority fork.
+  b100 [label="Block 100", pos="160,0!"]
+  b101 [label="Block 101", pos="160,80!"]
+  h102 [label="Hostile 102", pos="20,160!", style="filled,dashed",
+        color="#E5484D", fontcolor="#E5484D"]
+  b102 [label="Block 102", pos="160,160!", fillcolor="#F7931A",
+        fontcolor="#0B0B0C"]
+  sib [label="Sibling 102", pos="290,160!", style="filled,dashed",
+       color="#FFFFFF66", fontcolor="#FFFFFF8F"]
+  h103 [label="Hostile 103", pos="20,240!", style="filled,dashed",
+        color="#E5484D", fontcolor="#E5484D"]
+  h104 [label="Hostile 104", pos="20,320!", style="filled,dashed",
+        color="#E5484D", fontcolor="#E5484D"]
+
+  // Sharechain.
+  sh1 [label="Share 1", pos="440,200!"]
+  sh2 [label="Share 2", pos="440,265!"]
+  sh3 [label="Share 3", pos="440,330!"]
+  sh4 [label="Share 4", pos="440,395!"]
+  sh5 [label="Share 5", pos="440,460!", style="filled,dashed",
+       color="#E5484D", fontcolor="#E5484D"]
+
+  // Column titles.
+  node [shape=plain, style="", fixedsize=false, fontcolor="#FFFFFFC7",
+        fontsize=12]
+  btc_title [label="Bitcoin blockchain", pos="160,-45!"]
+  share_title [label="Sharechain", pos="440,160!"]
+
+  legend [fontsize=11, pos="230,-140!",
+          label="Dashed white arrows point to the block each share\lbuilds on. The paying share builds on Block 102,\lso the paying chain ends there.\l\lShares 2, 3, and 4 build on the benign sibling, the tip,\land the first hostile block. All three sit on the\lpaying chain or one block off it, so they earn.\l\lShare 5 builds on Hostile 103, two blocks off the\lpaying chain. The sharechain keeps it, but it earns\lnothing.\l"]
+
+  // Each block points back to its parent.
+  b101 -> b100
+  b102 -> b101
+  sib -> b101 [color="#FFFFFF66", style=dashed]
+  h102 -> b101 [color="#E5484D", style=dashed]
+  h103 -> h102 [color="#E5484D", style=dashed]
+  h104 -> h103 [color="#E5484D", style=dashed]
+  sh2 -> sh1
+  sh3 -> sh2
+  sh4 -> sh3
+  sh5 -> sh4 [color="#E5484D", style=dashed]
+
+  // Previous bitcoin block hash in each share's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7"]
+  sh1 -> b101
+  sh2 -> sib
+  sh3 -> b102
+  sh4 -> h102
+  sh5 -> h103 [color="#E5484D", xlabel="not paid", fontcolor="#E5484D"]
+}
+....
+
+In the diagram, the paying share builds on Block 102, so the paying
+chain ends there. Sibling 102 and Hostile 102 both build on Block 101,
+so each sits one block off the paying chain, and shares on them earn.
+Hostile 103 sits two blocks off, so Share 5 earns nothing. Nodes
+cannot tell a hostile fork's first block from a benign sibling. The
+rule pays both, and stops paying at the fork's second block.
+
+== Terms
+
+Known header:: A bitcoin header in the node's header store, reported
+by the local bitcoind or carried with a share and checked.
+Paying chain:: For share S, the bitcoin chain ending at S's bitcoin
+prev. S's coinbase extends this chain if S meets bitcoin difficulty.
+Eligible:: A bitcoin block is eligible for S when the block, or its
+parent, is on S's paying chain. A share is eligible for S when its
+bitcoin prev is.
+
+== Local Tree of Bitcoin Headers
+
+Each P2Poolv2 node keeps a store of full bitcoin headers, with their
+heights and parents. Acceptance and payout checks read only this store
+and do not call bitcoind RPC. Three sources maintain this store:
+
+* ZMQ `sequence` events from the local bitcoind. A block connect adds
+  the block; a disconnect leaves it in place. `sequence` numbers every
+  message, so a gap shows a missed one.
+* The `getchaintips` RPC, at startup and after a sequence gap or a ZMQ
+  reconnect. The node walks each listed branch back with
+  `getblockheader` until it reaches a header already in the store.
+* Carried headers with share chain headers that pass the header check.
+
+Payout checks reach about 14 days back (the PPLNS window), and nodes
+validate shares up to `PRUNE_DEPTH` (about 28 days) deep. The store
+therefore keeps about six weeks of headers: roughly 6,048.
+
+=== Siblings at the Tip
+
+The local bitcoind cannot tell every node about every orphan. Bitcoin
+Core announces a block only after making it its tip, and it ignores an
+equal-work sibling that arrives as a compact block. Some bitcoinds
+therefore never learn of an orphan.
+
+A node that cannot place a share on that orphan rebuilds a different
+coinbase from other nodes. It marks the paying share invalid, but the
+others accept it, and the sharechain splits. Every node therefore
+needs the same headers, siblings included. Therefore P2poolv2 shares
+carry the bitcoin headers needed to connect its bitcoin prev to the
+active bitcoin chain.
+
+== Shares Carry Bitcoin Headers
+
+A share carries the headers on the path from its bitcoin prev back to,
+but not including, the point where that path meets its parent's
+bitcoin prev:
+
+* Most shares build on the same bitcoin block as their parent and
+  carry nothing.
+* The first share after a new bitcoin block carries one header.
+* The first share after a bitcoin reorg carries the headers back to
+  the fork point.
+
+We call this list of bitcoin headers carried by a share as
+`ShareHeaderBatch`. The first share in each `ShareHeaderBatch` also
+carries the path back to the sender's active chain, because the
+receiver may never have seen its parent. A syncing node learns
+weeks-old orphans this way.
+
+[graphviz, carried-bitcoin-headers, svg]
+.Each share carries only the bitcoin headers its parent lacks
+....
+digraph carried {
+  // Positions are pinned: the bitcoin chain on the left, the
+  // sharechain in the middle, each share's carried headers on the
+  // right, the oldest blocks at the bottom.
+  layout=neato
+  inputscale=72
+  splines=true
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.2, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  // Bitcoin blockchain. Block 102 is the active tip; Sibling 102 lost
+  // the race and some nodes never saw it.
+  b100 [label="Block 100", pos="20,0!"]
+  b101 [label="Block 101", pos="20,80!"]
+  b102 [label="Block 102", pos="20,160!", fillcolor="#F7931A",
+        fontcolor="#0B0B0C"]
+  sib [label="Sibling 102", pos="150,160!", style="filled,dashed",
+       color="#FFFFFF66", fontcolor="#FFFFFF8F"]
+
+  // Sharechain.
+  sh1 [label="Share 1", pos="300,120!"]
+  sh2 [label="Share 2", pos="300,200!"]
+  sh3 [label="Share 3", pos="300,280!"]
+  sh4 [label="Share 4", pos="300,360!"]
+
+  // Headers each share carries: only those its parent lacks.
+  node [style="filled,dashed", color="#FFFFFF66", width=1.8]
+  c1 [label="none", fontcolor="#FFFFFF8F", pos="460,120!"]
+  c2 [label="Sibling 102 header", pos="460,200!"]
+  c3 [label="none", fontcolor="#FFFFFF8F", pos="460,280!"]
+  c4 [label="Block 102 header", pos="460,360!"]
+
+  // Column titles and note.
+  node [shape=plain, style="", fixedsize=false, fontcolor="#FFFFFFC7",
+        fontsize=12]
+  btc_title [label="Bitcoin blockchain", pos="85,-45!"]
+  share_title [label="Sharechain", pos="300,75!"]
+  carry_title [label="Carried headers", pos="460,75!"]
+  note [fontsize=11, pos="235,-125!",
+        label="Share 2 is the first share on Sibling 102, so it carries\lthat header. Share 3 builds on the same block and\lcarries nothing. Share 4 is the first share on Block 102,\lso it carries the Block 102 header. Every node can now\llink each share back to Block 101 on the active chain.\l"]
+
+  // Each block points back to its parent.
+  b101 -> b100
+  b102 -> b101
+  sib -> b101 [color="#FFFFFF66", style=dashed]
+  sh2 -> sh1
+  sh3 -> sh2
+  sh4 -> sh3
+
+  // Previous bitcoin block hash in each share's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7"]
+  sh1 -> b101
+  sh2 -> sib
+  sh3 -> sib
+  sh4 -> b102
+}
+....
+
+The headers travel beside the share header, outside the share header.
+The share's proof of work already binds its bitcoin prev, and each
+header's previous block hash fixes the header before it, so the share
+already commits to every header it needs. A sender can only leave
+headers out or add wrong ones. A missing header leaves the bitcoin
+prev unknown, and the node waits for a copy with the headers, while a
+wrong header fails the check.
+
+=== Checking a Header
+
+A node checks every carried header itself, with no RPC. A header
+passes when:
+
+* it links to a known header,
+* its hash meets its `bits`,
+* its `bits` is exactly the target the difficulty rules require, and
+* its timestamp is at most two hours ahead of the local clock.
+
+Within a 2,016-block period, the required `bits` equals the parent's.
+At a retarget boundary, the node computes it with rust-bitcoin's
+`CompactTarget::from_next_work_required`. On testnet4, the node also
+applies the min-difficulty and BIP94 timewarp rules, which rust-bitcoin
+leaves to the caller. The timestamp limit stops a fake branch from
+setting timestamps that ease its `bits`.
+
+A header that passes costs a full block of real bitcoin proof of work.
+It does not prove that a valid body exists. The payout rule makes that
+proof unnecessary, because it bounds how far off the paying chain paid
+work can sit.
+
+=== Accepting a Share
+
+The same steps apply to a share header in a `ShareHeaderBatch` and to
+an unsolicited share block. None of them waits on bitcoind.
+
+. If the share's parent or an uncle is unknown, drop the share and ask
+  the sender for headers, as the node does today for a missing parent.
+. Check the carried headers, oldest first, and stop at the first
+  failure. Headers that pass go into the store.
+. If the bitcoin prev is now known, store the share header, then fetch
+  and validate the body, payout rule included.
+. Otherwise drop the share without a verdict, and remember its hash in
+  a bounded, expiring cache so its children are dropped without a
+  refetch.
+
+Requiring a known bitcoin prev keeps nodes in agreement. Otherwise an
+attacker can mine a share on a real orphan, send it with headers to
+some nodes and without them to others, and make those nodes rebuild
+different coinbases later. A share on a made-up bitcoin prev never
+gets a header, so no node accepts it. An honest share is almost never
+dropped: its parent arrived first, so its carried headers link onto a
+known bitcoin prev.
+
+== Rejecting Work on Stale Bitcoin Blocks Fails
+
+Rejecting shares whose bitcoin prev is off the local bitcoind's active
+chain fails for four reasons:
+
+Bitcoin nodes disagree for a while:: A new bitcoin block reaches some
+bitcoind nodes before others. A node whose bitcoind has not seen the
+block rejects shares that build on it, and nodes that have seen it
+accept them. The sharechains on the two groups of nodes diverge.
+
+Reorgs strand honest work:: When a bitcoin block loses a race, every
+share mined on it becomes invalid, and the sharechain rolls back to
+the last share on the winning block.
+
+Late shares look like stale shares:: A share mined just before a new
+bitcoin block arrived looks the same as a share mined on an old block
+on purpose. Telling them apart needs a timing rule, and nodes have a
+clock synchronization delta of 11 bitcoin blocks from the MTP rule.
+
+Slack pays hostile forks:: Accepting shares within a few blocks of the
+local tip pays a hostile fork's miners for those first blocks, while
+they attack the main chain.
+
+The first diagram shows two nodes whose bitcoinds see different tips.
+Node B's bitcoind received Block O first, and Node A's received Block
+T. Under a rule tied to the local bitcoind, Node A rejects Share S and
+Node B accepts it, and the sharechain forks between the two nodes.
+
+[graphviz, bitcoin-view-split, svg]
+.Validity tied to the local bitcoind splits the sharechain
+....
+digraph split {
+  rankdir=BT
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.4
+  ranksep=0.4
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.1, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_a {
+    label="Node A"
+    labelloc=b
+    fontsize=12
+    color="#FFFFFF66"
+    as1 [label="Share 1"]
+    as [label="Share S", style="filled,dashed", color="#E5484D",
+        fontcolor="#E5484D"]
+    a100 [label="Block 100"]
+    ao [label="Block O\n(unseen)", style="filled,dashed", color="#E5484D",
+        fontcolor="#E5484D"]
+    at [label="Block T", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  }
+
+  subgraph cluster_b {
+    label="Node B"
+    labelloc=b
+    fontsize=12
+    color="#FFFFFF66"
+    bs1 [label="Share 1"]
+    bs [label="Share S"]
+    b100 [label="Block 100"]
+    bo [label="Block O", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+    bt [label="Block T", style="filled,dashed", color="#FFFFFF66",
+        fontcolor="#FFFFFF8F"]
+  }
+
+  note [shape=plain, style="", fillcolor="", fixedsize=false,
+        fontcolor="#FFFFFFC7", fontsize=11,
+        label="Share S builds on Block O. Node A's bitcoind has\lnot seen Block O, so Node A rejects Share S,\lbut Node B accepts it. The two sharechains differ.\l"]
+
+  // Each block points back to its parent.
+  as1 -> as [dir=back, color="#E5484D", style=dashed]
+  a100 -> at [dir=back]
+  a100 -> ao [dir=back, color="#E5484D", style=dashed]
+  bs1 -> bs [dir=back]
+  b100 -> bo [dir=back]
+  b100 -> bt [dir=back, color="#FFFFFF66", style=dashed]
+
+  {rank=same; as1; a100}
+  {rank=same; as; ao; at}
+  {rank=same; bs1; b100}
+  {rank=same; bs; bo; bt}
+
+  // Order each row: sharechain, then Block O, then Block T.
+  as -> ao -> at [style=invis]
+  bs -> bo -> bt [style=invis]
+
+  // Stack Node B above Node A, and keep the note at the bottom.
+  as -> bs1 [style=invis]
+  note -> as1 [style=invis]
+
+  // Each Share S names Block O as its bitcoin block.
+  edge [style=dashed, color="#FFFFFFC7", constraint=false]
+  as -> ao [color="#E5484D"]
+  bs -> bo [label="builds on"]
+}
+....
+
+The second diagram shows a reorg. Share 2 builds on Block O, which
+then loses to Blocks T and 102. A rule that rejects shares off the
+active chain invalidates Share 2, and Share 3 must extend Share 1. The
+sharechain then reorgs for every stale bitcoin block, and discards
+the honest work of miners whose block lost the race.
+
+[graphviz, bitcoin-reorg-strands, svg]
+.Rejecting shares off the active chain discards honest work after a reorg
+....
+digraph strand {
+  rankdir=BT
+  newrank=true
+  bgcolor="#0B0B0C"
+  nodesep=0.5
+  ranksep=0.4
+  fontname="DejaVu Sans"
+  fontcolor="#FFFFFFC7"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.2, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  subgraph cluster_sharechain {
+    label="Sharechain"
+    labelloc=b
+    fontsize=12
+    color="#FFFFFF66"
+    s1 [label="Share 1"]
+    s2 [label="Share 2", style="filled,dashed", color="#E5484D",
+        fontcolor="#E5484D"]
+    s3 [label="Share 3", fillcolor="#F7931A", fontcolor="#0B0B0C"]
+  }
+
+  subgraph cluster_bitcoin {
+    label="Bitcoin blockchain"
+    labelloc=b
+    fontsize=12
+    color="#FFFFFF66"
+    b100 [label="Block 100"]
+    o [label="Block O", style="filled,dashed", color="#FFFFFF66",
+       fontcolor="#FFFFFF8F"]
+    t [label="Block T"]
+    b102 [label="Block 102"]
+  }
+
+  note [shape=plain, style="", fillcolor="", fixedsize=false,
+        fontcolor="#FFFFFFC7", fontsize=11,
+        label="Block O lost the race to Block T. Rejecting shares\loff the active chain throws away Share 2, and\lShare 3 has to extend Share 1.\l"]
+
+  // Each block points back to its parent.
+  s1 -> s2 [dir=back, color="#E5484D", style=dashed]
+  s1 -> s3 [dir=back]
+  b100 -> t -> b102 [dir=back]
+  b100 -> o [dir=back, color="#FFFFFF66", style=dashed]
+
+  {rank=same; s1; b100}
+  {rank=same; s2; o; t}
+  {rank=same; s3; b102}
+
+  // Put the stale Block O beside the sharechain.
+  s2 -> o -> t [style=invis]
+
+  // Keep the note below the chains.
+  note -> s1 [style=invis]
+
+  // Previous bitcoin block hash in each share's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7", constraint=false]
+  s1 -> b100 [label="builds on"]
+  s2 -> o
+  s3 -> b102
+}
+....
+
+== Solution: Pay Only Work Near the Paying Chain
+
+Nodes accept every share whose bitcoin prev they know, so all nodes
+hold the same shares. The decision moves from accepting a share to
+paying it: each coinbase pays only the window shares eligible for the
+share that builds it.
+
+=== The Payout Rule
+
+When a node builds or checks the coinbase of share S, it computes the
+PPLNS window anchored on S's parent as before. It then pays each
+window share only if that share is eligible for S. An ineligible share
+keeps its place in the window and earns nothing.
+
+In the diagram below, Shares 1 to 4 form Share S's PPLNS window. A
+branch leaves the paying chain at Block 101; it stands for either a
+hostile fork or a two-block orphan race. Share 3, one block into the
+branch, is paid. Share 4, two blocks in, is not.
+
+[graphviz, payout-rule, svg]
+.Share S's coinbase pays window shares on its paying chain or one block off it
+....
+digraph payout {
+  // Positions are pinned: the bitcoin chain on the left, the
+  // sharechain in the middle, each share's payout on the right, the
+  // oldest blocks at the bottom.
+  layout=neato
+  inputscale=72
+  splines=true
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.2, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  // Bitcoin blockchain. Blocks 100 to 103 form the paying chain, which
+  // ends at Share S's bitcoin prev. Branch 102 and Branch 103 leave it
+  // at Block 101: a hostile fork or a two-block orphan race.
+  b100 [label="Block 100", pos="20,0!"]
+  b101 [label="Block 101", pos="20,80!"]
+  b102 [label="Block 102", pos="20,160!"]
+  b103 [label="Block 103", pos="20,240!"]
+  x102 [label="Branch 102", pos="160,160!", style="filled,dashed",
+        color="#FFFFFF66", fontcolor="#FFFFFF8F"]
+  x103 [label="Branch 103", pos="160,240!", style="filled,dashed",
+        color="#E5484D", fontcolor="#E5484D"]
+
+  // Sharechain. Shares 1 to 4 sit in Share S's PPLNS window.
+  w1 [label="Share 1", pos="320,0!"]
+  w2 [label="Share 2", pos="320,80!"]
+  w3 [label="Share 3", pos="320,160!"]
+  w4 [label="Share 4", pos="320,240!", style="filled,dashed",
+      color="#E5484D", fontcolor="#E5484D"]
+  s [label="Share S", pos="320,330!", fillcolor="#F7931A",
+     fontcolor="#0B0B0C"]
+
+  // What Share S's coinbase pays each window share.
+  node [shape=plain, style="", fixedsize=false, fontsize=11,
+        fontcolor="#FFFFFFC7"]
+  p1 [label="Paid: on the\lpaying chain\l", pos="460,0!"]
+  p2 [label="Paid: on the\lpaying chain\l", pos="460,80!"]
+  p3 [label="Paid: one block\loff the chain\l", pos="460,160!"]
+  p4 [label="Not paid: two\lblocks off\l", pos="460,240!",
+      fontcolor="#E5484D"]
+  ps [label="Paying share\l", pos="460,330!"]
+
+  // Column titles and note.
+  node [fontsize=12]
+  btc_title [label="Bitcoin blockchain", pos="90,-45!"]
+  share_title [label="Sharechain", pos="320,-45!"]
+  note [fontsize=11, pos="230,-130!",
+        label="Share S builds on Block 103, so its paying chain runs\lfrom Block 103 down through Block 100. Branch 102\lbuilds on Block 101, which is on that chain, so\lShare 3 is paid. Branch 103 builds on Branch 102,\lwhich is not, so Share 4 keeps its window slot but\learns nothing.\l"]
+
+  // Each block points back to its parent.
+  b101 -> b100
+  b102 -> b101
+  b103 -> b102
+  x102 -> b101 [color="#FFFFFF66", style=dashed]
+  x103 -> x102 [color="#E5484D", style=dashed]
+  w2 -> w1
+  w3 -> w2
+  w4 -> w3
+  s -> w4
+
+  // Previous bitcoin block hash in each share's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7"]
+  w1 -> b100
+  w2 -> b101
+  w3 -> x102
+  w4 -> x103 [color="#E5484D"]
+  s -> b103
+}
+....
+
+[cols="2,1,3"]
+|===
+| Bitcoin prev, relative to the paying chain | Paid | Examples
+
+| On it
+| Yes
+| Ordinary shares; deliberately old bitcoin prevs
+
+| One block off it
+| Yes
+| A block that lost an orphan race; a hostile fork's first block; a
+header-only block
+
+| Two or more blocks off it
+| No
+| A hostile fork's second and later blocks; the second block of a
+two-block orphan race
+
+| Unknown
+| Never in a window
+| The node never accepts the share
+|===
+
+Eligibility is measured from S's bitcoin prev, never from the checking
+node's bitcoind tip. It depends on headers alone, so every node that
+knows the same headers rebuilds the same coinbase. A template that
+lags the sharechain by one block still pays the newest shares, since
+their bitcoin prev sits one block off its paying chain.
+
+The rule changes share validity. Every node rebuilds every coinbase
+and compares it exactly (`validate_bitcoin_payout`), and any mismatch
+makes the share invalid. A rule that only honest job builders applied
+fails, because validators must then accept coinbases built either
+way.
+
+=== Uncles
+
+* An ineligible uncle earns nothing, and its nephew earns no bonus for
+  it. Honest nephews gain nothing by including fork shares.
+* An eligible uncle under an ineligible nephew earns its uncle weight.
+  The nephew's bonus goes unpaid.
+* Uncles still use no window slots.
+
+=== When Nothing in the Window Is Eligible
+
+A job builder whose window holds nothing eligible stops the node. Its
+miners extend a sharechain that an attacker controls.
+
+A node checking a share with nothing eligible marks the share invalid
+and keeps running. Anyone can make such a share for one share's proof
+of work, by naming a main chain block more than 14 days old. No honest
+share meets this case: its paying chain ends at its node's current
+template, and the recent shares in its window sit on or beside that
+chain.
+
+=== What the Design Costs
+
+* A validity change, which needs a coordinated upgrade at a fixed
+  sharechain height.
+* Hostile forks earn for about two block intervals of their hashrate
+  each time a fork starts.
+* Header-only work one block off the paying chain earns, at the cost
+  of a full block of proof of work.
+* Shares on the second block of a losing two-block orphan race earn
+  nothing. Such races are rare.
+* Payout variance rises during a fork war.
+* Signet gets weak protection, since a signet header's proof of work
+  is nearly free.
+
+== Alternatives Considered
+
+Accept shares within K blocks of the local tip:: Pays a hostile fork's
+miners for its first K blocks. Nodes also disagree for good after a
+bitcoin reorg.
+Pay only clean shares from the job builder:: Every node rebuilds every
+coinbase, so validators must accept coinbases built with the rule or
+without it.
+Payout rule with bitcoind's headers only:: Nodes disagree on coinbases
+whenever some bitcoinds never saw an orphan. The only consistent form
+stops paying orphans.
+Chainwork and fork-depth validity rules:: A header-only block passes
+them, they still pay a fork's later blocks, and they need the same
+headers as the payout rule.
+Pass carried headers to bitcoind with `submitheader`:: Costs an RPC
+round trip per header, and lets attackers load bitcoind. The local
+check suffices.
+Check only that a header meets its own `bits`:: A fake branch then
+uses easy `bits`, at a quarter of a block's work per header or less.

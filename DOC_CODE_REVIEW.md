@@ -30,12 +30,20 @@ Code paths are relative to `p2pool-v2/p2poolv2_lib/src`.
   when a spent output expires in
   `architecture/spending-coinbases-and-root-heights.adoc`.
 - [ ] **Mining on the current bitcoin chain.**
-  `architecture/validation.adoc` ("Mine on the Current Bitcoin Chain"
-  and "Bitcoin Blocks Are Not Validated") and `requirements.adoc`
-  ("Mining on the Current Chain") say nodes verify that each share's
-  bitcoin header is reachable from its parent's. No such check exists;
-  `validate_bitcoin_block` in `shares/validation/bitcoin_block_validation.rs`
-  is unused (`#[allow(dead_code)]`).
+  `architecture/bitcoin_chain_validation.adoc`, `architecture/validation.adoc`
+  ("Mine on the Current Bitcoin Chain" and "Bitcoin Blocks Are Not
+  Validated"), and `requirements.adoc` ("Mining on the Current Chain")
+  describe the design in
+  `p2pool-v2/docs/architecture/mine-on-bitcoin-chain.md` (issue #652):
+  a payout rule that pays a window share only if its bitcoin prev is on
+  the paying share's bitcoin chain or one block off it, with ineligible
+  shares keeping their window slots; bitcoin headers carried with share
+  messages and checked locally (exact `bits`, 2-hour timestamp limit);
+  a header store fed by zmq `sequence`, `getchaintips`, and carried
+  headers; and acceptance only once a share's bitcoin prev is known.
+  None of these exist in the code yet. `validate_bitcoin_block` in
+  `shares/validation/bitcoin_block_validation.rs` is unused
+  (`#[allow(dead_code)]`).
 - [ ] **An uncle serves only one nephew.** `architecture/validation.adoc`
   says a shareblock can be an uncle only if it is not already one. The
   code uses `is_already_uncle` only when a node selects uncles for its

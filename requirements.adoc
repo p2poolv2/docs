@@ -30,9 +30,9 @@ without approval from anyone. Each node runs a bitcoin node as a
 block template provider.
 
 Mining on the Current Chain:: Miner templates build on the current
-bitcoin chain; the pool rejects any work on forks that the majority
-hashrate has not agreed upon. No one can use P2Poolv2 to mine a
-minority fork of bitcoin.
+bitcoin chain. Each coinbase pays only work on the bitcoin chain its
+block extends, give or take one block, so no miner earns for work on a
+made-up bitcoin block or deep in a hostile fork.
 
 Precise Hashrate Reporting:: All miners see high-precision reporting
 of their hashrate on their node's dashboard. The hashrate is derived
