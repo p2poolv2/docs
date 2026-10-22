@@ -2,25 +2,151 @@
 :page-parent: Sharechain
 :page-nav_order: 25
 
-P2Poolv2 pays a share only for work on the bitcoin chain that the
+Miners on a hostile minority fork can use P2Poolv2 to earn bitcoin on
+the main chain while they attack it. To stop them, P2Poolv2 checks
+which bitcoin chain each share builds on and pays nothing for work
+deep in a hostile fork.
+
+== The Hostile Fork Attack
+
+A hostile fork begins when a group of miners splits from the main
+bitcoin chain and mines its own branch. If those miners also run
+P2Poolv2, they can point each share's bitcoin header at a block on
+their fork. Unless a rule withholds payment for shares on that block,
+their shares join the sharechain like any other and gain PPLNS weight.
+
+The attack pays the attackers twice. When an honest
+share meets bitcoin difficulty, its coinbase pays every share in its
+PPLNS window, the fork's shares included. The fork's miners earn main
+chain bitcoin for work that attacks the main chain, and they keep any
+reward the fork earns. P2Poolv2 then subsidizes the attack.
+
+[graphviz, hostile-fork-attack, svg]
+.A main chain block pays shares mined on a hostile fork
+....
+digraph attack {
+  // Positions are pinned: the bitcoin chain on the left, the hostile
+  // fork beside it, the sharechain and each share's payout on the
+  // right, the oldest blocks at the bottom.
+  layout=neato
+  inputscale=72
+  splines=true
+  bgcolor="#0B0B0C"
+  fontname="DejaVu Sans"
+  node [shape=box, style=filled, fillcolor="#121212", color="#F7931A",
+        fontname="DejaVu Sans", fontsize=12, fontcolor="#FFFFFF",
+        width=1.2, height=0.45, fixedsize=true]
+  edge [color="#F7931A", fontcolor="#FFFFFFC7", fontname="DejaVu Sans",
+        fontsize=10, penwidth=1.2]
+
+  // Bitcoin blockchain. Share S finds Block 105.
+  b100 [label="Block 100", pos="20,0!"]
+  b101 [label="Block 101", pos="20,100!"]
+  b102 [label="Block 102", pos="20,200!"]
+  b103 [label="Block 103", pos="20,300!"]
+  b104 [label="Block 104", pos="20,400!"]
+  b105 [label="Block 105", pos="20,500!", fillcolor="#F7931A",
+        fontcolor="#0B0B0C"]
+
+  // Hostile fork. It leaves the bitcoin chain at Block 101.
+  node [style="filled,dashed", color="#E5484D", fontcolor="#E5484D"]
+  h102 [label="Hostile 102", pos="160,200!"]
+  h103 [label="Hostile 103", pos="160,300!"]
+  h104 [label="Hostile 104", pos="160,400!"]
+
+  // Sharechain. Shares 3, 5, and 7 build on the hostile fork.
+  node [style=filled, color="#F7931A", fontcolor="#FFFFFF"]
+  s1 [label="Share 1", pos="320,100!"]
+  s2 [label="Share 2", pos="320,155!"]
+  s4 [label="Share 4", pos="320,265!"]
+  s6 [label="Share 6", pos="320,375!"]
+  s [label="Share S", pos="320,500!", fillcolor="#F7931A",
+     fontcolor="#0B0B0C"]
+  node [style="filled,dashed", color="#E5484D", fontcolor="#E5484D"]
+  s3 [label="Share 3", pos="320,210!"]
+  s5 [label="Share 5", pos="320,320!"]
+  s7 [label="Share 7", pos="320,430!"]
+
+  // What Share S's coinbase pays each window share.
+  node [shape=plain, style="", fixedsize=false, fontsize=11,
+        fontcolor="#FFFFFFC7"]
+  p1 [label="Paid for\lhonest work\l", pos="460,100!"]
+  p2 [label="Paid for\lhonest work\l", pos="460,155!"]
+  p3 [label="Paid for\lhostile work\l", pos="460,210!", fontcolor="#E5484D"]
+  p4 [label="Paid for\lhonest work\l", pos="460,265!"]
+  p5 [label="Paid for\lhostile work\l", pos="460,320!", fontcolor="#E5484D"]
+  p6 [label="Paid for\lhonest work\l", pos="460,375!"]
+  p7 [label="Paid for\lhostile work\l", pos="460,430!", fontcolor="#E5484D"]
+  ps [label="Becomes\lBlock 105\l", pos="460,500!"]
+
+  // Column titles and note.
+  node [fontsize=12]
+  btc_title [label="Bitcoin blockchain", pos="20,-45!"]
+  hostile_title [label="Hostile fork", pos="160,-45!",
+                 fontcolor="#E5484D"]
+  share_title [label="Sharechain", pos="320,-45!"]
+  note [fontsize=11, pos="240,-130!",
+        label="Shares 3, 5, and 7 build on hostile blocks. Share S\lmeets bitcoin difficulty and becomes Block 105.\lIts coinbase pays every share in its PPLNS window,\lso the hostile miners earn bitcoin on the chain\lthey attack.\l"]
+
+  // Each block points back to its parent.
+  b101 -> b100
+  b102 -> b101
+  b103 -> b102
+  b104 -> b103
+  b105 -> b104
+  h102 -> b101 [color="#E5484D", style=dashed]
+  h103 -> h102 [color="#E5484D", style=dashed]
+  h104 -> h103 [color="#E5484D", style=dashed]
+  s2 -> s1
+  s3 -> s2 [color="#E5484D", style=dashed]
+  s4 -> s3
+  s5 -> s4 [color="#E5484D", style=dashed]
+  s6 -> s5
+  s7 -> s6 [color="#E5484D", style=dashed]
+  s -> s7
+
+  // Previous bitcoin block hash in each share's bitcoin header.
+  edge [style=dashed, color="#FFFFFFC7"]
+  s1 -> b101
+  s2 -> b102
+  s4 -> b103
+  s6 -> b104
+  s -> b104
+  edge [color="#E5484D"]
+  s3 -> h102
+  s5 -> h103
+  s7 -> h104
+}
+....
+
+In the diagram, the hostile fork leaves the bitcoin chain at Block
+101. Shares 3, 5, and 7 build on hostile blocks, but they sit in the
+same sharechain as the honest shares. Share S then meets bitcoin
+difficulty and becomes Block 105, and its coinbase pays all seven
+shares in its window.
+
+== Overview of the Defense
+
+NOTE: P2Poolv2 pays a share only for work on the bitcoin chain that the
 paying block extends, give or take one block. Work on a made-up
 bitcoin block earns nothing, and work on a block that lost an orphan
 race still earns rewards. Miners on a hostile fork earn on the main
 chain for at most the fork's first two blocks.
 
 Every share names the bitcoin block it builds on, the previous block
-hash in its bitcoin header. This page calls that block the share's
-_bitcoin prev_. With no rule on it, a miner can name a bitcoin prev
-that does not exist, or one on a hostile fork, and still collect
-PPLNS weight. During a fork war, the fork's miners then earn from both
-chains for the same proof of work.
+hash in its bitcoin header included in the share header. This page
+calls that block the share's _bitcoin prev_. With no rule on checking
+the bitcoin_prev, a miner can name a bitcoin prev that does not exist,
+or one on a hostile fork, and still collect PPLNS weight. During a
+fork war, the fork's miners then earn from both chains for the same
+proof of work.
 
 The design has three parts:
 
 Payout rule:: A coinbase pays a share in its PPLNS window only if that
 share's bitcoin prev sits on the paying share's bitcoin chain, or one
-block off it. Every node rebuilds every coinbase, so this is a
-validity rule for shares.
+block off it. Every node rebuilds every coinbase during share
+validation, so this is a validity rule for shares.
 Carried bitcoin headers:: Share messages carry the bitcoin headers
 that each receiver needs to place every share's bitcoin prev. Each
 node checks these received headers without calling bitcoind RPC.
@@ -244,8 +370,8 @@ wrong header fails the check.
 
 === Checking a Header
 
-A node checks every carried header itself, with no RPC. A header
-passes when:
+A node checks every carried header itself, with no RPC calls to
+bitcoind. A header passes when:
 
 * it links to a known header,
 * its hash meets its `bits`,
