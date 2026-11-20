@@ -1,0 +1,27 @@
+= Design Principles
+:page-parent: Using Nix
+:page-nav_order: 10
+
+== Our Nix Strategy
+
+The P2Poolv2 team has decided to support using https://nixos.org[Nix] and incorporate https://nix.dev/concepts/flakes[Nix Flakes] into some of our xref:related_repos.adoc#_p2p_flakes[core repositories].  Nix is very popular in the Bitcoin developer community and is being rapidly adopted by AI infrastructure companies. It solves many problems in software development, supply chain management, and devops. For these reasons, we think using and supporting Nix is important.
+
+The P2Poolv2 team has a mixture of experienced Nix developers, Nix beginners, and Nix skeptics. The same will be true of our users. For this reason, the use of Nix will remain optional and there will always be alternative methods of development, installation, and deployment.
+
+Our intention is to start with the basics and keep things as simple as possible. We have reached consensus on a set of xref:#_principles[Design Principles] to help keep us focused.
+
+[#_principles]
+== Design Principles
+
+User Choice:: Use of Nix will remain _optional_. Nix users should have the freedom to use a variety of tools and our Nix configurations will allow alternative tools where reasonably possible. However, not all tools will be documented or officially supported.
+
+Provide Solutions:: Our Nix efforts will be focused on providing nix-based solutions for xref:index.adoc#_uc[specific problems].
+
+Opinionated defaults:: To keep things simple, our solutions will sometimes be opinionated, choose specific defaults, and/or not document all the options.
+
+Upstream where possible:: We will try to push P2Poolv2 Nix packages and services into upstream distributions such as https://github.com/nixos/nixpkgs[Nixpkgs] and https://github.com/bitcoinix/bitcoinix[Bitcoinix] as much as possible.
+
+Curation:: The Nix ecosystem is large with many different tools and technologies, multiple subprojects, and a myriad of community and ecosystem projects. This P2Poolv2 development team has tried to focus on xref:related_repos.adoc#_curated[choosing some] of the most useful, well-regarded, and well-maintained Nix tools and applied them to accomplish specific tasks.
+
+
+

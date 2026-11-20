@@ -1,0 +1,61 @@
+= Automated P2Pool Deployment
+:page-parent: Using Nix
+:page-nav_order: 50
+
+We are currently working on https://github.com/msgilligan/p2pool-anywhere[P2Pool Anywhere] a project for automated deployment to (bare-metal) severs, VMs, and systemd containers.
+
+This installation is working on an internal network and will be publicly released and fully documented soon.
+
+== Currently testing on Pi 5
+
+Although we intend to extend this installation to other x86_64 and aarch64-based systems, our initial focus is on the https://www.raspberrypi.com/products/raspberry-pi-5/[Raspberry Pi 5] and https://www.raspberrypi.com/products/compute-module-5/?[Raspberry Pi Compute Module 5]. One reason for this choice is the https://www.256foundation.org[256 Foundation]'s https://libreboard.org[Libre Board] (Open-source Bitcoin miner control board) is nearly identical to the https://www.raspberrypi.com/products/compute-module-5-io-board/[Raspberry Pi Compute Module 5 IO Board].
+
+== Configuration Notes
+
+The current configuration is optimized for software development and testing and runs the P2Poolv2 Stack in a guest NixOS VM on a NixOS host. This results in a few extra installation steps but allows for faster rebuilds and running multiple P2Poolv2 Stack instances on the same device. We use [extra-container] to separate the guest and host configurations.
+
+== Tested Hardware
+
+We have been testing a https://www.raspberrypi.com/products/cm5-dev-kit/[Raspberry Pi Development Kit for Compute Module 5] which _includes_ a CM5 with 4 GB RAM. Although CM5s can be hard to find, the **Development Kit** seems to be in-stock at many distributors.
+
+== Preview Instructions
+
+=== Get the P2Poolv2 Deployment Flake and set your configuration
+
+. `git clone <TBD>`
+. `cd <dir>`
+. `vi local.config`
+
+You'll need to set your hostname, network information, SSH keys, etc.
+
+=== Format the NVMe and install NixOS
+
+. Write the https://github.com/nvmd/nixos-raspberrypi#installer-configurations[installer SD card image] from xref:related_repos.adoc#_nvmdnixos_raspberrypi[nvmd/nixos-raspberrypi] to a USB stick and boot the Pi 5 with it.
+. Format the NVMe and Install NixOS
+. `nix develop`
+. `nixos-anywhere --flake .#<hostname> root@<address>`
+
+NOTE:: Using xref:related_repos.adoc#_nixos_anywhere[nixos-anywhere] and xref:related_repos.adoc#_disko[Disko] will wipe the NVMe drive, so should only be used for an initial installation.
+
+=== Deploy the P2Poolv2 container
+
+. Build the container closure
+.. `nix build .#packages.default.aarch64-linux`
+.. Note that the package path is reversed (it should be `aarch64-linux.default`, TBD)
+. Copy the configuration + updated binaries to the Pi
+.. nix copy --to ssh://nixos@<address> ./result
+. Build/rebuild the container
+.. ssh -t nixos@<address> "$(readlink ./result)/bin/container" create --update-changed
+
+NOTE:: These commands can easily be combined into a simple shell script.
+
+=== Connect your Miner
+
+TBD
+
+
+
+
+
+
+
