@@ -1,0 +1,61 @@
+= Using Nix
+:page-nav_order: 160
+
+We are beginning to support using the Nix package manager for setting up xref:#_uc_devenv[development environments], xref:_uc_install[installing] P2Poolv2 binaries, and xref:_uc_deploy[deploying] P2Poolv2 Nodes.
+
+This section provides xref:#_uc[task-specific documentation] on using these tools, a statement of xref:principles.adoc[design principles], and an xref:related_repos.adoc[overview] of the P2Poolv2 ecosystem and its curated subset of the Nix ecosystem.
+
+NOTE:: The use of Nix in P2Poolv2 is optional. _For now_, we only recommend it for _experienced Nix users_ (or patient users who have a strong desire to learn Nix.)  After we refine our tools and documentation, we will present Nix as an option for users without previous Nix experience.
+
+== Installing Nix
+
+WARN:: _At this time_, we do not encourage new users of Nix or P2Poolv2 to install and use Nix for P2Poolv2.
+
+Our documented Nix use cases require the https://wiki.nixos.org/wiki/Nix_(command)[Nix command] and daemon (to manage the https://nixos.org/guides/how-nix-works/[Nix store]) installed on your system. Everything else will be installed automatically by Nix. We strongly recommend installing Nix with the https://wiki.nixos.org/wiki/Flakes#Enabling_flakes_permanently[`nix-command` and `flakes` features enabled] -- our documentation assumes they are enabled.
+
+We also recommend using the https://github.com/NixOS/nix-installer#install-nix[Nix NG Installer] (sometimes known as the _Rust installer_.) It offers many https://github.com/NixOS/nix-installer#features[advantages] over the https://nixos.org/download/[shell-script installer] including dry-runs, installation receipts, an uninstaller and improved reliability after macOS upgrades.
+
+[#_uc]
+== P2Poolv2 Nix Use Cases
+
+[#_uc_devenv]
+=== P2Poolv2 Nix Development Environment
+
+If you want to build P2Poolv2 from source, make changes to the code, or run tests on your development box, we provide a Nix _development environment_ for this purpose.
+
+It is as simple as:
+
+----
+git clone git@github.com:p2poolv2/p2poolv2.git
+cd p2poolv2
+nix develop
+just build-release
+----
+
+You do not need to have _anything_ other than Nix installed and when you exit the development environment nothing has been installed permanently and your system is unchanged.
+
+[#_uc_install]
+=== Install P2Poolv2 Binaries
+
+If you just want to install P2Poolv2 release binaries use:
+
+----
+nix profile install github:p2poolv2/p2poolv2/v0.18.0
+----
+
+This will install (building and caching locally, if necessary) the main p2poolv2 binaries into your user account on your system and will be added to your shell's path.
+
+To uninstall:
+
+----
+nix profile remove p2poolv2
+----
+
+There are many other ways to install and use Nix packages, but `nix profile install` is one of the simplest.
+
+NOTE:: We are working on submitting a package to the xref:related_repos.adoc#_nixpkgs[Nixpkgs] repository, so that P2Poolv2 will be available through the standard Nixpkgs distribution and included in xref:related_repos.adoc#_nixos[NixOS].
+
+[#_uc_deploy]
+=== Automated P2Pool Deployment
+
+We are working on tools to simplify and automate the deployment of P2Poolv2 to local and remote machines, VMs, and containers. This process is documented in xref:deploy.adoc[Automated P2Pool Deployment].

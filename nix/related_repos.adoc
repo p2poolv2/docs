@@ -1,0 +1,99 @@
+= P2Poolv2 Nix Resources
+:page-parent: Design Principles
+:page-nav_exclude: true
+
+[#_p2p_flakes]
+== P2Poolv2 Flakes and Packages
+
+This section lists flakes and Nix packages provided by the P2Poolv2 project:
+
+* https://github.com/p2poolv2/p2poolv2[p2poolv2/p2poolv2] -- DevShell and Packaged Binaries
+* https://github.com/p2poolv2/docs/pull/4[p2poolv2/docs PR #4] - Flake for building P2Poolv2 docs
+
+Under construction:
+
+* https://github.com/msgilligan/p2pool-anywhere[msgilligan/p2pool-anywhere] - WIP for automated deployment P2Poolv2 to servers, VMs, and containers.
+* https://github.com/NixOS/nixpkgs/pull/586845[Nixpkgs PR #586845] - Draft PR to include P2Poolv2 in Nixpkgs
+
+[#_curated]
+== Ecosystem Flakes and Repositories
+
+These are Nix flakes and repositories that we use and recommend. For each item, the **Relevance** section explains how and why it is used by P2Poolv2 developers and users.
+
+[#_nixpkgs]
+=== Nixpkgs
+
+Description:: Nixpkgs is the large, community-maintained collection of package definitions, and the standard library behind them, written in the Nix language; it powers the Nix package manager and NixOS and provides reproducible, declarative builds for tens of thousands of software packages.
+
+Relevance:: Nixpkgs is a requirement in every P2Poolv2 Nix Use Case. Nixpkgs includes a `bitcoind` package. (Note that until a Bitcoin release with Testnet5 support, we will have to create a patch/overlay for the Nixpkgs `bitcoind` to add testnet5 support)
+
+Link:: https://github.com/nixos/nixpkgs
+
+[#_nixos]
+=== NixOS
+
+Description:: NixOS is a Linux distribution built on the Nix package manager and Nixpkgs, where the whole system is configured declaratively in Nix files, so it can be reproduced, upgraded atomically and rolled back.
+
+Relevance:: Some, P2Poolv2 Nix Use Cases install NixOS in a VM. NixOS can be used in a VM on any Linux distro (including NixOS, of course), macOS, and Windows. We also plan to provide an installation that uses NixOS as the host operating system for a "bare-metal" P2Poolv2 Stack configuration. The Raspberry Pi 5 installation instructions are a first iteration of a P2Pool Stack installer.
+
+Link:: https://github.com/NixOS
+
+=== extra-container
+
+Description:: NixOS containers that are declaratively specified and can be fully managed without system rebuilds.
+
+Relevance:: Used by **Bitcoinix** and in our Raspberry Pi P2Pool Stack configuration. Should also be useful for developers that want to run a P2Poolv2 Stack in a VM/container on Linux, NixOS, or macOS.
+
+Link:: https://github.com/extra-container/extra-container
+
+=== bitcoinix
+
+Description:: A collection of Nix packages and NixOS modules for easily installing full-featured Bitcoin nodes with an emphasis on security.
+
+Relevance:: Bitcoinix is a continuation of the well-regarded but discontinued nix-bitcoin project. It is a goal of the P2Poolv2 project to be able to run a P2Poolv2 node on a Bitcoinix system. Bitcoinix currently doesn't support Testnet5. https://github.com/bitcoinix/bitcoinix/pull/253[bitcoinix PR #253] should add testnet5 and is scheduled for Bitcoinix release v0.2.0.
+
+Link:: https://github.com/bitcoinix/bitcoinix
+
+=== nix-darwin
+
+Description:: Manage your macOS using Nix
+
+Relevance:: Used for development of the Pi 5 Stack configuration on macOS. Building Linux kernels with Nix requires Linux, nix-darwin makes it easy to manage a NixOS builder VM. Nix-darwin should also be a good tool for installing P2Poolv2 systemd services and extra-containers on macOS hosts.
+
+Link:: https://github.com/nix-darwin/nix-darwin
+
+=== system-manager
+
+Description:: Manage system configuration using Nix on Debian/Ubuntu. (In theory, it supports any systemd-based Linux distribution) Similar to **nix-darwin**, but works on Debian and Ubuntu.
+
+Relevance:: This _may_ be a good tool for installing P2Poolv2 systemd services and extra-containers on Debian and Ubuntu systems. We haven't tried it yet.
+
+Link:: https://github.com/numtide/system-manager
+
+[#_nvmdnixos_raspberrypi]
+=== nvmd/nixos-raspberrypi
+
+Description:: Nix flake for a fully declarative NixOS on Raspberry Pi
+
+Relevance:: Provides kernel and bootloader files for our Pi 5 P2Poolv2 Stack configuration. Currently upstream Nixpkgs does not have full support for Pi 5. In the future we may switch to upstream Nixpkgs.
+
+Link:: https://github.com/nvmd/nixos-raspberrypi
+
+[#_nixos_anywhere]
+=== nixos-anywhere
+
+Description:: Automated remote deployment tool that allows automated disk formatting and installation. Uses Disko for disk formatting.
+
+Relevance:: Recommended. Used for installation and formatting of our Pi 5 P2Poolv2 Stack configuration.
+
+Link:: https://github.com/nix-community/nixos-anywhere
+
+[#_disko]
+=== disko
+
+Description:: Declarative disk partitioning
+
+Relevance:: Used by our Pi 5 P2Poolv2 Stack configuration to format the NVMe before installing Nix.
+
+Link:: https://github.com/nix-community/disko
+
