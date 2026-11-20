@@ -8,4 +8,6 @@ vendor/
 *~
 .emacs.*
 .idea/
+.direnv/
+result
 

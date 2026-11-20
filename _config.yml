@@ -101,6 +101,9 @@ exclude:
   - .jekyll-cache
   - architecture/share_flow.adoc
   - architecture/pool_scalability_limits.adoc
+  - flake.nix
+  - flake.lock
+  - result
 
 # The theme's Sass still uses @import and global colour functions; keep
 # the build log readable until it migrates.
