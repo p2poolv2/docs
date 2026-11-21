@@ -48,6 +48,22 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
 
+  build_nix:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main   # optional caching
+      - name: Build
+        run: |
+          nix develop -c bundle install
+          nix develop -c bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+      - uses: actions/upload-artifact@v7
+        with:
+          path: '_site'
+
   deploy:
     needs: build
     runs-on: ubuntu-24.04
