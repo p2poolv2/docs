@@ -25,12 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # PlantUML runs on the JVM; Graphviz lays out class, component and
-      # activity diagrams.
-      - uses: actions/setup-java@v4
+      # PlantUML + Graphviz are used for diagrams
+      # PlantUML requires a JAVA distribution
+      - name: Install JDK
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: "25"
       - name: Install Graphviz
         run: sudo apt-get update && sudo apt-get install -y graphviz
 
